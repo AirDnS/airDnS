@@ -3,17 +3,14 @@ package com.example.airdns.domain.payment.entity;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "payments")
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Payments extends CommonEntity {
 
     @Id

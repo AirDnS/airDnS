@@ -1,11 +1,9 @@
 package com.example.airdns.domain.equipmentcategory.entity;
 
 import com.example.airdns.domain.equipment.entity.Equipments;
+import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,8 +13,8 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class EquipmentCategories {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class EquipmentCategories extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
