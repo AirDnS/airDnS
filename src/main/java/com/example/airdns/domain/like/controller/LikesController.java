@@ -17,20 +17,20 @@ public class LikesController {
     private final LikesService likesService;
 
     @PostMapping("/{roomsId}/like")
-    public ResponseEntity<CommonResponse<LikesResponseDto>> addLike(
+    public ResponseEntity<CommonResponse<LikesResponseDto.AddLikeResponseDto>> addLike(
             @PathVariable Long roomsId,
             Users users){
-        LikesResponseDto responseDto = likesService.postLike(roomsId, users);
+        LikesResponseDto.AddLikeResponseDto responseDto = likesService.postLike(roomsId, users);
         return new ResponseEntity<>(new CommonResponse<>(HttpStatus.OK,"msg",responseDto), HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{roomsId}/like")
-    public ResponseEntity<CommonResponse<LikesResponseDto>> cancelLike(
+    public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> cancelLike(
             @PathVariable Long roomsId,
             Users user
             // @AuthenitcationPrincipal UserDetails userDetails
             ){
-        LikesResponseDto responseDto = likesService.deleteLike(roomsId, user);
+        LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.deleteLike(roomsId, user);
         return new ResponseEntity<>(new CommonResponse<>(HttpStatus.OK,"msg",responseDto), HttpStatus.NO_CONTENT);
     }
 }
