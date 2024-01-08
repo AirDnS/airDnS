@@ -18,6 +18,7 @@ public class LikesResponseDto {
         private String roomName;
     }
 
+
     @Getter
     @Builder
     @NoArgsConstructor
