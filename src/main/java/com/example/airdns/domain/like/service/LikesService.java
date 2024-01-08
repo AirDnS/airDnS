@@ -14,11 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LikesService {
 
+    // 0. LikeRequestDto를 설정할지? 만약에 하게 된다면 어떤식으로 접근하는게 좋을지?
+    // 1. findRoom() 메서드를 사용해서 roomsService 접근에 대해 어떻게 생각하는지?
+    // 2. LikesServiceTest에서 해당 Test에 findRooms에 대한 테스트 코드 만들 것인지?
+    // 3. LikesResponseDto.AddLikeResponseDto 이런식의 사용 형태가 맞는지?
+    // 아니면 더 좋은 방법이 있을지?
+    // 4. NO_CONTENT에 대해서 responseDto를 반환 할지 말지
+
     private final LikesRepository likesRepository;
     private final RoomsService roomsService;
     @Transactional
     public LikesResponseDto.AddLikeResponseDto postLike(Long roomsId, Users user){
-        // #9 : 해당 부분은 테스트 용으로 사용, Rooms과 협의 후 설정
         Rooms room = roomsService.findRooms(roomsId);
 
         Likes likes = Likes.builder()

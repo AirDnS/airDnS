@@ -31,6 +31,6 @@ public class LikesController {
             // @AuthenitcationPrincipal UserDetails userDetails
             ){
         LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.deleteLike(roomsId, user);
-        return new ResponseEntity<>(new CommonResponse<>(HttpStatus.OK,"msg",responseDto), HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(new CommonResponse<>(HttpStatus.NO_CONTENT,"msg",responseDto), HttpStatus.NO_CONTENT);
     }
 }
