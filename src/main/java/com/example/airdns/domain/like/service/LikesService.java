@@ -27,12 +27,10 @@ public class LikesService {
                 .build();
         likesRepository.save(likes);
 
-        LikesResponseDto.AddLikeResponseDto responseDto = LikesResponseDto.AddLikeResponseDto.builder()
+        return LikesResponseDto.AddLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickName())
                 .build();
-
-        return responseDto;
     }
 
     @Transactional
@@ -41,11 +39,9 @@ public class LikesService {
 
         likesRepository.deleteByRoomsId(roomsId);
 
-        LikesResponseDto.DeleteLikeResponseDto responseDto = LikesResponseDto.DeleteLikeResponseDto.builder()
+        return LikesResponseDto.DeleteLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickName())
                 .build();
-
-        return responseDto;
     }
 }
