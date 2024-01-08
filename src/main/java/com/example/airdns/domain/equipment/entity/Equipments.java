@@ -5,10 +5,7 @@ import com.example.airdns.domain.equipmentcategory.entity.EquipmentCategories;
 import com.example.airdns.domain.roomequipment.entity.RoomEquipments;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +15,7 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Equipments extends CommonEntity {
 
     @Id

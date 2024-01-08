@@ -3,10 +3,7 @@ package com.example.airdns.domain.holiday.entity;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Holidays extends CommonEntity {
 
     @Id

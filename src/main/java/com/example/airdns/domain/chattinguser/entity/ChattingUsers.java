@@ -4,17 +4,14 @@ import com.example.airdns.domain.chatting.entity.Chatting;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "chatting_users")
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChattingUsers extends CommonEntity {
 
     @Id
