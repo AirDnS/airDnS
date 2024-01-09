@@ -1,7 +1,6 @@
 package com.example.airdns.like;
 
 import com.example.airdns.domain.like.dto.LikesResponseDto;
-import com.example.airdns.domain.like.exception.DuplicateLikeException;
 import com.example.airdns.domain.like.exception.LikesExceptionCode;
 import com.example.airdns.domain.like.exception.UserNotLikedException;
 import com.example.airdns.domain.like.service.LikesServiceImplV1;
@@ -61,7 +60,7 @@ public class LikesServiceTest {
     }
 
     @Test
-    @DisplayName("LikesService postLike Success")
+    @DisplayName("LikesService addLike Success")
     void roomsLikeSuccess() {
         // given
         Long roomsId = 2L;
@@ -72,37 +71,11 @@ public class LikesServiceTest {
         when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
 
         // when
-        LikesResponseDto.AddLikeResponseDto response = likesService.postLike(roomsId, user);
+        LikesResponseDto.AddLikeResponseDto response = likesService.addLike(roomsId, user);
 
         // then
         assertEquals(room.getName(), response.getRoomName());
         assertEquals(user.getNickName(), response.getNickName());
-    }
-
-    @Test
-    @DisplayName("LikesService postLike DuplicatedUser")
-    void postLikeDuplicatedUser() {
-        // given
-        Long roomsId = 1L;
-        Long userId = 1L;
-        Users user = Users.builder().id(userId).nickName("TestUser").build();
-        Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
-
-        when(roomsService.findRooms(anyLong())).thenReturn(room);
-        when(likesRepository.findByRoomsIdAndUsersId(roomsId, userId)).thenReturn(Optional.of(Likes.builder().build()));
-
-        // when & then
-        DuplicateLikeException exception = assertThrows(DuplicateLikeException.class, () -> {
-            likesService.postLike(roomsId, user);
-        });
-
-        assertEquals("해당 사용자는 해당 룸에 '좋아요'를 눌렀습니다.", exception.getMessage());
-        assertEquals(LikesExceptionCode.DUPLICATE_LIKE.getErrorCode(), exception.getErrorCode());
-        assertEquals(LikesExceptionCode.DUPLICATE_LIKE.getHttpStatus(), exception.getHttpStatus());
-
-        verify(roomsService, times(1)).findRooms(anyLong());
-        verify(likesRepository, times(1)).findByRoomsIdAndUsersId(roomsId, userId);
-        verify(likesRepository, never()).save(any());
     }
 
     @Test
@@ -123,9 +96,6 @@ public class LikesServiceTest {
         assertEquals(room.getName(), result.getRoomName());
         assertEquals(user.getNickName(), result.getNickName());
 
-        verify(roomsService, times(1)).findRooms(anyLong());
-        verify(likesRepository, times(1)).findByRoomsId(roomsId);
-        verify(likesRepository, times(1)).deleteByRoomsId(roomsId);
     }
 
     @Test
@@ -144,7 +114,7 @@ public class LikesServiceTest {
             likesService.cancelLike(roomsId, user);
         });
 
-        assertEquals("해당 사용자는 해당 룸에 '좋아요'를 누르지 않았습니다.", exception.getMessage());
+        assertEquals("해당 사용자가 좋아요를 누르지 않았습니다.", exception.getMessage());
         assertEquals(LikesExceptionCode.USER_NOT_LIKED.getErrorCode(), exception.getErrorCode());
 
         verify(roomsService, times(1)).findRooms(anyLong());

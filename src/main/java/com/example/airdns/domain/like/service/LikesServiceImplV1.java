@@ -2,7 +2,6 @@ package com.example.airdns.domain.like.service;
 
 import com.example.airdns.domain.like.dto.LikesResponseDto;
 import com.example.airdns.domain.like.entity.Likes;
-import com.example.airdns.domain.like.exception.DuplicateLikeException;
 import com.example.airdns.domain.like.exception.LikesExceptionCode;
 import com.example.airdns.domain.like.exception.UserNotLikedException;
 import com.example.airdns.domain.like.repository.LikesRepository;
@@ -41,13 +40,8 @@ public class LikesServiceImplV1 implements LikesService {
     }
     @Override
     @Transactional
-    public LikesResponseDto.AddLikeResponseDto postLike(Long roomsId, Users user){
+    public LikesResponseDto.AddLikeResponseDto addLike(Long roomsId, Users user){
         Rooms room = roomsService.findRooms(roomsId);
-
-        // LikesRepository에 roomsId와 userId가 존재
-        if(likesRepository.findByRoomsIdAndUsersId(roomsId, user.getId()).isPresent()){
-            throw new DuplicateLikeException(LikesExceptionCode.DUPLICATE_LIKE);
-        }
 
         Likes likes = Likes.builder()
                 .rooms(room)

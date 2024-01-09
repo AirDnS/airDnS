@@ -19,24 +19,29 @@ public class LikesController {
 
     private final LikesService likesService;
 
+    // 6. LikesException으로 통합하고, LikeExceptionCode로 경우의 수를 다루는게 나을거 같습니다.
+
     @GetMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<List<LikesResponseDto.GetLikeResponseDto>>> getLikeList(
             @PathVariable Long roomsId,
             Users user){
         List<LikesResponseDto.GetLikeResponseDto> responseDto = likesService.getLikeList(roomsId, user);
-        return new ResponseEntity<>(
-                new CommonResponse<>(HttpStatus.CREATED,"룸 좋아요 조회 성공",responseDto),
-                HttpStatus.CREATED);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new CommonResponse<>(HttpStatus.CREATED, "룸 좋아요 목록 조회 성공", responseDto)
+        );
     }
 
     @PostMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<LikesResponseDto.AddLikeResponseDto>> addLike(
             @PathVariable Long roomsId,
             Users users){
-        LikesResponseDto.AddLikeResponseDto responseDto = likesService.postLike(roomsId, users);
-        return new ResponseEntity<>(
-                new CommonResponse<>(HttpStatus.OK,"msg",responseDto),
-                HttpStatus.OK
+        LikesResponseDto.AddLikeResponseDto responseDto = likesService.addLike(roomsId, users);
+        // ok
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(
+                        HttpStatus.OK, "룸 좋아요 성공", responseDto
+                )
         );
     }
 
@@ -45,8 +50,8 @@ public class LikesController {
             @PathVariable Long roomsId,
             Users user){
         LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.cancelLike(roomsId, user);
-        return new ResponseEntity<>(new CommonResponse<>(
-                HttpStatus.OK,"msg",responseDto),
-                HttpStatus.OK);
+        return ResponseEntity.ok().body(
+                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 취소 성공", responseDto)
+        );
     }
 }
