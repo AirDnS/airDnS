@@ -9,5 +9,5 @@ public interface LikesService {
 
     List<LikesResponseDto.GetLikeListResponseDto> getLikeList(Long roomsId, Users user);
     LikesResponseDto.AddLikeResponseDto postLike(Long roomsId, Users user);
-    LikesResponseDto.DeleteLikeResponseDto deleteLike(Long roomsId, Users user);
+    LikesResponseDto.DeleteLikeResponseDto cancelLike(Long roomsId, Users user);
 }

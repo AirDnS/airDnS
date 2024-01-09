@@ -44,7 +44,7 @@ public class LikesController {
     public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> cancelLike(
             @PathVariable Long roomsId,
             Users user){
-        LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.deleteLike(roomsId, user);
+        LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.cancelLike(roomsId, user);
         return new ResponseEntity<>(new CommonResponse<>(
                 HttpStatus.OK,"msg",responseDto),
                 HttpStatus.OK);
