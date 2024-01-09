@@ -2,6 +2,7 @@ package com.example.airdns.like;
 
 import com.example.airdns.domain.like.dto.LikesResponseDto;
 import com.example.airdns.domain.like.service.LikesService;
+import com.example.airdns.domain.like.service.LikesServiceImplV1;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.*;
 public class LikesServiceTest {
 
     @InjectMocks
-    private LikesService likesService;
+    private LikesServiceImplV1 likesService;
 
     @Mock
     private LikesRepository likesRepository;
@@ -60,7 +61,7 @@ public class LikesServiceTest {
         // when
         when(roomsService.findRooms(anyLong())).thenReturn(room);
         doNothing().when(likesRepository).deleteByRoomsId(anyLong());
-        LikesResponseDto.DeleteLikeResponseDto result = likesService.deleteLike(1L, user);
+        LikesResponseDto.DeleteLikeResponseDto result = likesService.cancelLike(1L, user);
 
         // then
         assertNotNull(result);
