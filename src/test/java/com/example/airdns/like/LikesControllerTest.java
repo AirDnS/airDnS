@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 
 @WebMvcTest(LikesController.class)
 @ContextConfiguration(classes = LikesController.class)
-public class LikeControllerTest {
+public class LikesControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
