@@ -25,13 +25,13 @@ public class LikesServiceImplV1 implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LikesResponseDto.GetLikeListResponseDto> getLikeList(Long roomsId, Users user){
+    public List<LikesResponseDto.GetLikeResponseDto> getLikeList(Long roomsId, Users user){
         Rooms room = roomsService.findRooms(roomsId);
 
         List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
 
         return likesList.stream()
-                .map(like -> LikesResponseDto.GetLikeListResponseDto.builder()
+                .map(like -> LikesResponseDto.GetLikeResponseDto.builder()
                         .roomName(room.getName())
                         .roomAddress(room.getAddress())
                         .nickName(user.getNickName())

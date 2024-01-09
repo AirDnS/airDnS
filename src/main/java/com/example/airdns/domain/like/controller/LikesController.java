@@ -20,10 +20,10 @@ public class LikesController {
     private final LikesService likesService;
 
     @GetMapping("/{roomsId}/likes")
-    public ResponseEntity<CommonResponse<List<LikesResponseDto.GetLikeListResponseDto>>> getLikeList(
+    public ResponseEntity<CommonResponse<List<LikesResponseDto.GetLikeResponseDto>>> getLikeList(
             @PathVariable Long roomsId,
             Users user){
-        List<LikesResponseDto.GetLikeListResponseDto> responseDto = likesService.getLikeList(roomsId, user);
+        List<LikesResponseDto.GetLikeResponseDto> responseDto = likesService.getLikeList(roomsId, user);
         return new ResponseEntity<>(
                 new CommonResponse<>(HttpStatus.CREATED,"룸 좋아요 조회 성공",responseDto),
                 HttpStatus.CREATED);

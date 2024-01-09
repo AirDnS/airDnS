@@ -14,7 +14,7 @@ public class LikesResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     // @Schema(description = "좋아요 요청 dto")
-    public static class GetLikeListResponseDto {
+    public static class GetLikeResponseDto {
         // @Schema(description = "추가할 이름", defaultValue = "test")
         private String nickName;
         private String roomName;
