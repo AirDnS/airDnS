@@ -10,5 +10,7 @@ public interface LikesRepository extends JpaRepository<Likes, Long> {
     void deleteByRoomsId(Long roomsId);
     List<Likes> findAllByRoomsId(Long roomsId);
 
-    Optional<Object> findByRoomsId(Long roomsId);
+    Optional<Likes> findByRoomsId(Long roomsId);
+
+    Optional<Likes> findByRoomsIdAndUsersId(Long roomsId, Long usersId);
 }

@@ -44,9 +44,10 @@ public class LikesServiceImplV1 implements LikesService {
     public LikesResponseDto.AddLikeResponseDto postLike(Long roomsId, Users user){
         Rooms room = roomsService.findRooms(roomsId);
 
-        likesRepository.findByRoomsId(roomsId).orElseThrow(
-                ()-> new DuplicateLikeException(LikesExceptionCode.DUPLICATE_LIKE)
-        );
+        // LikesRepository에 roomsId와 userId가 존재
+        if(likesRepository.findByRoomsIdAndUsersId(roomsId, user.getId()).isPresent()){
+            throw new DuplicateLikeException(LikesExceptionCode.DUPLICATE_LIKE);
+        }
 
         Likes likes = Likes.builder()
                 .rooms(room)
