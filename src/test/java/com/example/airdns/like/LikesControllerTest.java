@@ -52,7 +52,7 @@ public class LikesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 좋아요 조회 성공"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 좋아요 목록 조회 성공"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[0]").exists())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data[1]").exists());
@@ -66,7 +66,7 @@ public class LikesControllerTest {
         Users user = Users.builder().id(1L).nickName("TestUser").build();
         LikesResponseDto.AddLikeResponseDto responseDto = LikesResponseDto.AddLikeResponseDto.builder().build();
 
-        when(likesService.postLike(anyLong(), any())).thenReturn(responseDto);
+        when(likesService.addLike(anyLong(), any())).thenReturn(responseDto);
 
         // when and then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/users/rooms/{roomsId}/likes", roomsId)
@@ -74,7 +74,7 @@ public class LikesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("msg"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 좋아요 성공"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists());
 
     }
@@ -95,7 +95,7 @@ public class LikesControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("msg"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 좋아요 취소 성공"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists());
 
     }
