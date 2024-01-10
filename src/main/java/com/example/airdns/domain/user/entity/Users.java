@@ -57,6 +57,9 @@ public class Users extends CommonEntity {
     @Column
     private LocalDateTime deletedAt;
 
+    @Column
+    private Long kakaoId;
+
     @Builder.Default
     @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
     private List<Reviews> reviewsList = new ArrayList<>();
