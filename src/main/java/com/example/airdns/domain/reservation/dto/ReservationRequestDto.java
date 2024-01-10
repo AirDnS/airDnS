@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReservationRequestDto {
@@ -20,20 +19,16 @@ public class ReservationRequestDto {
     @AllArgsConstructor
     public static class CreateReservationDto {
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-        private LocalDate reservationDate;
-
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkInTime;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkOutTime;
 
         public Reservation toEntity(Users users, Rooms rooms) {
             return Reservation.builder()
                     .users(users)
                     .rooms(rooms)
-                    .reservedAt(reservationDate)
                     .checkIn(checkInTime)
                     .checkOut(checkOutTime)
                     .build();

@@ -31,9 +31,6 @@ public class Reservation extends CommonEntity {
     private LocalDateTime checkOut;
 
     @Column
-    private LocalDate reservedAt;
-
-    @Column
     @Builder.Default
     private Boolean isDeleted = false;
 

@@ -12,7 +12,7 @@ import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -31,17 +31,15 @@ public class ReservationServiceImplV1 implements ReservationService {
                                   ReservationRequestDto.CreateReservationDto requestDto) {
         Users users = usersService.findById(userId);
         Rooms rooms = roomsService.findById(roomId);
-        LocalDate now = LocalDate.now();
-        System.out.println(now);
-        if (requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
+        LocalDateTime now = LocalDateTime.now();
+        if (requestDto.getCheckInTime().isBefore(now)) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION);
         }
-        if (requestDto.getReservationDate().isBefore(now)) {
+        if (requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION);
         }
         Reservation reservation = requestDto.toEntity(users, rooms);
         reservationRepository.save(reservation);
     }
-
 
 }

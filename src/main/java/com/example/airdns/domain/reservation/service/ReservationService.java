@@ -1,7 +1,6 @@
 package com.example.airdns.domain.reservation.service;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
-import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 
 public interface ReservationService {
 

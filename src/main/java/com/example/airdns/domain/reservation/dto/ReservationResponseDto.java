@@ -45,7 +45,6 @@ public class ReservationResponseDto {
                     .id(reservation.getId())
                     .checkIn(reservation.getCheckIn())
                     .checkOut(reservation.getCheckOut())
-                    .reservedAt(reservation.getReservedAt())
                     .isDeleted(reservation.getIsDeleted())
                     .deletedAt(reservation.getDeletedAt())
                     .createdAt(reservation.getCreatedAt())
