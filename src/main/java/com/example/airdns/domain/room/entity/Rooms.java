@@ -12,6 +12,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,7 @@ public class Rooms extends CommonEntity {
     private String name;
 
     @Column
-    private Long price;
+    private BigDecimal price;
 
     @Column
     private String address;
