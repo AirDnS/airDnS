@@ -1,6 +1,5 @@
 package com.example.airdns.domain.room.dto;
 
-import com.example.airdns.domain.room.entity.Rooms;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +14,7 @@ public class RoomsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class AddRoomsRequestDto {
+    public static class CreateRoomsRequestDto {
         private String name;
         private BigDecimal price;
         private String address;
@@ -29,7 +28,7 @@ public class RoomsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class selectRoomsListRequestDto {
+    public static class ReadRoomsListRequestDto {
         private String name;
         private String desc;
     }
@@ -59,7 +58,7 @@ public class RoomsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class updateRoomsEquipmentsRequestDto {
+    public static class UpdateRoomsEquipmentsRequestDto {
         private String name;
         private String desc;
     }
@@ -68,7 +67,7 @@ public class RoomsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class addRoomsHolidaysRequestDto {
+    public static class CreateRoomsHolidaysRequestDto {
         private LocalDate date;
     }
 

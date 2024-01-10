@@ -26,7 +26,7 @@ public class RoomsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class SelectRoomsResponseDto {
+    public static class ReadRoomsResponseDto {
         private String name;
         private BigDecimal price;
         private String address;

@@ -12,13 +12,14 @@ import org.springframework.test.context.ActiveProfiles;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @ActiveProfiles("test")
 @DisplayName("RoomsRepository 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback(value = false)
-class RoomsRepositoryTest {
+class RoomsRepositoryTest extends RoomsTestConstant{
 
     @Autowired
     private RoomsRepository roomsRepository;
@@ -27,11 +28,7 @@ class RoomsRepositoryTest {
     @DisplayName("스터디 룸 등록")
     void roomInsertTest() {
 
-        //givne
-        String testName = "이름";
-        BigDecimal testPrice = BigDecimal.valueOf(100000L);
-        String testDescription = "설명";
-
+        //when
         Rooms room = Rooms.builder()
                 .name(testName)
                 .price(testPrice)
@@ -41,11 +38,10 @@ class RoomsRepositoryTest {
         Rooms result = roomsRepository.save(room);
 
 
+        //then
         assertThat(result.getAddress()).isNull();
         assertThat(result.getDescription()).isEqualTo(testDescription);
         assertThat(result.getPrice()).isEqualTo(testPrice);
     }
-
-
 
 }
