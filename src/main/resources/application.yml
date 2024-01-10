@@ -21,6 +21,15 @@ spring:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
 
+#swagger
+  mvc:
+    path match:
+      matching-strategy: ant_path_matcher
+#spring docs
+
+springdoc:
+  swagger-ui:
+    tags-sorter: alpha
 
 
 
