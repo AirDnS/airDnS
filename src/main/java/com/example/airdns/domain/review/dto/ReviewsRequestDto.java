@@ -22,7 +22,7 @@ public class ReviewsRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     // @Schema(description = 리뷰 단건 추가 요청 dto")
-    public static class ModifyReviewRequestDto {
+    public static class UpdateReviewRequestDto {
         // @Schema(description = "추가할 이름", defaultValue = "test")
         private String content;
     }

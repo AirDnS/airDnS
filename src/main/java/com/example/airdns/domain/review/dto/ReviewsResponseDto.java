@@ -14,8 +14,22 @@ public class ReviewsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = 리뷰 단건 조회 응답 dto")
-    public static class GetReviewResponseDto {
+    // @Schema(description = 리뷰 조회 응답 dto")
+    public static class ReadReviewResponseDto {
+        // @Schema(description = "추가할 이름", defaultValue = "test")
+        private String nickName;
+        private String roomName;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+        private String content;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    // @Schema(description = 리뷰 단건 추가 응답 dto")
+    public static class CreateReviewResponseDto {
         // @Schema(description = "추가할 이름", defaultValue = "test")
         private String nickName;
         private String roomName;
@@ -27,39 +41,14 @@ public class ReviewsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = 리뷰 리스트 조회 응답 dto")
-    public static class GetReviewListResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
-        private String content;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    // @Schema(description = 리뷰 단건 추가 응답 dto")
-    public static class AddReviewResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
-        private String content;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     // @Schema(description = 리뷰 단건 추가 요청 dto")
-    public static class ModifyReviewResponseDto {
+    public static class UpdateReviewResponseDto {
         // @Schema(description = "추가할 이름", defaultValue = "test")
+        private String nickName;
+        private String roomName;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
         private String content;
     }
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    // @Schema(description = 리뷰 단건 삭제 응답 dto")
-    public static class DeleteReviewResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
-        private String content;
-    }
 }
