@@ -1,5 +1,6 @@
 package com.example.airdns.domain.like.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,9 +14,9 @@ public class LikesResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = "좋아요 요청 dto")
-    public static class GetLikeResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
+    @Schema(description = "좋아요 조회 응답 dto")
+    public static class ReadLikeResponseDto {
+        @Schema(description = "좋아요 조회 응답 내용", defaultValue = "get like response")
         private String nickName;
         private String roomName;
         private String roomAddress;
@@ -26,9 +27,9 @@ public class LikesResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = "좋아요 요청 dto")
-    public static class AddLikeResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
+    @Schema(description = "좋아요 추가 응답 dto")
+    public static class CreateLikeResponseDto {
+        @Schema(description = "좋아요 추가 응답 내용", defaultValue = "add like response")
         private String nickName;
         private String roomName;
         private LocalDateTime createdAt;
@@ -39,9 +40,9 @@ public class LikesResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = "좋아요 요청 dto")
+    @Schema(description = "좋아요 삭제 응답 dto")
     public static class DeleteLikeResponseDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
+        @Schema(description = "좋아요 삭제 응답 내용", defaultValue = "delete like response")
         private String nickName;
         private String roomName;
     }

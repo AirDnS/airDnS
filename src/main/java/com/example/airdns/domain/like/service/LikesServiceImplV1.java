@@ -24,13 +24,13 @@ public class LikesServiceImplV1 implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LikesResponseDto.GetLikeResponseDto> getLikeList(Long roomsId, Users user){
+    public List<LikesResponseDto.ReadLikeResponseDto> getLikeList(Long roomsId, Users user){
         Rooms room = roomsService.findById(roomsId);
 
         List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
 
         return likesList.stream()
-                .map(like -> LikesResponseDto.GetLikeResponseDto.builder()
+                .map(like -> LikesResponseDto.ReadLikeResponseDto.builder()
                         .roomName(room.getName())
                         .roomAddress(room.getAddress())
                         .nickName(user.getNickName())
@@ -40,16 +40,18 @@ public class LikesServiceImplV1 implements LikesService {
     }
     @Override
     @Transactional
-    public LikesResponseDto.AddLikeResponseDto addLike(Long roomsId, Users user){
+    public LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user){
         Rooms room = roomsService.findById(roomsId);
 
         Likes likes = Likes.builder()
                 .rooms(room)
                 .users(user)
                 .build();
+
+        // room.addLike(likes);
         likesRepository.save(likes);
 
-        return LikesResponseDto.AddLikeResponseDto.builder()
+        return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickName())
                 .createdAt(likes.getCreatedAt())
