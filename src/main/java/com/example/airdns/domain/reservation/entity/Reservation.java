@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -24,19 +25,14 @@ public class Reservation extends CommonEntity {
     private Long id;
 
     @Column
-    private Boolean isReserved;
-
-    @Column
     private LocalDateTime checkIn;
 
     @Column
     private LocalDateTime checkOut;
 
     @Column
-    private LocalDateTime reservedAt;
-
-    @Column
-    private Boolean isDeleted;
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     @Column
     private LocalDateTime deletedAt;

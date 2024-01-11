@@ -71,6 +71,9 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/login").permitAll()
                         .requestMatchers("/signup").permitAll()
                         .requestMatchers("/").permitAll()
+                        // swagger v3
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**")
+                        .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() // '/api/users/'로 시작하는 요청 모두 접근 허가
                         .anyRequest().authenticated()
         );
