@@ -3,14 +3,14 @@ package com.example.airdns.domain.review.service;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
 import com.example.airdns.global.jwt.UserDetailsImplV1;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ReviewsService {
     ReviewsResponseDto.ReadReviewResponseDto getReview(Long roomId, Long reviewId);
 
-    List<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomId);
+    /*List<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomId);*/
+    Page<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomId, Pageable pageable);
 
     ReviewsResponseDto.CreateReviewResponseDto addReview(
             Long roomsId, UserDetailsImplV1 userDetails,

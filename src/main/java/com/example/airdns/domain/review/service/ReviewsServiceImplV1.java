@@ -2,13 +2,19 @@ package com.example.airdns.domain.review.service;
 
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
+import com.example.airdns.domain.review.entity.QReviews;
 import com.example.airdns.domain.review.entity.Reviews;
 import com.example.airdns.domain.review.exception.*;
 import com.example.airdns.domain.review.repository.ReviewsRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.global.jwt.UserDetailsImplV1;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +26,7 @@ import java.util.stream.Collectors;
 public class ReviewsServiceImplV1 implements ReviewsService{
     private final ReviewsRepository reviewsRepository;
     private final RoomsService roomsService;
+    private final JPAQueryFactory queryFactory;
 
     // 단건 조회
     @Override
@@ -40,7 +47,8 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     }
 
     // 리스트 조회
-    @Override
+    // 안되면 사용해볼 예정
+    /*@Override
     @Transactional(readOnly = true)
     public List<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId){
         Rooms room = roomsService.findById(roomsId);
@@ -56,7 +64,42 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                         .modifiedAt(review.getModifiedAt())
                         .build())
                 .collect(Collectors.toList());
+    }*/
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId, Pageable pageable) {
+        Rooms room = roomsService.findById(roomsId);
+
+        QReviews qReviews = QReviews.reviews;
+
+        List<ReviewsResponseDto.ReadReviewResponseDto> reviewResponseDtos = queryFactory
+                .select(qReviews)
+                .from(qReviews)
+                .leftJoin(qReviews.users).fetchJoin()
+                .where(qReviews.rooms.id.eq(roomsId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch()
+                .stream()
+                .map(review -> ReviewsResponseDto.ReadReviewResponseDto.builder()
+                        .roomName(room.getName())
+                        .nickName(review.getUsers().getNickName())
+                        .content(review.getContent())
+                        .createdAt(review.getCreatedAt())
+                        .modifiedAt(review.getModifiedAt())
+                        .build())
+                .collect(Collectors.toList());
+
+        long total = queryFactory
+                .select(qReviews)
+                .from(qReviews)
+                .where(qReviews.rooms.id.eq(roomsId))
+                .fetchCount();
+
+        return new PageImpl<>(reviewResponseDtos, pageable, total);
     }
+
     // 리뷰 작성
     @Override
     @Transactional
