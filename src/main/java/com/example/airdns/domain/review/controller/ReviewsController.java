@@ -37,15 +37,6 @@ public class ReviewsController {
                 );
     }
 
-    /*@GetMapping("/{roomsId}/review")
-    public ResponseEntity<CommonResponse<List<ReviewsResponseDto.ReadReviewResponseDto>>> getReviews(
-            @PathVariable Long roomsId){
-        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = reviewsService.getReviews(roomsId);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 전체 조회 성공", responseDtoList)
-                );
-    }*/
-
     // 전체 리뷰 조회를 생성 날짜 내림 차순 정렬로 10개마다 페이징 처리 구현
     @GetMapping("/{roomsId}/review")
     public ResponseEntity<CommonResponse<Page<ReviewsResponseDto.ReadReviewResponseDto>>> getReviews(
@@ -76,7 +67,7 @@ public class ReviewsController {
             @Valid ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         ReviewsResponseDto.UpdateReviewResponseDto responseDto = reviewsService.modifyReview(roomsId, reviewId, userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new CommonResponse<>(HttpStatus.NO_CONTENT, "룸 리뷰 수정 성공", responseDto)
+                .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 수정 성공", responseDto)
                 );
     }
 
