@@ -1,14 +1,20 @@
 package com.example.airdns.review;
 
 
+import com.example.airdns.domain.review.entity.Reviews;
+import com.example.airdns.domain.room.entity.Rooms;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class ReviewsRepositoryTest {
+public class ReviewsRepositoryTest {
 
-    /*@Autowired
+    @Autowired
     private ReviewsRepository reviewsRepository;
 
     @Autowired
@@ -49,5 +55,5 @@ class ReviewsRepositoryTest {
 
         // then
         assertTrue(result.isPresent());
-    }*/
+    }
 }
