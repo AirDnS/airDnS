@@ -35,7 +35,7 @@ public class LikesServiceTest {
     private RoomsService roomsService;
 
     @Test
-    @DisplayName("LikesService getRoomsLikeList Success")
+    @DisplayName("LikesService readRoomsLikeList Success")
     void getRoomLikeListSuccess() {
         // given
         Long roomsId = 1L;
@@ -49,7 +49,7 @@ public class LikesServiceTest {
         ));
 
         // when
-        List<LikesResponseDto.GetLikeResponseDto> result = likesService.getLikeList(roomsId, user);
+        List<LikesResponseDto.ReadLikeResponseDto> result = likesService.getLikeList(roomsId, user);
 
         // then
         assertEquals(2, result.size());
@@ -60,7 +60,7 @@ public class LikesServiceTest {
     }
 
     @Test
-    @DisplayName("LikesService addLike Success")
+    @DisplayName("LikesService createLike Success")
     void roomsLikeSuccess() {
         // given
         Long roomsId = 2L;
@@ -71,7 +71,7 @@ public class LikesServiceTest {
         when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
 
         // when
-        LikesResponseDto.AddLikeResponseDto response = likesService.addLike(roomsId, user);
+        LikesResponseDto.CreateLikeResponseDto response = likesService.addLike(roomsId, user);
 
         // then
         assertEquals(room.getName(), response.getRoomName());

@@ -39,9 +39,9 @@ public class LikesControllerTest {
         // given
         Long roomsId = 1L;
         Users user = Users.builder().id(1L).nickName("TestUser").build();
-        List<LikesResponseDto.GetLikeResponseDto> responseDtoList = Arrays.asList(
-                LikesResponseDto.GetLikeResponseDto.builder().build(),
-                LikesResponseDto.GetLikeResponseDto.builder().build()
+        List<LikesResponseDto.ReadLikeResponseDto> responseDtoList = Arrays.asList(
+                LikesResponseDto.ReadLikeResponseDto.builder().build(),
+                LikesResponseDto.ReadLikeResponseDto.builder().build()
         );
 
         when(likesService.getLikeList(anyLong(), any())).thenReturn(responseDtoList);
@@ -64,7 +64,7 @@ public class LikesControllerTest {
         // given
         Long roomsId = 1L;
         Users user = Users.builder().id(1L).nickName("TestUser").build();
-        LikesResponseDto.AddLikeResponseDto responseDto = LikesResponseDto.AddLikeResponseDto.builder().build();
+        LikesResponseDto.CreateLikeResponseDto responseDto = LikesResponseDto.CreateLikeResponseDto.builder().build();
 
         when(likesService.addLike(anyLong(), any())).thenReturn(responseDto);
 
@@ -76,7 +76,6 @@ public class LikesControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 좋아요 성공"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").exists());
-
     }
 
     @Test
