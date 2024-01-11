@@ -25,7 +25,7 @@ public class LikesServiceImplV1 implements LikesService {
     @Override
     @Transactional(readOnly = true)
     public List<LikesResponseDto.GetLikeResponseDto> getLikeList(Long roomsId, Users user){
-        Rooms room = roomsService.findRooms(roomsId);
+        Rooms room = roomsService.findById(roomsId);
 
         List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
 
@@ -41,7 +41,7 @@ public class LikesServiceImplV1 implements LikesService {
     @Override
     @Transactional
     public LikesResponseDto.AddLikeResponseDto addLike(Long roomsId, Users user){
-        Rooms room = roomsService.findRooms(roomsId);
+        Rooms room = roomsService.findById(roomsId);
 
         Likes likes = Likes.builder()
                 .rooms(room)
@@ -59,7 +59,7 @@ public class LikesServiceImplV1 implements LikesService {
     @Override
     @Transactional
     public LikesResponseDto.DeleteLikeResponseDto cancelLike(Long roomsId, Users user) {
-        Rooms room = roomsService.findRooms(roomsId);
+        Rooms room = roomsService.findById(roomsId);
 
         likesRepository.findByRoomsId(roomsId).orElseThrow(
                 ()-> new UserNotLikedException(LikesExceptionCode.USER_NOT_LIKED)
