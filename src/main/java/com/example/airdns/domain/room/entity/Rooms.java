@@ -9,12 +9,10 @@ import com.example.airdns.domain.roomequipment.entity.RoomEquipments;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +22,8 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@SQLDelete(sql = "UPDATE rooms SET deleted = true WHERE id = ?")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE rooms SET is_deleted = true WHERE id = ?")
 public class Rooms extends CommonEntity {
 
     @Id
@@ -36,7 +34,7 @@ public class Rooms extends CommonEntity {
     private String name;
 
     @Column
-    private Long price;
+    private BigDecimal price;
 
     @Column
     private String address;

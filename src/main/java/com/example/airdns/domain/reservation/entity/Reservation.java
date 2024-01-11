@@ -5,29 +5,24 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "reservaion")
+@Table(name = "reservation")
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@SQLDelete(sql = "UPDATE reservation SET deleted = true WHERE id = ?")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
 public class Reservation extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column
-    private Boolean isReserved;
 
     @Column
     private LocalDateTime checkIn;
@@ -36,10 +31,8 @@ public class Reservation extends CommonEntity {
     private LocalDateTime checkOut;
 
     @Column
-    private LocalDateTime reservedAt;
-
-    @Column
-    private Boolean isDeleted;
+    @Builder.Default
+    private Boolean isDeleted = false;
 
     @Column
     private LocalDateTime deletedAt;
