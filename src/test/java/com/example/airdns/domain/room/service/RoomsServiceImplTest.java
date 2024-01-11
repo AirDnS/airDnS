@@ -30,7 +30,7 @@ class RoomsServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        roomsService = new RoomsServiceImplV1(roomsRepository);
+//        roomsService = new RoomsServiceImplV1(roomsRepository);
     }
 
     @Test

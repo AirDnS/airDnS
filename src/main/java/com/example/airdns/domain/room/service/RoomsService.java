@@ -4,6 +4,7 @@ import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,8 +13,9 @@ public interface RoomsService {
     /**
      * 스터디 룸 등록
      * @param requestDto 스터디 룸 정보
+     * @param files
      */
-    void createRooms(CreateRoomsRequestDto requestDto, Users users);
+    void createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users);
 
 
     /**
