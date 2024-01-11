@@ -25,7 +25,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     @Override
     @Transactional(readOnly = true)
     public ReviewsResponseDto.ReadReviewResponseDto getReview(Long roomsId, Long reivewId){
-        roomsService.findRooms(roomsId);
+        roomsService.findById(roomsId);
 
         // 조회를 하는데, 없다고 이게 오류일 필요가 없을 듯?
         Reviews review = reviewsRepository.findByRoomsId(roomsId).orElse(null);
@@ -43,7 +43,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     @Override
     @Transactional(readOnly = true)
     public List<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId){
-        Rooms room = roomsService.findRooms(roomsId);
+        Rooms room = roomsService.findById(roomsId);
 
         List<Reviews> reviews = reviewsRepository.findAllByRoomsId(roomsId);
 
@@ -63,7 +63,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     public ReviewsResponseDto.CreateReviewResponseDto addReview(
             Long roomsId, UserDetailsImplV1 userDetails,
             ReviewsRequestDto.AddReviewRequestDto requestDto){
-        Rooms room = roomsService.findRooms(roomsId);
+        Rooms room = roomsService.findById(roomsId);
 
         reviewsRepository.existsByRoomsId(roomsId).orElseThrow(
                 ()-> new ReviewAlreadyExistsException(ReviewsExceptionCode.ALREADY_EXISTS_REVIEW)
@@ -92,7 +92,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     public ReviewsResponseDto.UpdateReviewResponseDto modifyReview(
             Long roomsId, Long reviewId, UserDetailsImplV1 userDetails,
             ReviewsRequestDto.UpdateReviewRequestDto requestDto){
-        roomsService.findRooms(roomsId);
+        roomsService.findById(roomsId);
 
         Reviews review = reviewsRepository.findByIdAndUsersId(userDetails.getUser().getId(), reviewId).orElseThrow(
                 ()-> new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW)
@@ -115,7 +115,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     @Transactional
     public void removeReview(
             Long roomsId, Long reviewId, UserDetailsImplV1 userDetails){
-        roomsService.findRooms(roomsId);
+        roomsService.findById(roomsId);
 
         // 해당 로그인한 유저가 작성한 리뷰가 존재하는지?
         reviewsRepository.findByIdAndUsersId(reviewId, userDetails.getUser().getId()).orElseThrow(
