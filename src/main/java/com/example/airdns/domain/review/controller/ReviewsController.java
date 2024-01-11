@@ -46,10 +46,11 @@ public class ReviewsController {
                 );
     }*/
 
+    // 전체 리뷰 조회를 생성 날짜 내림 차순 정렬로 10개마다 페이징 처리 구현
     @GetMapping("/{roomsId}/review")
     public ResponseEntity<CommonResponse<Page<ReviewsResponseDto.ReadReviewResponseDto>>> getReviews(
             @PathVariable Long roomsId,
-            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = reviewsService.getReviews(roomsId, pageable);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 전체 조회 성공", responseDtoList)

@@ -9,7 +9,6 @@ import com.example.airdns.domain.review.repository.ReviewsRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.global.jwt.UserDetailsImplV1;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -47,25 +46,6 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     }
 
     // 리스트 조회
-    // 안되면 사용해볼 예정
-    /*@Override
-    @Transactional(readOnly = true)
-    public List<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId){
-        Rooms room = roomsService.findById(roomsId);
-
-        List<Reviews> reviews = reviewsRepository.findAllByRoomsId(roomsId);
-
-        return reviews.stream()
-                .map(review -> ReviewsResponseDto.ReadReviewResponseDto.builder()
-                        .roomName(room.getName())
-                        .nickName(review.getUsers().getNickName())
-                        .content(review.getContent())
-                        .createdAt(review.getCreatedAt())
-                        .modifiedAt(review.getModifiedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }*/
-
     @Override
     @Transactional(readOnly = true)
     public Page<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId, Pageable pageable) {
