@@ -22,12 +22,12 @@ public class S3FileUtil {
 
     public String uploadFile(MultipartFile file, String prefix) {
         try {
-            String fileName = file.getOriginalFilename();
+            String fileName = prefix + file.getOriginalFilename();
 
             ObjectMetadata metadata= new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
-            PutObjectResult result = amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+            amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
 
             return amazonS3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {

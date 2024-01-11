@@ -1,5 +1,6 @@
 package com.example.airdns.domain.room.service;
 
+import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.repository.ImagesRepository;
 import com.example.airdns.domain.image.service.ImagesService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
@@ -29,6 +30,8 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     private final RoomEquipmentsService roomEquipmentsService;
 
+    private final EquipmentsService equipmentsService;
+
     private final S3FileUtil s3FileUtil;
 
     @Override
@@ -36,8 +39,10 @@ public class RoomsServiceImplV1 implements RoomsService {
         Rooms rooms = RoomsConverter.toEntity(requestDto, users);
         roomsRepository.save(rooms);
 
-        for (Integer equipment : requestDto.getEquipment()) {
-            roomEquipmentsService.createRoomEquipments(rooms);
+        for (Long equipment : requestDto.getEquipment()) {
+            roomEquipmentsService.createRoomEquipments(
+                    rooms, equipmentsService.findById(equipment)
+            );
         }
 
         for(MultipartFile file : files) {

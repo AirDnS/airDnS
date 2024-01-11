@@ -1,5 +1,6 @@
 package com.example.airdns.domain.room.service;
 
+import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.service.ImagesService;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
@@ -29,6 +30,7 @@ class RoomsServiceImplTest {
     @Mock RoomsRepository roomsRepository;
     @Mock ImagesService imagesService;
     @Mock RoomEquipmentsService roomEquipmentsService;
+    @Mock EquipmentsService equipmentsService;
     @Mock S3FileUtil s3FileUtil;
 
     private RoomsService roomsService;
@@ -36,7 +38,11 @@ class RoomsServiceImplTest {
     @BeforeEach
     void setUp() {
         roomsService = new RoomsServiceImplV1(
-                roomsRepository, imagesService, roomEquipmentsService, s3FileUtil
+                roomsRepository,
+                imagesService,
+                roomEquipmentsService,
+                equipmentsService,
+                s3FileUtil
         );
     }
 

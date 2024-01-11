@@ -9,4 +9,5 @@ public interface EquipmentsService {
     Equipments createEquipments();
 
 
+    Equipments findById(Long equipments_id);
 }

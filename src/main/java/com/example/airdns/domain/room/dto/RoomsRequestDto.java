@@ -20,7 +20,7 @@ public class RoomsRequestDto {
         private String address;
         private Integer size;
         private String desc;
-        private List<Integer> equipment;
+        private List<Long> equipment;
         private List<String> imageUrl;
     }
 
