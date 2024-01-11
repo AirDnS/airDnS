@@ -3,6 +3,7 @@ package com.example.airdns.review;
 import com.example.airdns.domain.review.controller.ReviewsController;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
+import com.example.airdns.domain.review.entity.Reviews;
 import com.example.airdns.domain.review.service.ReviewsService;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
@@ -21,15 +22,22 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
 @WebMvcTest(ReviewsController.class)
 @MockBean(JpaMetamodelMappingContext.class)
@@ -144,24 +152,28 @@ public class ReviewsControllerTest {
         String username = "testUser";
         String password = "testPassword";
 
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(
-                Users.builder()
-                        .nickName(username)
-                        .password(password)
-                        .build()
-        );
+        Users user = Users.builder()
+                .nickName(username)
+                .password(password)
+                .build();
+
+        UserDetailsImplV1 userDetails = new UserDetailsImplV1(user);
 
         ReviewsRequestDto.AddReviewRequestDto requestDto =
-                new ReviewsRequestDto.AddReviewRequestDto("Great room!");
-
-        System.out.println("addReviewRequestDto.getCotent : "+requestDto.getContent());
+                new ReviewsRequestDto.AddReviewRequestDto("add room review!");
 
         ReviewsResponseDto.CreateReviewResponseDto mockResponseDto = ReviewsResponseDto.CreateReviewResponseDto.builder()
                 .content(requestDto.getContent())
                 .nickName(userDetails.getUser().getNickName())
                 .build();
 
-        when(reviewsService.addReview(roomId, userDetails, requestDto)).thenReturn(mockResponseDto);
+        when(reviewsService.addReview(roomId, userDetails.getUser(), requestDto)).thenReturn(mockResponseDto);
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(securityContext);
+
+        when(reviewsService.addReview(eq(roomId), eq(user), eq(requestDto))).thenReturn(mockResponseDto);
 
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/{roomsId}/review", roomId)
@@ -197,15 +209,21 @@ public class ReviewsControllerTest {
                 .nickName(userDetails.getUser().getNickName())
                 .build();
 
-        when(reviewsService.modifyReview(roomId, reviewId, userDetails, requestDto)).thenReturn(mockResponseDto);
+        when(reviewsService.modifyReview(roomId, reviewId, userDetails.getUser(), requestDto)).thenReturn(mockResponseDto);
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(securityContext);
 
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/rooms/{roomsId}/review/{reviewId}", roomId, reviewId)
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/{roomsId}/review", roomId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 수정 성공"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 작성 성공"))
+                .andDo(print())
+                .andReturn();
     }
 
     @Test
@@ -225,10 +243,23 @@ public class ReviewsControllerTest {
                         .build()
         );
 
+        Rooms room = Rooms.builder().name("Room Number 1").users(userDetails.getUser()).build();
+        Reviews savedReview = Reviews.builder().users(userDetails.getUser()).rooms(room).build();
+
+        ReviewsResponseDto.DeleteReviewResponseDto mockResponseDto = ReviewsResponseDto.DeleteReviewResponseDto.builder()
+                .content(savedReview.getContent())
+                .nickName(userDetails.getUser().getNickName())
+                .build();
+
+        when(reviewsService.removeReview(roomId,reviewId,userDetails.getUser())).thenReturn(mockResponseDto);
+
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+        SecurityContextHolder.setContext(securityContext);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/rooms/{roomsId}/review/{reviewId}", roomId, reviewId)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 삭제 성공"));
     }

@@ -14,28 +14,18 @@ import com.example.airdns.domain.room.repository.RoomsRepository;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.jwt.UserDetailsImplV1;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -91,12 +81,7 @@ public class ReviewsServiceTest {
         // given
         Long roomId = 1L;
 
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
-        Users mockUser = Users.builder().nickName("test").build();
-        when(userDetails.getUser()).thenReturn(mockUser);
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Users user = saveUsersInfo();
 
         ReviewsRequestDto.AddReviewRequestDto requestDto
                 = new ReviewsRequestDto.AddReviewRequestDto("Test review content");
@@ -106,7 +91,7 @@ public class ReviewsServiceTest {
         when(reviewsRepository.existsByRoomsId(roomId)).thenReturn(Optional.of(
                 Reviews.builder()
                         .rooms(room)
-                        .users(mockUser)
+                        .users(user)
                         .content(requestDto.getContent())
                         .build())
         );
@@ -114,18 +99,18 @@ public class ReviewsServiceTest {
         Reviews savedReview = Reviews.builder()
                 .id(1L)
                 .rooms(room)
-                .users(mockUser)
+                .users(user)
                 .content(requestDto.getContent())
                 .build();
 
         when(reviewsRepository.save(any(Reviews.class))).thenReturn(savedReview);
 
         // when
-        ReviewsResponseDto.CreateReviewResponseDto result = reviewsService.addReview(roomId, userDetails, requestDto);
+        ReviewsResponseDto.CreateReviewResponseDto result = reviewsService.addReview(roomId, user, requestDto);
 
         // then
         assertNotNull(result);
-        assertEquals(userDetails.getUser().getNickName(), result.getNickName());
+        assertEquals(user.getNickName(), result.getNickName());
         assertEquals(room.getName(), result.getRoomName());
         assertEquals(requestDto.getContent(), result.getContent());
     }
@@ -146,7 +131,7 @@ public class ReviewsServiceTest {
 
         // when / then
         assertThrows(ReviewAlreadyExistsException.class,
-                () -> reviewsService.addReview(roomsId, userDetails, requestDto));
+                () -> reviewsService.addReview(roomsId, userDetails.getUser(), requestDto));
 
         verify(reviewsRepository, never()).save(any());
     }
@@ -158,34 +143,29 @@ public class ReviewsServiceTest {
         Long roomId = 1L;
         Long reviewId = 1L;
 
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
-        Users mockUser = Users.builder().id(1L).nickName("test").build();
-        when(userDetails.getUser()).thenReturn(mockUser);
+        Users user = saveUsersInfo();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        Rooms room = Rooms.builder().id(roomId).users(mockUser).name("Room number1").build();
+        Rooms room = Rooms.builder().id(roomId).users(user).name("Room number1").build();
 
         Reviews originalReview = Reviews.builder()
                 .id(reviewId)
                 .rooms(room)
-                .users(mockUser)
+                .users(user)
                 .content("original review")
                 .build();
 
-        when(reviewsRepository.findByIdAndUsersId(mockUser.getId(), reviewId)).thenReturn(Optional.of(originalReview));
+        when(reviewsRepository.findByIdAndUsersId(user.getId(), reviewId)).thenReturn(Optional.of(originalReview));
 
         ReviewsRequestDto.UpdateReviewRequestDto requestDto
                 = new ReviewsRequestDto.UpdateReviewRequestDto("modify review");
 
         // when
         ReviewsResponseDto.UpdateReviewResponseDto result
-                = reviewsService.modifyReview(roomId, reviewId, userDetails, requestDto);
+                = reviewsService.modifyReview(roomId, reviewId, user, requestDto);
 
         // then
         assertNotNull(result);
-        assertEquals(userDetails.getUser().getNickName(), result.getNickName());
+        assertEquals(user.getNickName(), result.getNickName());
         assertEquals(room.getName(), result.getRoomName());
         assertEquals(requestDto.getContent(), result.getContent());
     }
@@ -196,19 +176,15 @@ public class ReviewsServiceTest {
         Long mockUserId = 1L;
         Long mockReviewId = 1L;
         Long mockRoomId = 1L;
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
-        Users mockUser = Users.builder().id(1L).nickName("test").build();
-        when(userDetails.getUser()).thenReturn(mockUser);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Users user = saveUsersInfo();
 
         ReviewsRequestDto.UpdateReviewRequestDto mockRequestDto = new ReviewsRequestDto.UpdateReviewRequestDto();
 
         when(reviewsRepository.findByIdAndUsersId(mockUserId, mockReviewId)).thenReturn(Optional.empty());
 
         assertThrows(NotModifyReviewException.class, () -> {
-            reviewsService.modifyReview(mockRoomId, mockReviewId, userDetails, mockRequestDto);
+            reviewsService.modifyReview(mockRoomId, mockReviewId, user, mockRequestDto);
         });
     }
 
@@ -219,19 +195,19 @@ public class ReviewsServiceTest {
         Long userId = 1L;
         Long reviewId = 1L;
         Long roomId = 1L;
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
-        Users mockUser = Users.builder().id(1L).nickName("test").build();
-        when(userDetails.getUser()).thenReturn(mockUser);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Users user = saveUsersInfo();
 
-        Reviews review = Reviews.builder().content("content").build();
+        Rooms room = Rooms.builder().name("Room Number1").build();
+        Reviews review = Reviews.builder()
+                .users(user)
+                .rooms(room)
+                .content("content").build();
 
         when(reviewsRepository.findByIdAndUsersId(reviewId, userId)).thenReturn(Optional.of(review));
 
         // when
-        reviewsService.removeReview(roomId, reviewId, userDetails);
+        reviewsService.removeReview(roomId, reviewId, user);
 
         // then
         verify(reviewsRepository).deleteById(reviewId);
@@ -244,6 +220,17 @@ public class ReviewsServiceTest {
         Long userId = 1L;
         Long reviewId = 1L;
         Long roomId = 1L;
+        Users user = saveUsersInfo();
+
+        when(reviewsRepository.findByIdAndUsersId(reviewId, userId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(NotRemoveReviewException.class, () -> {
+            reviewsService.removeReview(roomId, reviewId, user);
+        });
+    }
+
+    private Users saveUsersInfo(){
         UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
         Users mockUser = Users.builder().id(1L).nickName("test").build();
         when(userDetails.getUser()).thenReturn(mockUser);
@@ -251,11 +238,6 @@ public class ReviewsServiceTest {
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        when(reviewsRepository.findByIdAndUsersId(reviewId, userId)).thenReturn(Optional.empty());
-
-        // when & then
-        assertThrows(NotRemoveReviewException.class, () -> {
-            reviewsService.removeReview(roomId, reviewId, userDetails);
-        });
+        return userDetails.getUser();
     }
 }
