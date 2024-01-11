@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ActiveProfiles("test")
 @DisplayName("RoomsRepository 테스트")
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Rollback(value = false)
 class RoomsRepositoryTest extends RoomsTestConstant{
 
     @Autowired

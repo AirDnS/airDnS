@@ -1,9 +1,12 @@
 package com.example.airdns.domain.room.service;
 
+import com.example.airdns.domain.image.service.ImagesService;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
 import com.example.airdns.domain.room.repository.RoomsRepository;
+import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
+import com.example.airdns.global.awss3.S3FileUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,14 +26,18 @@ import static org.mockito.Mockito.doReturn;
 @ExtendWith(MockitoExtension.class)
 class RoomsServiceImplTest {
 
-    @Mock
-    RoomsRepository roomsRepository;
+    @Mock RoomsRepository roomsRepository;
+    @Mock ImagesService imagesService;
+    @Mock RoomEquipmentsService roomEquipmentsService;
+    @Mock S3FileUtil s3FileUtil;
 
-    private RoomsServiceImplV1 roomsService;
+    private RoomsService roomsService;
 
     @BeforeEach
     void setUp() {
-//        roomsService = new RoomsServiceImplV1(roomsRepository);
+        roomsService = new RoomsServiceImplV1(
+                roomsRepository, imagesService, roomEquipmentsService, s3FileUtil
+        );
     }
 
     @Test
@@ -44,7 +51,6 @@ class RoomsServiceImplTest {
 
         //then
         assertEquals(RoomsExceptionCode.INVALID_ROOMS_ID.getMessage(), exception.getMessage());
-
     }
 
 }

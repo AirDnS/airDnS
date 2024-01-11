@@ -2,6 +2,7 @@ package com.example.airdns.global.awss3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.example.airdns.global.exception.AWSCustomException;
 import com.example.airdns.global.exception.GlobalExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +23,13 @@ public class S3FileUtil {
     public String uploadFile(MultipartFile file, String prefix) {
         try {
             String fileName = file.getOriginalFilename();
-            String fileUrl = "https://" + bucket + "/" + prefix + fileName;
 
             ObjectMetadata metadata= new ObjectMetadata();
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
-            amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
+            PutObjectResult result = amazonS3Client.putObject(bucket, fileName, file.getInputStream(), metadata);
 
-            //return amazonS3.getUrl(bucket, fileName).toString();
-            return fileUrl;
+            return amazonS3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {
             throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_UPLOAD_FAIL);
         }
