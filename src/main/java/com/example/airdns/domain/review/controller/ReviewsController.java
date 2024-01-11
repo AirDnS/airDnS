@@ -66,7 +66,7 @@ public class ReviewsController {
     }
 
     @DeleteMapping("/{roomsId}/review/{reviewId}")
-    public ResponseEntity<CommonResponse<Void>> deleteReview(
+    public ResponseEntity<CommonResponse<Void>> removeReview(
             @PathVariable Long roomsId,
             @PathVariable Long reviewId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails){

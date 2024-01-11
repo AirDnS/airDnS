@@ -94,13 +94,6 @@ public class ReviewsServiceImplV1 implements ReviewsService{
             ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         roomsService.findRooms(roomsId);
 
-        // review라는게...? review에 해당 작성자와 룸의 아이디를 가지고 있는데?
-        // reviewRepository.findById(reviewId)하면 해당 review에 대한 정보가 나오고
-        // 해당 정보에 userId가 알맞은지? 찾으면 되지 않나?
-        // 해당 리뷰 == 작성자일 수도 있지만? 아닐 수도 있는데?
-        // 그러면 reviewRepository.findByIdAndUserId()까지는 맞는듯?
-        // 해당 방의 리뷰를 들어온거니까 room은 무조건 맞음
-        // 리뷰가 로그인한 사용자의 댓글인지 확인 및 해당 review가 해당 작성자가 아니라면 Exception 처리
         Reviews review = reviewsRepository.findByIdAndUsersId(userDetails.getUser().getId(), reviewId).orElseThrow(
                 ()-> new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW)
         );
@@ -131,4 +124,6 @@ public class ReviewsServiceImplV1 implements ReviewsService{
 
         reviewsRepository.deleteById(reviewId);
     }
+
+
 }
