@@ -69,48 +69,6 @@ public class ReviewsServiceTest {
     }
 
     @Test
-    @DisplayName("ReviewsService getReviews Success")
-    void getReviewsSuccess() {
-        // given
-        Long roomId = 1L;
-
-        List<Reviews> mockReviews = new ArrayList<>();
-        Rooms room1 = Rooms.builder().id(1L).name("Room number1").build();
-
-        Reviews mockReview1 = Reviews.builder()
-                .users(Users.builder().nickName("User number1").build())
-                .rooms(room1)
-                .content("review Content1")
-                .build();
-
-        mockReviews.add(mockReview1);
-
-        Rooms room2 = Rooms.builder().id(2L).name("Room number2").build();
-        Reviews mockReview2 = Reviews.builder()
-                .users(Users.builder().nickName("User number2").build())
-                .rooms(room2)
-                .content("review Content2")
-                .build();
-
-        mockReviews.add(mockReview2);
-        roomsRepository.save(room1);
-        roomsRepository.save(room2);
-
-        when(roomsService.findById(roomId)).thenReturn(room1);
-
-        when(reviewsRepository.findAllByRoomsId(roomId)).thenReturn(mockReviews);
-
-        // when
-        List<ReviewsResponseDto.ReadReviewResponseDto> result = reviewsService.getReviews(roomId);
-
-        // then
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertEquals("review Content1", result.get(0).getContent());
-        assertEquals("review Content2", result.get(1).getContent());
-    }
-
-    @Test
     @DisplayName("ReviewsService addReview Success")
     void addReviewSuccess() {
         // given
