@@ -82,4 +82,7 @@ public class Rooms extends CommonEntity {
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Reviews> reviewsList = new ArrayList<>();
 
+    public void addReview(Reviews review){
+        reviewsList.add(review);
+    }
 }
