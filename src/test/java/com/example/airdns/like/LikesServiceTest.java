@@ -42,7 +42,7 @@ public class LikesServiceTest {
         Users user = createUsers();
         Rooms room = createRooms();
 
-        when(roomsService.findRooms(anyLong())).thenReturn(room);
+        when(roomsService.findById(anyLong())).thenReturn(room);
         when(likesRepository.findAllByRoomsId(roomsId)).thenReturn(Arrays.asList(
                 Likes.builder().build(),
                 Likes.builder().build()
@@ -67,7 +67,7 @@ public class LikesServiceTest {
         Users user = Users.builder().id(1L).nickName("TestUser").build();
         Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
 
-        when(roomsService.findRooms(anyLong())).thenReturn(room);
+        when(roomsService.findById(anyLong())).thenReturn(room);
         when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
 
         // when
@@ -86,7 +86,7 @@ public class LikesServiceTest {
         Users user = Users.builder().id(1L).nickName("TestUser").build();
         Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
 
-        when(roomsService.findRooms(anyLong())).thenReturn(room);
+        when(roomsService.findById(anyLong())).thenReturn(room);
         when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.of(Likes.builder().build()));
 
         // when
@@ -106,7 +106,7 @@ public class LikesServiceTest {
         Users user = Users.builder().id(1L).nickName("TestUser").build();
         Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
 
-        when(roomsService.findRooms(anyLong())).thenReturn(room);
+        when(roomsService.findById(anyLong())).thenReturn(room);
         when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
 
         // when & then
@@ -117,7 +117,7 @@ public class LikesServiceTest {
         assertEquals("해당 사용자가 좋아요를 누르지 않았습니다.", exception.getMessage());
         assertEquals(LikesExceptionCode.USER_NOT_LIKED.getErrorCode(), exception.getErrorCode());
 
-        verify(roomsService, times(1)).findRooms(anyLong());
+        verify(roomsService, times(1)).findById(anyLong());
         verify(likesRepository, times(1)).findByRoomsId(roomsId);
         verify(likesRepository, never()).deleteByRoomsId(anyLong()); // deleteByRoomsId 메소드는 호출되지 않아야 함
     }
