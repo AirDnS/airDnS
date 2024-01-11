@@ -67,7 +67,7 @@ public class ReviewsController {
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails,
             @Valid ReviewsRequestDto.AddReviewRequestDto requestDto){
-        ReviewsResponseDto.CreateReviewResponseDto responseDto = reviewsService.addReview(roomsId, userDetails, requestDto);
+        ReviewsResponseDto.CreateReviewResponseDto responseDto = reviewsService.addReview(roomsId, userDetails.getUser(), requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(new CommonResponse<>(HttpStatus.CREATED, "룸 리뷰 작성 성공", responseDto)
         );
@@ -83,7 +83,7 @@ public class ReviewsController {
             @PathVariable Long reviewId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails,
             @Valid ReviewsRequestDto.UpdateReviewRequestDto requestDto){
-        ReviewsResponseDto.UpdateReviewResponseDto responseDto = reviewsService.modifyReview(roomsId, reviewId, userDetails, requestDto);
+        ReviewsResponseDto.UpdateReviewResponseDto responseDto = reviewsService.modifyReview(roomsId, reviewId, userDetails.getUser(), requestDto);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 수정 성공", responseDto)
                 );
@@ -94,13 +94,13 @@ public class ReviewsController {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 수정 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 삭제할 권한이 없습니다."),
     })
-    public ResponseEntity<CommonResponse<Void>> removeReview(
+    public ResponseEntity<CommonResponse<ReviewsResponseDto.DeleteReviewResponseDto>> removeReview(
             @PathVariable Long roomsId,
             @PathVariable Long reviewId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails){
-        reviewsService.removeReview(roomsId, reviewId, userDetails);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT)
-                .body(new CommonResponse<>(HttpStatus.NO_CONTENT, "룸 리뷰 삭제 성공", null)
+        ReviewsResponseDto.DeleteReviewResponseDto responseDto = reviewsService.removeReview(roomsId, reviewId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 삭제 성공", responseDto)
                 );
     }
 }

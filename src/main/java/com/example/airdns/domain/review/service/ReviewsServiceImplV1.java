@@ -8,7 +8,7 @@ import com.example.airdns.domain.review.exception.*;
 import com.example.airdns.domain.review.repository.ReviewsRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
+import com.example.airdns.domain.user.entity.Users;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -84,7 +84,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     @Override
     @Transactional
     public ReviewsResponseDto.CreateReviewResponseDto addReview(
-            Long roomsId, UserDetailsImplV1 userDetails,
+            Long roomsId, Users user,
             ReviewsRequestDto.AddReviewRequestDto requestDto){
         Rooms room = roomsService.findById(roomsId);
 
@@ -94,7 +94,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
 
         Reviews review = Reviews.builder()
                 .rooms(room)
-                .users(userDetails.getUser())
+                .users(user)
                 .content(requestDto.getContent())
                 .build();
 
@@ -113,11 +113,11 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     @Override
     @Transactional
     public ReviewsResponseDto.UpdateReviewResponseDto modifyReview(
-            Long roomsId, Long reviewId, UserDetailsImplV1 userDetails,
+            Long roomsId, Long reviewId, Users user,
             ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         roomsService.findById(roomsId);
 
-        Reviews review = reviewsRepository.findByIdAndUsersId(userDetails.getUser().getId(), reviewId).orElseThrow(
+        Reviews review = reviewsRepository.findByIdAndUsersId(user.getId(), reviewId).orElseThrow(
                 ()-> new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW)
         );
 
@@ -136,17 +136,23 @@ public class ReviewsServiceImplV1 implements ReviewsService{
     // 리뷰 삭제
     @Override
     @Transactional
-    public void removeReview(
-            Long roomsId, Long reviewId, UserDetailsImplV1 userDetails){
+    public ReviewsResponseDto.DeleteReviewResponseDto removeReview(
+            Long roomsId, Long reviewId, Users user){
         roomsService.findById(roomsId);
 
         // 해당 로그인한 유저가 작성한 리뷰가 존재하는지?
-        reviewsRepository.findByIdAndUsersId(reviewId, userDetails.getUser().getId()).orElseThrow(
+        Reviews review = reviewsRepository.findByIdAndUsersId(reviewId, user.getId()).orElseThrow(
                 ()-> new NotRemoveReviewException(ReviewsExceptionCode.NOT_DELETE_REVIEW)
         );
 
         reviewsRepository.deleteById(reviewId);
+
+        return ReviewsResponseDto.DeleteReviewResponseDto.builder()
+                .nickName(review.getUsers().getNickName())
+                .roomName(review.getRooms().getName())
+                .createdAt(review.getCreatedAt())
+                .modifiedAt(review.getModifiedAt())
+                .content(review.getContent())
+                .build();
     }
-
-
 }

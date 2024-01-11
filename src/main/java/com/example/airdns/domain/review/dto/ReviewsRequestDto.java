@@ -1,5 +1,6 @@
 package com.example.airdns.domain.review.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,9 +12,9 @@ public class ReviewsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = 리뷰 단건 추가 요청 dto")
+    @Schema(description = "리뷰 단건 추가 요청 dto")
     public static class AddReviewRequestDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
+        @Schema(description = "추가할 이름", defaultValue = "review Content")
         private String content;
     }
 
@@ -21,9 +22,9 @@ public class ReviewsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    // @Schema(description = 리뷰 단건 추가 요청 dto")
+    @Schema(description = "리뷰 단건 수정 요청 dto")
     public static class UpdateReviewRequestDto {
-        // @Schema(description = "추가할 이름", defaultValue = "test")
+        @Schema(description = "추가할 이름", defaultValue = "review update Content")
         private String content;
     }
 }
