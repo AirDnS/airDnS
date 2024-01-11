@@ -10,7 +10,6 @@ import java.util.Optional;
 public interface ReviewsRepository extends JpaRepository<Reviews, Long>, QuerydslPredicateExecutor<Reviews> {
 
     Optional<Reviews> findByRoomsId(Long roomsId);
-    List<Reviews> findAllByRoomsId(Long roomsId);
 
     Optional<Reviews> existsByRoomsId(Long roomsId);
 
