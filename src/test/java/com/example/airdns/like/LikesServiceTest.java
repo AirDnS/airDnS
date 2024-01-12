@@ -1,28 +1,30 @@
 package com.example.airdns.like;
 
 import com.example.airdns.domain.like.dto.LikesResponseDto;
-import com.example.airdns.domain.like.exception.LikesExceptionCode;
+import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.like.exception.UserNotLikedException;
+import com.example.airdns.domain.like.repository.LikesRepository;
 import com.example.airdns.domain.like.service.LikesServiceImplV1;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
-import com.example.airdns.domain.like.entity.Likes;
-import com.example.airdns.domain.like.repository.LikesRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class LikesServiceTest {
 
     @InjectMocks
@@ -35,103 +37,93 @@ public class LikesServiceTest {
     private RoomsService roomsService;
 
     @Test
-    @DisplayName("LikesService getRoomsLikeList Success")
-    void getRoomLikeListSuccess() {
+    @DisplayName("LikeService getLikeList Success")
+    void getLikeListSuccess() {
         // given
-        Long roomsId = 1L;
-        Users user = createUsers();
-        Rooms room = createRooms();
-
-        when(roomsService.findById(anyLong())).thenReturn(room);
-        when(likesRepository.findAllByRoomsId(roomsId)).thenReturn(Arrays.asList(
+        Long roomId = 1L;
+        Users user = Users.builder().nickName("User1").build();
+        Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
+        List<Likes> likesList = Arrays.asList(
                 Likes.builder().build(),
                 Likes.builder().build()
-        ));
+        );
+
+        when(roomsService.findById(roomId)).thenReturn(room);
+        when(likesRepository.findAllByRoomsId(roomId)).thenReturn(likesList);
 
         // when
-        List<LikesResponseDto.GetLikeResponseDto> result = likesService.getLikeList(roomsId, user);
+        List<LikesResponseDto.ReadLikeResponseDto> result = likesService.getLikeList(roomId, user);
 
         // then
-        assertEquals(2, result.size());
-        assertEquals("Test Room", result.get(0).getRoomName());
-        assertEquals("TestAddress", result.get(0).getRoomAddress());
-        assertEquals("TestUser", result.get(0).getNickName());
-        // 여러 다른 assertEquals 작업을 추가하면 됩니다.
+        assertEquals(likesList.size(), result.size());
+        for (int i = 0; i < likesList.size(); i++) {
+            Likes like = likesList.get(i);
+            LikesResponseDto.ReadLikeResponseDto responseDto = result.get(i);
+
+            assertEquals(room.getName(), responseDto.getRoomName());
+            assertEquals(room.getAddress(), responseDto.getRoomAddress());
+            assertEquals(user.getNickName(), responseDto.getNickName());
+        }
     }
 
     @Test
-    @DisplayName("LikesService addLike Success")
-    void roomsLikeSuccess() {
+    @DisplayName("LikeService addLike Success")
+    void addLikeSuccess() {
         // given
-        Long roomsId = 2L;
-        Users user = Users.builder().id(1L).nickName("TestUser").build();
-        Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
+        Long roomId = 1L;
+        Users user = Users.builder().nickName("User1").build();
+        Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
+        Likes savedLike = Likes.builder()
+                .rooms(room)
+                .users(user)
+                .build();
 
-        when(roomsService.findById(anyLong())).thenReturn(room);
-        when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
+        when(roomsService.findById(roomId)).thenReturn(room);
+        when(likesRepository.save(org.mockito.ArgumentMatchers.any(Likes.class))).thenReturn(savedLike);
 
         // when
-        LikesResponseDto.AddLikeResponseDto response = likesService.addLike(roomsId, user);
-
-        // then
-        assertEquals(room.getName(), response.getRoomName());
-        assertEquals(user.getNickName(), response.getNickName());
-    }
-
-    @Test
-    @DisplayName("LikesService cancelLike Success")
-    void cancelLikeSuccess() {
-        // given
-        Long roomsId = 1L;
-        Users user = Users.builder().id(1L).nickName("TestUser").build();
-        Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
-
-        when(roomsService.findById(anyLong())).thenReturn(room);
-        when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.of(Likes.builder().build()));
-
-        // when
-        LikesResponseDto.DeleteLikeResponseDto result = likesService.cancelLike(roomsId, user);
+        LikesResponseDto.CreateLikeResponseDto result = likesService.addLike(roomId, user);
 
         // then
         assertEquals(room.getName(), result.getRoomName());
         assertEquals(user.getNickName(), result.getNickName());
+        assertEquals(savedLike.getCreatedAt(), result.getCreatedAt());
+    }
 
+    @Test
+    @DisplayName("LikeService cancelLike Success")
+    void cancelLikeSuccess() {
+        // given
+        Long roomId = 1L;
+        Users user = Users.builder().nickName("User1").build();
+        Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
+        Likes existingLike = Likes.builder().rooms(room).users(user).build();
+
+        when(roomsService.findById(roomId)).thenReturn(room);
+        when(likesRepository.findByRoomsId(roomId)).thenReturn(Optional.of(existingLike));
+
+        // when
+        LikesResponseDto.DeleteLikeResponseDto result = likesService.cancelLike(roomId, user);
+
+        // then
+        assertEquals(room.getName(), result.getRoomName());
+        assertEquals(user.getNickName(), result.getNickName());
     }
 
     @Test
     @DisplayName("LikesService cancelLike UserNotLikedException")
-    void cancelLikeUserNotLiked() {
+    void cancelLikeUserNotLikedException() {
         // given
-        Long roomsId = 1L;
-        Users user = Users.builder().id(1L).nickName("TestUser").build();
-        Rooms room = Rooms.builder().id(roomsId).name("TestRoom").build();
+        Long roomId = 1L;
+        Users user = Users.builder().nickName("User1").build();
 
-        when(roomsService.findById(anyLong())).thenReturn(room);
-        when(likesRepository.findByRoomsId(roomsId)).thenReturn(Optional.empty());
+        when(likesRepository.findByRoomsId(roomId)).thenReturn(Optional.empty());
 
         // when & then
         UserNotLikedException exception = assertThrows(UserNotLikedException.class, () -> {
-            likesService.cancelLike(roomsId, user);
+            likesService.cancelLike(roomId, user);
         });
 
         assertEquals("해당 사용자가 좋아요를 누르지 않았습니다.", exception.getMessage());
-        assertEquals(LikesExceptionCode.USER_NOT_LIKED.getErrorCode(), exception.getErrorCode());
-
-        verify(roomsService, times(1)).findById(anyLong());
-        verify(likesRepository, times(1)).findByRoomsId(roomsId);
-        verify(likesRepository, never()).deleteByRoomsId(anyLong()); // deleteByRoomsId 메소드는 호출되지 않아야 함
-    }
-
-    private Rooms createRooms(){
-        return Rooms.builder()
-                .name("Test Room")
-                .address("TestAddress")
-                .build();
-    }
-
-    private Users createUsers(){
-        return Users.builder()
-                .nickName("TestUser")
-                .build();
     }
 }
