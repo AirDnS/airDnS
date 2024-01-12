@@ -74,4 +74,5 @@ public class LikesServiceImplV1 implements LikesService {
                 .nickName(user.getNickName())
                 .build();
     }
+
 }

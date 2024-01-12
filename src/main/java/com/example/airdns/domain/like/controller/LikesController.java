@@ -22,7 +22,7 @@ public class LikesController {
     private final LikesService likesService;
 
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "룸 좋아요 목록 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "룸 좋아요 목록 조회 성공"),
     })
     @GetMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<List<LikesResponseDto.ReadLikeResponseDto>>> getLikeList(
@@ -30,8 +30,8 @@ public class LikesController {
             @AuthenticationPrincipal UserDetailsImplV1 userDetails){
         List<LikesResponseDto.ReadLikeResponseDto> responseDto = likesService.getLikeList(roomsId, userDetails.getUser());
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CommonResponse<>(HttpStatus.CREATED, "룸 좋아요 목록 조회 성공", responseDto)
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 목록 조회 성공", responseDto)
         );
     }
 
