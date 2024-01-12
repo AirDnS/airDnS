@@ -13,9 +13,9 @@ public interface RoomsService {
     /**
      * 스터디 룸 등록
      * @param requestDto 스터디 룸 정보
-     * @param files
+     * @param files 이미지 파일
      */
-    void createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users);
+    ReadRoomsResponseDto createRooms(ReadRoomsRequestDto requestDto, List<MultipartFile> files, Users users);
 
 
     /**
