@@ -1,7 +1,6 @@
 package com.example.airdns.domain.room.service;
 
 import com.example.airdns.domain.equipment.service.EquipmentsService;
-import com.example.airdns.domain.image.repository.ImagesRepository;
 import com.example.airdns.domain.image.service.ImagesService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
@@ -10,9 +9,9 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
 import com.example.airdns.domain.room.repository.RoomsRepository;
-import com.example.airdns.domain.roomequipment.entity.RoomEquipments;
 import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
 import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.awss3.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,21 +34,28 @@ public class RoomsServiceImplV1 implements RoomsService {
     private final S3FileUtil s3FileUtil;
 
     @Override
-    public void createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users) {
+    public ReadRoomsResponseDto createRooms(ReadRoomsRequestDto requestDto, List<MultipartFile> files, Users users) {
+        if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
+            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
+        }
+
         Rooms rooms = RoomsConverter.toEntity(requestDto, users);
         roomsRepository.save(rooms);
 
         for (Long equipment : requestDto.getEquipment()) {
-            roomEquipmentsService.createRoomEquipments(
+            rooms.addEquipments(roomEquipmentsService.createRoomEquipments(
                     rooms, equipmentsService.findById(equipment)
-            );
+            ));
         }
 
         for(MultipartFile file : files) {
             //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
             String fileUrl = s3FileUtil.uploadFile(file, rooms.getId() + "_");
-            imagesService.createImages(rooms, fileUrl);
+            rooms.addImage(imagesService.createImages(rooms, fileUrl));
+
         }
+
+        return RoomsConverter.toDto(rooms);
 
     }
 
