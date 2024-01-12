@@ -1,7 +1,7 @@
 package com.example.airdns.review;
 
-
 import com.example.airdns.domain.review.entity.Reviews;
+import com.example.airdns.domain.review.repository.ReviewsRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,9 +10,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ReviewsRepositoryTest {
+class ReviewsRepositoryTest {
 
     @Autowired
     private ReviewsRepository reviewsRepository;
