@@ -37,8 +37,8 @@ public class RoomsTestConstant {
             .build();
 
 
-    protected RoomsRequestDto.ReadRoomsRequestDto REQUEST_DTO
-            = RoomsRequestDto.ReadRoomsRequestDto.builder()
+    protected RoomsRequestDto.CreateRoomsRequestDto REQUEST_DTO
+            = RoomsRequestDto.CreateRoomsRequestDto.builder()
             .name(TEST_NAME)
             .desc(TEST_DESCRIPTION)
             .price(TEST_PRICE)

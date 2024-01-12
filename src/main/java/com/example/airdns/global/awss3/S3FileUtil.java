@@ -1,8 +1,8 @@
 package com.example.airdns.global.awss3;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectResult;
 import com.example.airdns.global.exception.AWSCustomException;
 import com.example.airdns.global.exception.GlobalExceptionCode;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +37,12 @@ public class S3FileUtil {
 
     public String uploadFile(MultipartFile file) {
         return uploadFile(file, "");
+    }
+
+    public void removeFile(String fileUrl, String prefix) {
+        String fileName = fileUrl.substring(fileUrl.indexOf(prefix));
+
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
 

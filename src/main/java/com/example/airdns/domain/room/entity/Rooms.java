@@ -87,7 +87,23 @@ public class Rooms extends CommonEntity {
         this.getImagesList().add(images);
     }
 
+    public void resetEquipments() {this.roomEquipmentsList.clear();}
     public void addEquipments(RoomEquipments roomEquipments) {
         this.getRoomEquipmentsList().add(roomEquipments);
+    }
+
+    public void updateRooms(
+            String name,
+            BigDecimal price,
+            String address,
+            Integer size,
+            String description,
+            Boolean isClosed) {
+        this.name = name;
+        this.price = price;
+        this.address = address;
+        this.size = size;
+        this.description = description;
+        this.isClosed = isClosed;
     }
 }

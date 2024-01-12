@@ -15,6 +15,7 @@ import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.awss3.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -31,10 +32,8 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     private final EquipmentsService equipmentsService;
 
-    private final S3FileUtil s3FileUtil;
-
     @Override
-    public ReadRoomsResponseDto createRooms(ReadRoomsRequestDto requestDto, List<MultipartFile> files, Users users) {
+    public ReadRoomsResponseDto createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users) {
         if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
             throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
         }
@@ -42,40 +41,55 @@ public class RoomsServiceImplV1 implements RoomsService {
         Rooms rooms = RoomsConverter.toEntity(requestDto, users);
         roomsRepository.save(rooms);
 
-        for (Long equipment : requestDto.getEquipment()) {
-            rooms.addEquipments(roomEquipmentsService.createRoomEquipments(
-                    rooms, equipmentsService.findById(equipment)
-            ));
-        }
+        updateEquipments(rooms, requestDto.getEquipment());
+        uploadImages(rooms, files);
 
-        for(MultipartFile file : files) {
-            //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
-            String fileUrl = s3FileUtil.uploadFile(file, rooms.getId() + "_");
-            rooms.addImage(imagesService.createImages(rooms, fileUrl));
-
-        }
 
         return RoomsConverter.toDto(rooms);
-
     }
 
     @Override
-    public ReadRoomsResponseDto readRooms(Long roomsId, Users users) {
-        return null;
+    public ReadRoomsResponseDto readRooms(Long roomsId) {
+        return RoomsConverter.toDto(findById(roomsId));
     }
 
     @Override
     public List<ReadRoomsResponseDto> readRoomsList(ReadRoomsListRequestDto requestDto) {
-        return null;
+        //TODO 조건추가
+        return roomsRepository.findAll().stream()
+                .map(RoomsConverter::toDto)
+                .toList();
+    }
+
+    @Transactional
+    @Override
+    public ReadRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long roomsId, Users users) {
+        Rooms rooms = findById(roomsId);
+
+        rooms.resetEquipments();
+        updateEquipments(rooms, requestDto.getEquipment());
+
+        return RoomsConverter.toDto(requestDto, rooms);
     }
 
     @Override
-    public UpdateRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long rooms_id, Users users) {
-        return null;
-    }
+    public UpdateRoomsImagesResponseDto updateRoomsImages(
+            UpdateRoomsImagesRequestDto requestDto,
+            Long roomsId,
+            List<MultipartFile> files,
+            Users users) {
+        Rooms rooms = findById(roomsId);
 
-    @Override
-    public void addRoomsImages(UpdateRoomsImagesRequestDto requestDto, Long rooms_id, Users users) {
+        //TODO 데이터 없으면 리턴
+
+        if (!rooms.getUsers().getId().equals(users.getId())) {
+            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
+        }
+
+        deleteImage(rooms, requestDto.getRemoveImages());
+        uploadImages(rooms, files);
+
+        return RoomsConverter.toImagesDto(rooms);
 
     }
 
@@ -98,5 +112,26 @@ public class RoomsServiceImplV1 implements RoomsService {
     public Rooms findById(Long roomsId) {
         return roomsRepository.findById(roomsId)
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
+    }
+
+    private void updateEquipments(Rooms rooms, List<Long> equipments) {
+        equipments.stream().distinct().forEach(
+                equipment -> rooms.addEquipments(
+                        roomEquipmentsService.createRoomEquipments(
+                                rooms, equipmentsService.findById(equipment)
+                        )
+                )
+        );
+    }
+
+    private void uploadImages(Rooms rooms, List<MultipartFile> files) {
+        for(MultipartFile file : files) {
+            //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
+            rooms.addImage(imagesService.createImages(rooms, file));
+        }
+    }
+
+    private void deleteImage(Rooms rooms, List<Long> removeImages) {
+        removeImages.forEach(images -> imagesService.deleteImages(images, rooms));
     }
 }
