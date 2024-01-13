@@ -1,5 +1,6 @@
 package com.example.airdns.global.common.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,16 +12,18 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class CommonResponse<T> {
 
-    private HttpStatus httpStatus;
+    private Integer httpStatus;
 
     private String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
+    public CommonResponse(HttpStatus httpStatus, String message, T data) {
+        this(httpStatus.value(), message, data);
+    }
 
-    //TODO HttpStatus값이 value로 나가도록 수정할 것
     public CommonResponse(HttpStatus httpStatus, String message) {
-        this(httpStatus, message, null);
+        this(httpStatus.value(), message, null);
     }
 }
