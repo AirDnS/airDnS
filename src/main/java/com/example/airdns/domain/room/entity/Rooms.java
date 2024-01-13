@@ -23,7 +23,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE rooms SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE rooms SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 public class Rooms extends CommonEntity {
 
     @Id
@@ -63,15 +63,15 @@ public class Rooms extends CommonEntity {
     private List<Reservation> reservationList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Images> imagesList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Holidays>  holidaysList= new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<RoomEquipments> roomEquipmentsList = new ArrayList<>();
 
     @Builder.Default
@@ -85,6 +85,10 @@ public class Rooms extends CommonEntity {
   
     public void addImage(Images images) {
         this.getImagesList().add(images);
+    }
+
+    public void deleteImages(Images images) {
+        this.getImagesList().remove(images);
     }
 
     public void resetEquipments() {this.roomEquipmentsList.clear();}

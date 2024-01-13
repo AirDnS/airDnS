@@ -5,7 +5,6 @@ import com.example.airdns.domain.image.exception.ImagesCustomException;
 import com.example.airdns.domain.image.exception.ImagesExceptionCode;
 import com.example.airdns.domain.image.repository.ImagesRepository;
 import com.example.airdns.domain.room.entity.Rooms;
-import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.awss3.S3FileUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,17 +33,15 @@ public class ImagesServiceImplV1 implements ImagesService {
                 .orElseThrow(() -> new ImagesCustomException(ImagesExceptionCode.INVALID_IMAGES_ID));
 
         if (!rooms.getId().equals(images.getRooms().getId())) {
-            throw new ImagesCustomException(ImagesExceptionCode.NO_PERMISSION_USER);
+            throw new ImagesCustomException(ImagesExceptionCode.NO_PERMISSION_USER_IMAGES);
         }
 
-        //TODO 파일이름 비어있으면 에러안남
-        //
         s3FileUtil.removeFile(images.getImageUrl(), getFilePrefix(images.getRooms()));
-        imagesRepository.delete(images);
+        rooms.deleteImages(images);
     }
 
 
-    public String getFilePrefix(Rooms rooms) {
+    private String getFilePrefix(Rooms rooms) {
         return rooms.getId() + "_";
     }
 }

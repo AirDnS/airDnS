@@ -85,7 +85,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRooms(
-            @PathVariable(value = "roomsId") Long roomsId,
+            @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -106,7 +106,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRoomsImage(
-            @PathVariable(value = "roomsId") Long roomsId,
+            @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
@@ -125,12 +125,12 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity deleteRooms(
-            @PathVariable Long roomsId,
+            @PathVariable("roomsId") Long roomsId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         roomsService.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
-                "스터디 룸 정보 조회에 성공했습니다"
+                "스터디 룸 삭제에 성공했습니다"
         ));
     }
 
