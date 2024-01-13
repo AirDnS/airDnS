@@ -1,4 +1,4 @@
-package com.example.airdns.domain.holiday.entity;
+package com.example.airdns.domain.restschedule.entity;
 
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.global.common.entity.CommonEntity;
