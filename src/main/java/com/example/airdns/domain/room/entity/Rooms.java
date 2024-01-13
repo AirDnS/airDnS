@@ -82,7 +82,7 @@ public class Rooms extends CommonEntity {
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Reviews> reviewsList = new ArrayList<>();
 
-
+  
     public void addImage(Images images) {
         this.getImagesList().add(images);
     }
@@ -105,5 +105,9 @@ public class Rooms extends CommonEntity {
         this.size = size;
         this.description = description;
         this.isClosed = isClosed;
+    }
+      
+    public void addReview(Reviews review){
+        reviewsList.add(review);
     }
 }

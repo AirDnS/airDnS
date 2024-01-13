@@ -1,6 +1,5 @@
 package com.example.airdns.domain.like.exception;
 
-import com.example.airdns.global.exception.CustomException;
 import lombok.Getter;
 
 @Getter

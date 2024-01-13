@@ -1,5 +1,6 @@
 package com.example.airdns.domain.review.entity;
 
+import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
@@ -30,4 +31,8 @@ public class Reviews extends CommonEntity {
     @JoinColumn(name = "users_id")
     private Users users;
 
+    // 편의 메서드
+    public void modify(ReviewsRequestDto.UpdateReviewRequestDto requestDto){
+        this.content = requestDto.getContent();
+    }
 }
