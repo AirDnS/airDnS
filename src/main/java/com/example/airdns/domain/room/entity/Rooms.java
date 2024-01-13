@@ -1,6 +1,6 @@
 package com.example.airdns.domain.room.entity;
 
-import com.example.airdns.domain.holiday.entity.Holidays;
+import com.example.airdns.domain.restschedule.entity.RestSchedule;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.reservation.entity.Reservation;
@@ -68,7 +68,7 @@ public class Rooms extends CommonEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Holidays>  holidaysList= new ArrayList<>();
+    private List<RestSchedule> restScheduleList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
