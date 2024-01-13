@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public class CommonResponse<T> {
 
-    private int httpStatus;
+    private Integer httpStatus;
 
     private String message;
 
