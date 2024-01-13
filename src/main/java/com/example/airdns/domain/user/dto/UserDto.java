@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.boot.autoconfigure.graphql.ConditionalOnGraphQlSchema;
 
+import java.time.LocalDateTime;
+
 public class UserDto {
 
     @Getter
@@ -25,6 +27,25 @@ public class UserDto {
         private Long id;
         private String nickname;
         private String email;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserRequestDto {
+        private String nickname;
+        private String address;
+        private String contact;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserUpdateResponseDto {
+        private String nickname;
+        private LocalDateTime modified_at;
     }
 
 }
