@@ -38,8 +38,8 @@ public class ReservationServiceImplV1 implements ReservationService {
         if (requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION);
         }
-        Reservation reservation = requestDto.toEntity(users, rooms);
-        reservationRepository.save(reservation);
+        //Reservation reservation = requestDto.toEntity(users, rooms);
+        //reservationRepository.save(reservation);
     }
 
 }
