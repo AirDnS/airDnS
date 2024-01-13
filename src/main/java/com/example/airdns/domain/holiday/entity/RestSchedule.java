@@ -8,19 +8,22 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "holidays")
+@Table(name = "rest_schedule")
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Holidays extends CommonEntity {
+public class RestSchedule extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column
-    private LocalDateTime holiday;
+    private LocalDateTime restStartTime;
+
+    @Column
+    private LocalDateTime restEndTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rooms_id")
