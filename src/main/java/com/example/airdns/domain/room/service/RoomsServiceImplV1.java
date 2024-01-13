@@ -3,13 +3,10 @@ package com.example.airdns.domain.room.service;
 import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.image.service.ImagesService;
+import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
-import com.example.airdns.domain.room.dto.RoomsRequestDto.CreateRoomsRequestDto;
-import com.example.airdns.domain.room.dto.RoomsRequestDto.ReadRoomsListRequestDto;
-import com.example.airdns.domain.room.dto.RoomsRequestDto.UpdateRoomsImagesRequestDto;
-import com.example.airdns.domain.room.dto.RoomsRequestDto.UpdateRoomsRequestDto;
-import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
-import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
+import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
@@ -33,6 +30,8 @@ public class RoomsServiceImplV1 implements RoomsService {
     private final ImagesService imagesService;
 
     private final RoomEquipmentsService roomEquipmentsService;
+
+    private final RestScheduleService restScheduleService;
 
     private final EquipmentsService equipmentsService;
 
@@ -105,6 +104,36 @@ public class RoomsServiceImplV1 implements RoomsService {
         validateUserIsRoomsHost(rooms, users);
 
         roomsRepository.delete(rooms);
+    }
+
+    @Override
+    public void CreateRoomsRestSchedule(
+            CreateRoomsRestScheduleRequestDto requestDto,
+            Long roomsId,
+            Users users) {
+        Rooms rooms = findById(roomsId);
+
+        validateUserIsRoomsHost(rooms, users);
+
+        rooms.addRestSchedule(
+                restScheduleService.createRestSchedule(
+                        rooms, requestDto.getStartDate(), requestDto.getEndDate()
+                )
+        );
+    }
+
+    @Transactional
+    @Override
+    public void DeleteRoomsRestSchedule(
+            DeleteRoomsRestScheduleRequestDto requestDto,
+            Long roomsId,
+            Users users) {
+
+        Rooms rooms = findById(roomsId);
+
+        validateUserIsRoomsHost(rooms, users);
+
+        restScheduleService.deleteRestSchedule(requestDto.getRestScheduleId(), rooms);
     }
 
     @Override

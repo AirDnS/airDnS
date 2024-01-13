@@ -8,6 +8,7 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.global.awss3.S3FileUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -27,6 +28,7 @@ public class ImagesServiceImplV1 implements ImagesService {
                 .build());
     }
 
+    @Transactional
     @Override
     public void deleteImages(Long imagesId, Rooms rooms) {
         Images images = imagesRepository.findById(imagesId)
@@ -37,6 +39,7 @@ public class ImagesServiceImplV1 implements ImagesService {
         }
 
         s3FileUtil.removeFile(images.getImageUrl(), getFilePrefix(images.getRooms()));
+        imagesRepository.delete(images);
         rooms.deleteImages(images);
     }
 

@@ -7,6 +7,7 @@ import com.example.airdns.global.jwt.UserDetailsImplV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -131,6 +132,42 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 삭제에 성공했습니다"
+        ));
+    }
+
+    @PostMapping("/rooms/{roomsId}/addRestTime")
+    @Operation(summary = "Read Rooms", description = "휴식 일정을 등록한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴식 일정 등록 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity CreateRoomsRestSchedule(
+            @PathVariable("roomsId") Long roomsId,
+            @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "휴식 일정 등록에 성공했습니다"
+        ));
+    }
+
+    @DeleteMapping("/rooms/{roomsId}/removeRestTime")
+    @Operation(summary = "Read Rooms", description = "휴식 일정을 삭제한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴식 일정 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity DeleteRoomsRestSchedule(
+        @PathVariable("roomsId") Long roomsId,
+        @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "휴식 일정 삭제에 성공했습니다"
         ));
     }
 

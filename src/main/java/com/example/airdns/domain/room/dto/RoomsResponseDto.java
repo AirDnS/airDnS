@@ -45,11 +45,4 @@ public class RoomsResponseDto {
         private List<String> imageUrl;
     }
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CreateRoomsHolidaysResponseDto {
-        private List<String> imageUrl;
-    }
 }

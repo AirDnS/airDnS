@@ -84,16 +84,16 @@ public class Rooms extends CommonEntity {
 
   
     public void addImage(Images images) {
-        this.getImagesList().add(images);
+        this.imagesList.add(images);
     }
 
     public void deleteImages(Images images) {
-        this.getImagesList().remove(images);
+        this.imagesList.remove(images);
     }
 
     public void resetEquipments() {this.roomEquipmentsList.clear();}
     public void addEquipments(RoomEquipments roomEquipments) {
-        this.getRoomEquipmentsList().add(roomEquipments);
+        this.roomEquipmentsList.add(roomEquipments);
     }
 
     public void updateRooms(
@@ -113,5 +113,13 @@ public class Rooms extends CommonEntity {
       
     public void addReview(Reviews review){
         reviewsList.add(review);
+    }
+
+    public void addRestSchedule(RestSchedule restSchedule) {
+        this.restScheduleList.add(restSchedule);
+    }
+
+    public void deleteRestSchedule(RestSchedule restSchedule) {
+        this.restScheduleList.remove(restSchedule);
     }
 }

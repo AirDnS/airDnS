@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum ImagesExceptionCode {
 
-    NO_PERMISSION_USER_IMAGES(HttpStatus.UNAUTHORIZED, "IMAGE-001", "이미지에 대한 권한이 없습니다."),
+    NO_PERMISSION_USER_IMAGES(HttpStatus.FORBIDDEN, "IMAGE-001", "이미지에 대한 권한이 없습니다."),
     INVALID_IMAGES_ID(HttpStatus.BAD_REQUEST, "IMAGE-002", "이미지 번호가 유효하지 않습니다."),
 
     ;
