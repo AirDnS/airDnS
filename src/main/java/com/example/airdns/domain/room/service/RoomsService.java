@@ -4,6 +4,7 @@ import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,17 +13,17 @@ public interface RoomsService {
     /**
      * 스터디 룸 등록
      * @param requestDto 스터디 룸 정보
+     * @param files 이미지 파일
      */
-    void createRooms(CreateRoomsRequestDto requestDto, Users users);
+    ReadRoomsResponseDto createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users);
 
 
     /**
      * 스터디 룸 조회
      * @param roomsId 방 번호
-     * @param users 로그인 회원
      * @return 방 데이터
      */
-    ReadRoomsResponseDto readRooms(Long roomsId, Users users);
+    ReadRoomsResponseDto readRooms(Long roomsId);
 
     /**
      * 스터디 룸 전체 조회
@@ -34,20 +35,20 @@ public interface RoomsService {
     /**
      * 스터디 룸 변경
      * @param requestDto 변경할 데이터
-     * @param rooms_id 방 번호
+     * @param roomsId 방 번호
      * @param users 로그인 회원
      * @return 변경된 방 데이터
      */
-    UpdateRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long rooms_id, Users users);
+    ReadRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long roomsId, Users users);
 
     /**
-     * 스터디룸 이미지 추가
+     * 스터디룸 이미지 수정
      * @param requestDto 변경된 이미지 정보
-     * @param rooms_id 방 번호
+     * @param roomsId 방 번호
      * @param users 로그인 회원
      */
-    void addRoomsImages(UpdateRoomsImagesRequestDto requestDto, Long rooms_id, Users users);
-
+    UpdateRoomsImagesResponseDto updateRoomsImages(
+            UpdateRoomsImagesRequestDto requestDto, Long roomsId, List<MultipartFile> files, Users users);
 
     /**
      * 스터디룸 삭제
@@ -74,4 +75,5 @@ public interface RoomsService {
      * @return 방
      */
     Rooms findById(Long roomsId);
+
 }

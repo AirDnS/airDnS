@@ -14,6 +14,20 @@ public class RoomsResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    public static class ReadRoomsResponseDto {
+        private String name;
+        private BigDecimal price;
+        private String address;
+        private Integer size;
+        private String desc;
+        private List<Long> equipment;
+        private List<String> imageUrl;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class UpdateRoomsResponseDto {
         private String name;
         private BigDecimal price;
@@ -22,17 +36,20 @@ public class RoomsResponseDto {
         private String desc;
     }
 
+
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class ReadRoomsResponseDto {
-        private String name;
-        private BigDecimal price;
-        private String address;
-        private Integer size;
-        private String desc;
-        private List<Long> equipment;
+    public static class UpdateRoomsImagesResponseDto {
+        private List<String> imageUrl;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateRoomsHolidaysResponseDto {
         private List<String> imageUrl;
     }
 }

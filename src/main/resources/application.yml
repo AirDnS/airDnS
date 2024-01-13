@@ -20,7 +20,10 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-
+  servlet:
+    multipart:
+      max-file-size: 10MB # 한개 파일의 최대 사이즈 (default: 1MB)
+      max-request-size: 100MB # 한개 요청의 최대 사이즈 (default: 10MB)
 #swagger
   mvc:
     path match:
@@ -31,5 +34,15 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha
 
+#AWS S3
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: ${AWS_ACCESSKEY}
+      secretKey: ${AWS_SECRETKEY}
 
 
