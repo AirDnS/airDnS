@@ -1,6 +1,6 @@
 package com.example.airdns.domain.room.entity;
 
-import com.example.airdns.domain.holiday.entity.RestSchedule;
+import com.example.airdns.domain.restschedule.entity.RestSchedule;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.reservation.entity.Reservation;
