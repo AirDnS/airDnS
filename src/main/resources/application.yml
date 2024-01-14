@@ -20,7 +20,10 @@ spring:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
-
+  servlet:
+    multipart:
+      max-file-size: 10MB # 한개 파일의 최대 사이즈 (default: 1MB)
+      max-request-size: 100MB # 한개 요청의 최대 사이즈 (default: 10MB)
 #swagger
   mvc:
     path match:
@@ -38,3 +41,14 @@ payment :
     secret_api_key : testsecretapikey
     success_url : "http://localhost:8080/api/v1/payments/toss/success"
     fail_url : "http://localhost:8080/api/v1/payments/toss/fail"
+    
+#AWS S3
+cloud:
+  aws:
+    s3:
+      bucket: ${AWS_BUCKET_NAME}
+    stack.auto: false
+    region.static: ap-northeast-2
+    credentials:
+      accessKey: ${AWS_ACCESSKEY}
+      secretKey: ${AWS_SECRETKEY}
