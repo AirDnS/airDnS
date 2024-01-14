@@ -1,13 +1,14 @@
 package com.example.airdns.domain.room.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RoomsRequestDto {
@@ -105,8 +106,20 @@ public class RoomsRequestDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class CreateRoomsHolidaysRequestDto {
-        private LocalDate date;
+    public static class CreateRoomsRestScheduleRequestDto {
+        @NotNull(message = "시작 시간을 입력해주세요.")
+        private LocalDateTime startDate;
+
+        @NotNull(message = "종료 시간을 입력해주세요.")
+        private LocalDateTime endDate;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteRoomsRestScheduleRequestDto {
+        @NotNull(message = "삭제할 휴식 일정 번호를 입력해주세요.")
+        private Long restScheduleId;
+    }
 }

@@ -6,12 +6,18 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.example.airdns.global.exception.AWSCustomException;
 import com.example.airdns.global.exception.GlobalExceptionCode;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class S3FileUtil {
@@ -22,6 +28,10 @@ public class S3FileUtil {
 
     public String uploadFile(MultipartFile file, String prefix) {
         try {
+            if (Objects.requireNonNull(file.getOriginalFilename()).isBlank()) {
+                throw new AWSCustomException(GlobalExceptionCode.AWS_S3_FILE_NAME_IS_BLANK);
+            }
+
             String fileName = prefix + file.getOriginalFilename();
 
             ObjectMetadata metadata= new ObjectMetadata();
@@ -40,8 +50,7 @@ public class S3FileUtil {
     }
 
     public void removeFile(String fileUrl, String prefix) {
-        String fileName = fileUrl.substring(fileUrl.indexOf(prefix));
-
+        String fileName = URLDecoder.decode(fileUrl, StandardCharsets.UTF_8).substring(fileUrl.indexOf(prefix));
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
     }
 
