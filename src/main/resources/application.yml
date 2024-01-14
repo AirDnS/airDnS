@@ -24,10 +24,36 @@ spring:
     multipart:
       max-file-size: 10MB # 한개 파일의 최대 사이즈 (default: 1MB)
       max-request-size: 100MB # 한개 요청의 최대 사이즈 (default: 10MB)
-#swagger
+  #swagger
   mvc:
     path match:
       matching-strategy: ant_path_matcher
+
+  #OAuth 2.0
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: 1d3026040c2f7980f0aea5a6693f4331
+            client-secret: k9o8FrS7yeDL38oXra0EY4NGziki1S89
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            scope: # https://developers.kakao.com/docs/latest/ko/kakaologin/common#user-info
+              - profile_nickname
+              - account_email
+            redirect-uri: "{baseUrl}/{action}/oauth2/code/{registrationId}"
+            client-name: Kakao
+
+        provider:
+          kakao:
+            authorizationUri: https://kauth.kakao.com/oauth/authorize
+            tokenUri: https://kauth.kakao.com/oauth/token
+            userInfoUri: https://kapi.kakao.com/v2/user/me
+            userInfoAuthenticationMethod: header
+            userNameAttribute: id
+
+
 #spring docs
 
 springdoc:
@@ -44,5 +70,4 @@ cloud:
     credentials:
       accessKey: ${AWS_ACCESSKEY}
       secretKey: ${AWS_SECRETKEY}
-
 
