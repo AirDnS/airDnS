@@ -4,6 +4,8 @@ import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -30,7 +32,7 @@ public interface RoomsService {
      * @param requestDto 검색 조건
      * @return 방 리스트 데이터
      */
-    List<ReadRoomsResponseDto> readRoomsList(ReadRoomsListRequestDto requestDto);
+    Page<ReadRoomsResponseDto> readRoomsList(Pageable pageable, ReadRoomsListRequestDto requestDto);
 
     /**
      * 스터디 룸 변경
