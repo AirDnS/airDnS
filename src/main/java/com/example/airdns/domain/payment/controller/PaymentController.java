@@ -1,44 +1,32 @@
 package com.example.airdns.domain.payment.controller;
 
-import com.example.airdns.domain.payment.dto.PaymentResponseDto;
-import com.example.airdns.domain.payment.service.PaymentService;
-import com.example.airdns.global.common.dto.CommonResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
+
+import com.example.airdns.domain.payment.dto.PaymentReqDto;
+import com.example.airdns.domain.payment.dto.PaymentResDto;
+import com.example.airdns.domain.payment.service.TossPaymentServiceImplV1;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-
-@Controller
-@RequiredArgsConstructor
-@RequestMapping("/")
+@RestController
+@RequestMapping("/payment")
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final TossPaymentServiceImplV1 tossPaymentService;
 
-    @GetMapping
-    public ResponseEntity<CommonResponse<?>> getPaymentResult(
-            @RequestParam(value = "orderId") String orderId,
-            @RequestParam(value = "amount") Integer amount,
-            @RequestParam(value = "paymentKey") String paymentKey){
-
-        // 해당 secretKey와 encoder 작업을 JwtUtil에서 실행할지? @PostConstruct
-        // 인가 코드 만드는거라... 이거는 그냥 jwtUitl에서 수행하는게 맞는듯?
-        String secretKey = "test_ak_ZORzdMaqN3wQd5k6ygr5AkYXQGwy:";
-
-        Base64.Encoder encoder = Base64.getEncoder();
-        byte[] encodedBytes = encoder.encode(secretKey.getBytes(StandardCharsets.UTF_8));
-        String authorization = "Basic" + new String(encodedBytes, 0, encodedBytes.length);
-
-        PaymentResponseDto.ReadPaymentResponseDto responseDto = null;// paymentService.getPaymentResult(authorization);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 취소 성공", responseDto)
-        );
+    @Autowired
+    public PaymentController(TossPaymentServiceImplV1 tossPaymentService) {
+        this.tossPaymentService = tossPaymentService;
     }
+
+    @PostMapping("/request")
+    public ResponseEntity<?> processPayment(@RequestBody PaymentReqDto paymentReqDto) {
+        PaymentResDto responseDto = tossPaymentService.processPayment(paymentReqDto)
+                .toPaymentResDto();
+        return ResponseEntity.ok(responseDto);
+    }
+
 }
