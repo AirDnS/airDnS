@@ -35,7 +35,6 @@ public class LikesResponseDto {
         private LocalDateTime createdAt;
     }
 
-
     @Getter
     @Builder
     @NoArgsConstructor
