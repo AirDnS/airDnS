@@ -1,5 +1,7 @@
 package com.example.airdns.domain.oauth2.common;
 
+import com.example.airdns.domain.user.entity.Users;
+
 import java.util.Map;
 
 public interface OAuth2UserInfo {
@@ -15,4 +17,6 @@ public interface OAuth2UserInfo {
     String getEmail();
 
     String getNickname();
+
+    Users toEntity();
 }

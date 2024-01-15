@@ -72,7 +72,9 @@ public class Users extends CommonEntity {
     @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
     private List<Reservation> reservationList = new ArrayList<>();
 
-    public String getRoleKey() {
-        return this.role.getKey();
+    public Users update(String email, OAuth2Provider provider) {
+        this.email = email;
+        this.provider = provider;
+        return this;
     }
 }

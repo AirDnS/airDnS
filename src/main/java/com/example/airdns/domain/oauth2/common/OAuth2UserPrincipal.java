@@ -1,19 +1,24 @@
 package com.example.airdns.domain.oauth2.common;
 
+import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 
 public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
 
     private final OAuth2UserInfo userInfo;
+    private final Users users;
 
-    public OAuth2UserPrincipal(OAuth2UserInfo userInfo) {
+    public OAuth2UserPrincipal(OAuth2UserInfo userInfo, Users users) {
         this.userInfo = userInfo;
+        this.users = users;
     }
     @Override
     public String getPassword() {
@@ -52,7 +57,14 @@ public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        UserRole role = users.getRole();
+        String authority = role.getAuthority();
+
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(authority);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(simpleGrantedAuthority);
+
+        return authorities;
     }
 
     @Override
@@ -60,6 +72,9 @@ public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
         return userInfo.getNickname();
     }
 
+    public Users getUsers() {
+        return users;
+    }
     public OAuth2UserInfo getUserInfo() {
         return userInfo;
     }

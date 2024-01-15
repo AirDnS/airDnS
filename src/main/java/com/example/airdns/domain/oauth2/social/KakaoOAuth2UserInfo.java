@@ -2,6 +2,8 @@ package com.example.airdns.domain.oauth2.social;
 
 import com.example.airdns.domain.oauth2.common.OAuth2Provider;
 import com.example.airdns.domain.oauth2.common.OAuth2UserInfo;
+import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.enums.UserRole;
 
 import java.util.Map;
 
@@ -25,7 +27,7 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
 
         this.attributes.put("nickname",nickName);
         this.attributes.put("id", id);
-        this.attributes.put("email", this.email);
+        this.attributes.put("email", email);
     }
 
     @Override
@@ -56,5 +58,14 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     @Override
     public String getNickname() {
         return nickName;
+    }
+
+    @Override
+    public Users toEntity() {
+        return Users.builder()
+                .email(email)
+                .provider(OAuth2Provider.KAKAO)
+                .role(UserRole.USER)
+                .build();
     }
 }

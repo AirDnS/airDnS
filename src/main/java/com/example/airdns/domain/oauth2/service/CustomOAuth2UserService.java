@@ -4,6 +4,8 @@ import com.example.airdns.domain.oauth2.common.OAuth2UserInfo;
 import com.example.airdns.domain.oauth2.common.OAuth2UserInfoFactory;
 import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.oauth2.exception.OAuth2AuthenticationProcessingException;
+import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
@@ -17,6 +19,8 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
+
+    private final UsersRepository usersRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
 
@@ -46,7 +50,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         if (!StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
-        return new OAuth2UserPrincipal(oAuth2UserInfo);
+
+        Users users = saveOrUpdate(oAuth2UserInfo);
+
+        return new OAuth2UserPrincipal(oAuth2UserInfo, users);
+    }
+
+    private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
+        Users users = usersRepository.findByEmail(oAuth2UserInfo.getEmail())
+                .map(entity -> entity.update(oAuth2UserInfo.getEmail(), oAuth2UserInfo.getProvider()))
+                .orElse(oAuth2UserInfo.toEntity());
+
+        return usersRepository.save(users);
     }
 
 }
