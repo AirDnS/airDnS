@@ -4,8 +4,8 @@ import com.example.airdns.global.exception.CustomException;
 import lombok.Getter;
 
 @Getter
-public class UserCustomException extends CustomException {
-    public UserCustomException(UserExceptionCode e) {
+public class UsersCustomException extends CustomException {
+    public UsersCustomException(UsersExceptionCode e) {
         super(e.getHttpStatus(), e.getErrorCode(), e.getMessage());
     }
 }
