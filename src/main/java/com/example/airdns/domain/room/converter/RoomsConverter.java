@@ -3,6 +3,7 @@ package com.example.airdns.domain.room.converter;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
+import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 
@@ -62,6 +63,17 @@ public class RoomsConverter {
                                 .map((Images::getImageUrl))
                                 .collect(Collectors.toList())
                 )
+                .build();
+    }
+
+    public static RoomsSearchConditionDto toRoomsSearchCondition(RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
+        return RoomsSearchConditionDto.builder()
+                .keyword(requestDto.getKeyword())
+                .startPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(0) : null)
+                .endPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(1) : null)
+                .startSize(requestDto.getSize() != null ? requestDto.getSize().get(0) : null)
+                .endSize(requestDto.getSize() != null ? requestDto.getSize().get(1) : null)
+                .equpmentList(requestDto.getEquipment())
                 .build();
     }
 }

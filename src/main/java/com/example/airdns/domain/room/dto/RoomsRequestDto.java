@@ -2,10 +2,8 @@ package com.example.airdns.domain.room.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -61,12 +59,21 @@ public class RoomsRequestDto {
     }
 
     @Getter
+    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadRoomsListRequestDto {
-        private String name;
-        private String desc;
+        @Schema(description = "검색어", example = "엘리스")
+        private String keyword;
+
+        @Size(min=2, max=2, message = "가격 검색은 최솟값, 최댓값으로 구성되어야 합니다.")
+        private List<BigDecimal> price;
+
+        @Size(min=2, max=2, message = "크기 검색은 최솟값, 최댓값으로 구성되어야 합니다.")
+        private List<Integer> size;
+
+        private List<Long> equipment;
     }
 
     @Getter

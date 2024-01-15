@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,12 +72,12 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity readRoomsList(
-            RoomsRequestDto.ReadRoomsListRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @PageableDefault(size=8, sort="createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
-                roomsService.readRoomsList(requestDto)
+                roomsService.readRoomsList(pageable, requestDto)
         ));
     }
 
