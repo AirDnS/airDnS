@@ -1,90 +1,76 @@
 package com.example.airdns.global.config;
 
-import com.example.airdns.domain.user.repository.UserRepository;
-import com.example.airdns.global.jwt.JwtAuthorizationFilter;
+import com.example.airdns.domain.oauth2.handler.OAuth2AuthenticationFailureHandler;
+import com.example.airdns.domain.oauth2.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.example.airdns.domain.oauth2.service.CustomOAuth2UserService;
 import com.example.airdns.global.jwt.JwtUtil;
-import com.example.airdns.global.jwt.UserDetailsServiceImplV1;
-import com.example.airdns.global.redis.dao.RedisDao;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImplV1 userDetailsService;
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final ObjectMapper objectMapper;
-    private final RedisDao redisDao;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    CorsConfigurationSource corsConfigurationSource() {
+        return request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowCredentials(true);
+            config.setAllowedOrigins(List.of("http://localhost:3000"));
+            config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+            config.setAllowedHeaders(List.of("*"));
+            config.setExposedHeaders(List.of("*"));
+            return config;
+        };
     }
 
     @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisDao, objectMapper);
-    }
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // CSRF 설정
-        http.csrf(AbstractHttpConfigurer::disable);
-
-        // 기본 설정인 Session 방식은 사용하지 않고 JWT 방식을 사용하기 위한 설정
-        http.sessionManagement(sessionManagement ->
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
-
-        http.authorizeHttpRequests((authorizeHttpRequests) ->
-                authorizeHttpRequests
-                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/redis").permitAll()
-                        .requestMatchers("/api/login").permitAll()
-                        .requestMatchers("/signup").permitAll()
-                        .requestMatchers("/").permitAll()
+        http.csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
+                .cors(corsConfigure -> corsConfigure.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
                         // swagger v3
-                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**")
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").permitAll() // '/api/v1/users/'로 시작하는 요청 모두 접근 허가
+                        .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login/**").permitAll()
                         .anyRequest().authenticated()
-        );
-
-        http.formLogin(formLogin ->
-                formLogin
-                        .loginPage("/api/login").permitAll()
-        );
-
-        // 필터 관리
-        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+                )
+                .sessionManagement(sessions -> sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .oauth2Login(configure ->
+                        configure.authorizationEndpoint(config -> config.authorizationRequestRepository(httpCookieOAuth2AuthorizationRequestRepository))
+                                .userInfoEndpoint(config -> config.userService(customOAuth2UserService))
+                                .successHandler(oAuth2AuthenticationSuccessHandler)
+                                .failureHandler(oAuth2AuthenticationFailureHandler)
+                );
 
         return http.build();
     }

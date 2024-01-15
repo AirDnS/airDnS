@@ -1,9 +1,9 @@
 package com.example.airdns.domain.room.controller;
 
+import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.global.common.dto.CommonResponse;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -42,7 +42,7 @@ public class RoomsController {
     public ResponseEntity createRooms(
             @RequestPart(value = "data") RoomsRequestDto.CreateRoomsRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
                 HttpStatus.CREATED,
                 "스터디 룸 등록에 성공했습니다",
@@ -75,6 +75,8 @@ public class RoomsController {
     public ResponseEntity readRoomsList(
             @PageableDefault(size=8, sort="createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
+            RoomsRequestDto.ReadRoomsListRequestDto requestDto,
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
@@ -92,7 +94,7 @@ public class RoomsController {
     public ResponseEntity updateRooms(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 수정에 성공했습니다",
@@ -114,7 +116,7 @@ public class RoomsController {
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "이미지 변경에 성공했습니다",
@@ -130,8 +132,10 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity deleteRooms(
-            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @Parameter(name = "roomsId", description = "방 ID") 
+            @PathVariable("roomsId") Long roomsId,
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+
         roomsService.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
