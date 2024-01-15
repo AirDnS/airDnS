@@ -1,6 +1,6 @@
 package com.example.airdns.domain.room.entity;
 
-import com.example.airdns.domain.holiday.entity.Holidays;
+import com.example.airdns.domain.restschedule.entity.RestSchedule;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.reservation.entity.Reservation;
@@ -23,7 +23,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE rooms SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE rooms SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 public class Rooms extends CommonEntity {
 
     @Id
@@ -63,15 +63,15 @@ public class Rooms extends CommonEntity {
     private List<Reservation> reservationList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Images> imagesList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Holidays>  holidaysList= new ArrayList<>();
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
+    private List<RestSchedule> restScheduleList = new ArrayList<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "rooms", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<RoomEquipments> roomEquipmentsList = new ArrayList<>();
 
     @Builder.Default
@@ -82,4 +82,44 @@ public class Rooms extends CommonEntity {
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Reviews> reviewsList = new ArrayList<>();
 
+  
+    public void addImage(Images images) {
+        this.imagesList.add(images);
+    }
+
+    public void deleteImages(Images images) {
+        this.imagesList.remove(images);
+    }
+
+    public void resetEquipments() {this.roomEquipmentsList.clear();}
+    public void addEquipments(RoomEquipments roomEquipments) {
+        this.roomEquipmentsList.add(roomEquipments);
+    }
+
+    public void updateRooms(
+            String name,
+            BigDecimal price,
+            String address,
+            Integer size,
+            String description,
+            Boolean isClosed) {
+        this.name = name;
+        this.price = price;
+        this.address = address;
+        this.size = size;
+        this.description = description;
+        this.isClosed = isClosed;
+    }
+      
+    public void addReview(Reviews review){
+        reviewsList.add(review);
+    }
+
+    public void addRestSchedule(RestSchedule restSchedule) {
+        this.restScheduleList.add(restSchedule);
+    }
+
+    public void deleteRestSchedule(RestSchedule restSchedule) {
+        this.restScheduleList.remove(restSchedule);
+    }
 }

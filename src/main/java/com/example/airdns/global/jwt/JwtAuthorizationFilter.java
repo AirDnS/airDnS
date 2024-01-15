@@ -1,78 +1,69 @@
 package com.example.airdns.global.jwt;
 
-import com.example.airdns.domain.user.exception.UserExceptionCode;
-import com.example.airdns.global.common.dto.CommonResponse;
-import com.example.airdns.global.redis.dao.RedisDao;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
+import com.example.airdns.global.exception.GlobalExceptionCode;
+import com.example.airdns.global.exception.JwtCustomException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-@Slf4j(topic = "JWT 검증 및 인가")
+@Component
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    private static final String AUTHORIZATION_HEADER = "Authorization";
     private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImplV1 userDetailsService;
-    private final RedisDao redisDao;
-    private final ObjectMapper objectMapper;
-
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String tokenValue = jwtUtil.getJwtFromHeader(req);
+        String token = request.getHeader(AUTHORIZATION_HEADER);
 
-        if (StringUtils.hasText(tokenValue)) {
-
-            var logout = redisDao.getBlackList(tokenValue);
-
-            if (!jwtUtil.validateToken(tokenValue) || logout != null) {
-                res.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                res.setContentType("application/json; charset=UTF-8");
-                CommonResponse commonResponse = new CommonResponse(UserExceptionCode.INVALID_TOKEN.getHttpStatus() , UserExceptionCode.INVALID_TOKEN.getMessage(), "");
-                res.getWriter().write(objectMapper.writeValueAsString(commonResponse));
-                return;
-            }
-
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-
-            try {
-                setAuthentication(info.getSubject());
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                return;
+        if (StringUtils.hasText(token)) {
+            String tokenValue = jwtUtil.substringToken(token);
+            JwtStatus jwtStatus = jwtUtil.validateToken(tokenValue);
+            switch (jwtStatus) {
+                case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+                case ACCESS -> successValidatedToken(tokenValue);
+                case EXPIRED -> checkRefreshToken(request, response);
             }
         }
 
-        filterChain.doFilter(req, res);
+        filterChain.doFilter(request, response);
     }
 
-    // 인증 처리
-    public void setAuthentication(String username) {
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        Authentication authentication = createAuthentication(username);
-        context.setAuthentication(authentication);
-
-        SecurityContextHolder.setContext(context);
+    private void successValidatedToken(String tokenValue) {
+        Authentication authentication = jwtUtil.getAuthentication(tokenValue);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    // 인증 객체 생성
-    private Authentication createAuthentication(String username) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+    private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = jwtUtil.getTokenFromRequestCookie(request);
+        String tokenValue = jwtUtil.substringToken(refreshToken);
+        JwtStatus jwtStatus = jwtUtil.validateToken(tokenValue);
+        switch (jwtStatus) {
+            case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
+            case ACCESS -> makeNewAccessToken(tokenValue, response);
+            case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.UNAUTHORIZED_REFRESH_TOKEN_VALUE);
+        }
     }
+
+    // Refresh Token이 유효 기간이 지났을 경우
+    private void makeNewAccessToken(String tokenValue, HttpServletResponse response) {
+        Authentication authentication = jwtUtil.getAuthentication(tokenValue);
+        if (refreshTokenRepository.existsByUsername(authentication.getName())) {
+            String newAccessToken = jwtUtil.createAccessToken(authentication);
+            response.addHeader(AUTHORIZATION_HEADER, newAccessToken);
+        }
+    }
+
 }

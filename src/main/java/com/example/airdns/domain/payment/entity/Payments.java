@@ -20,8 +20,14 @@ public class Payments extends CommonEntity {
     @Column
     private String paymentType;
 
-    @Column
+    @Column(nullable = false)
     private Long amount;
+
+    @Column(nullable = false, name = "pay_name")
+    private String orderName;
+
+    @Column(nullable = false, name = "order_id")
+    private Long orderId;
 
     @Column
     private Boolean isCanceled;
@@ -30,7 +36,13 @@ public class Payments extends CommonEntity {
     private Boolean isPaySuccess;
 
     @Column
+    private String paymentKey;
+
+    @Column
     private String failReason;
+
+    @Column
+    private String cancelReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
