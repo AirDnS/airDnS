@@ -5,6 +5,7 @@ import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.jwt.UserDetailsImplV1;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -32,7 +33,7 @@ public class RoomsController {
     @PostMapping(
             value = "/rooms"
             , consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "Create Rooms", description = "방을 등록한다")
+    @Operation(summary = "방 등록", description = "방을 등록한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "스터디 룸 등록 성공"),
             @ApiResponse(responseCode = "403", description = "등록 권한 없음"),
@@ -50,13 +51,13 @@ public class RoomsController {
     }
 
     @GetMapping("/rooms/{roomsId}")
-    @Operation(summary = "Read Rooms", description = "선택한 방 정보를 조회한다")
+    @Operation(summary = "선택 방 조회", description = "선택한 방 정보를 조회한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스터디 룸 조회 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity readRooms(@PathVariable Long roomsId) {
+    public ResponseEntity readRooms(@Parameter(name = "roomsId", description = "방 ID") @PathVariable Long roomsId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
@@ -65,7 +66,7 @@ public class RoomsController {
     }
 
     @GetMapping("/rooms")
-    @Operation(summary = "Read Rooms List", description = "방 정보를 조회한다")
+    @Operation(summary = "방 정보 전체 조회", description = "방 정보를 조회한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스터디 룸 조회 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
@@ -82,14 +83,14 @@ public class RoomsController {
     }
 
     @PatchMapping("/rooms/{roomsId}")
-    @Operation(summary = "Update Rooms", description = "방을 수정한다")
+    @Operation(summary = "방 정보 수정", description = "방을 수정한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스터디 룸 수정 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRooms(
-            @PathVariable("roomsId") Long roomsId,
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -103,14 +104,14 @@ public class RoomsController {
             value = "/rooms/{roomsId}/updateImages",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
     )
-    @Operation(summary = "Update Rooms Images", description = "방 이미지를 수정한다")
+    @Operation(summary = "방 이미지 수정", description = "방 이미지를 수정한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "이미지 수정 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRoomsImage(
-            @PathVariable("roomsId") Long roomsId,
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
@@ -122,14 +123,14 @@ public class RoomsController {
     }
 
     @DeleteMapping("/rooms/{roomsId}")
-    @Operation(summary = "Delete Rooms", description = "방을 삭제한다")
+    @Operation(summary = "방 삭제", description = "방을 삭제한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스터디 룸 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity deleteRooms(
-            @PathVariable("roomsId") Long roomsId,
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         roomsService.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -139,14 +140,14 @@ public class RoomsController {
     }
 
     @PostMapping("/rooms/{roomsId}/addRestTime")
-    @Operation(summary = "Read Rooms", description = "휴식 일정을 등록한다")
+    @Operation(summary = "휴식 일정 등록", description = "휴식 일정을 등록한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "휴식 일정 등록 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity CreateRoomsRestSchedule(
-            @PathVariable("roomsId") Long roomsId,
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
@@ -157,14 +158,14 @@ public class RoomsController {
     }
 
     @DeleteMapping("/rooms/{roomsId}/removeRestTime")
-    @Operation(summary = "Read Rooms", description = "휴식 일정을 삭제한다")
+    @Operation(summary = "휴식 일정 삭제", description = "휴식 일정을 삭제한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "휴식 일정 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity DeleteRoomsRestSchedule(
-        @PathVariable("roomsId") Long roomsId,
+        @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
         @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
         @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
         roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
