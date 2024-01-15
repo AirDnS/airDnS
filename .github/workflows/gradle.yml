@@ -1,1 +1,62 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
 
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # 실행 환경 지정
+    runs-on: ubuntu-latest
+
+    # task의 순서
+    # version 17 실행
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    # build gradle
+    - name: Build with Gradle
+      run : ./gradlew clean build
+
+    # 전송할 파일(jar)을 담을 디렉토리 생성
+    - name: Make Directory for deliver
+      run: mkdir -p deploy
+
+    # jar 파일 복사 후, deploy 폴더에 담는다.
+    - name: Copy Jar
+      run: cp ./build/libs/*.jar ./deploy
+
+    # code deploy는 jar파일을 인식 못 하기에 압축
+    - name: Make zip file
+      run: zip -r ./myTest.zip ./deploy
+      shell: bash
+
+    # Deploy s3 파일 업로드 또는 CodeDeploy 배포 등 외부 서비스와 연동
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-northeast-2
+
+    - name: Upload to S3
+      run: aws s3 cp --region ap-northeast-2 ./myTest.zip s3://githubactionaws
