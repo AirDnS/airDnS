@@ -3,7 +3,6 @@ package com.example.airdns.domain.review.service;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
 import com.example.airdns.domain.user.entity.Users;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
