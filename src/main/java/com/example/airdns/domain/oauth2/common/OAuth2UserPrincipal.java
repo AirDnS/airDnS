@@ -2,6 +2,7 @@ package com.example.airdns.domain.oauth2.common;
 
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
 
+    @Getter
     private final OAuth2UserInfo userInfo;
     private final Users users;
 
@@ -72,10 +74,7 @@ public class OAuth2UserPrincipal implements OAuth2User, UserDetails {
         return userInfo.getNickname();
     }
 
-    public Users getUsers() {
+    public Users getUser() {
         return users;
-    }
-    public OAuth2UserInfo getUserInfo() {
-        return userInfo;
     }
 }
