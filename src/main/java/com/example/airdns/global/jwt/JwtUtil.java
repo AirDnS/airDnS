@@ -8,21 +8,29 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -50,7 +58,7 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(key);
     }
 
-    public boolean validateToken(String token) {
+    public JwtStatus validateToken(String token) {
 
         try {
             Jwts.parserBuilder()
@@ -58,20 +66,18 @@ public class JwtUtil {
                     .build()
                     .parseClaimsJws(token);
 
-            return true;
+            return JwtStatus.ACCESS;
         } catch (UnsupportedJwtException | MalformedJwtException exception) {
-            log.error("JWT is not valid");
+            return JwtStatus.FAIL;
         } catch (SignatureException exception) {
-            log.error("JWT signature validation fails");
+            return JwtStatus.FAIL;
         } catch (ExpiredJwtException exception) {
-            log.error("JWT is expired");
+            return JwtStatus.EXPIRED;
         } catch (IllegalArgumentException exception) {
-            log.error("JWT is null or empty or only whitespace");
+            return JwtStatus.FAIL;
         } catch (Exception exception) {
-            log.error("JWT validation fails", exception);
+            return JwtStatus.FAIL;
         }
-
-        return false;
     }
 
     public String createAccessToken(Authentication authentication) {
@@ -104,8 +110,9 @@ public class JwtUtil {
                         .compact();
     }
 
-    public void saveRefreshToken(String username, String refreshToken){
-        refreshTokenRepository.saveRefreshToken(username,refreshToken);
+
+    public void saveRefreshToken(String username, String refreshToken) {
+        refreshTokenRepository.saveRefreshToken(username, refreshToken);
     }
 
     public void addJwtToCookie(String token, HttpServletResponse res) {
@@ -128,9 +135,36 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
 
-        UserDetails user = new User(claims.getSubject(), "", Collections.emptyList());
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORIZATION_KEY).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
 
-        return new UsernamePasswordAuthenticationToken(user, "", Collections.emptyList());
+        UserDetails user = new User(claims.getSubject(), "", authorities);
+        return new UsernamePasswordAuthenticationToken(user, "", authorities);
+    }
+
+    public String substringToken(String tokenValue) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+            return tokenValue.substring(7);
+        }
+        throw new NullPointerException("Not Found Token");
+    }
+
+    public String getTokenFromRequestCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
 }

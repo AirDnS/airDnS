@@ -35,8 +35,8 @@ spring:
       client:
         registration:
           kakao:
-            client-id: 1d3026040c2f7980f0aea5a6693f4331
-            client-secret: k9o8FrS7yeDL38oXra0EY4NGziki1S89
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             client-authentication-method: client_secret_post
             authorization-grant-type: authorization_code
             scope: # https://developers.kakao.com/docs/latest/ko/kakaologin/common#user-info
