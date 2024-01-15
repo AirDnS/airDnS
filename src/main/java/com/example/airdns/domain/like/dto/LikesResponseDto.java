@@ -45,5 +45,4 @@ public class LikesResponseDto {
         private String nickName;
         private String roomName;
     }
-
 }
