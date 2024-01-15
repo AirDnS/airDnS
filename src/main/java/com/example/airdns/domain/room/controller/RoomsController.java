@@ -7,6 +7,7 @@ import com.example.airdns.global.common.dto.CommonResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -85,7 +86,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRooms(
-            @PathVariable(value = "roomsId") Long roomsId,
+            @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
             @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -106,7 +107,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity updateRoomsImage(
-            @PathVariable(value = "roomsId") Long roomsId,
+            @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
@@ -127,10 +128,47 @@ public class RoomsController {
     public ResponseEntity deleteRooms(
             @PathVariable Long roomsId,
             @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+
         roomsService.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
-                "스터디 룸 정보 조회에 성공했습니다"
+                "스터디 룸 삭제에 성공했습니다"
+        ));
+    }
+
+    @PostMapping("/rooms/{roomsId}/addRestTime")
+    @Operation(summary = "Read Rooms", description = "휴식 일정을 등록한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴식 일정 등록 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity CreateRoomsRestSchedule(
+            @PathVariable("roomsId") Long roomsId,
+            @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "휴식 일정 등록에 성공했습니다"
+        ));
+    }
+
+    @DeleteMapping("/rooms/{roomsId}/removeRestTime")
+    @Operation(summary = "Read Rooms", description = "휴식 일정을 삭제한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴식 일정 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity DeleteRoomsRestSchedule(
+        @PathVariable("roomsId") Long roomsId,
+        @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "휴식 일정 삭제에 성공했습니다"
         ));
     }
 

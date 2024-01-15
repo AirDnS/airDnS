@@ -58,6 +58,20 @@ public interface RoomsService {
     void deleteRooms(Long roomsId, Users users);
 
     /**
+     * 스터디룸 휴식 일정 등록
+     * @param requestDto 휴식 일정 정보
+     * @param roomsId 방 번호
+     */
+    void CreateRoomsRestSchedule(CreateRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
+
+    /**
+     * 스터디룸 휴식 일정 삭제
+     * @param requestDto 휴식 일정 정보
+     * @param roomsId 방 번호
+     */
+    void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
+
+    /**
      * 방 활성화 여부 확인
      * @return 활성화 여부
      */
@@ -75,5 +89,4 @@ public interface RoomsService {
      * @return 방
      */
     Rooms findById(Long roomsId);
-
 }

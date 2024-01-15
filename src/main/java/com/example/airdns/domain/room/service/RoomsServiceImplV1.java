@@ -1,7 +1,9 @@
 package com.example.airdns.domain.room.service;
 
 import com.example.airdns.domain.equipment.service.EquipmentsService;
+import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.image.service.ImagesService;
+import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
@@ -12,7 +14,6 @@ import com.example.airdns.domain.room.repository.RoomsRepository;
 import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
-import com.example.airdns.global.awss3.S3FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,8 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     private final RoomEquipmentsService roomEquipmentsService;
 
+    private final RestScheduleService restScheduleService;
+
     private final EquipmentsService equipmentsService;
 
     @Override
@@ -43,7 +46,6 @@ public class RoomsServiceImplV1 implements RoomsService {
 
         updateEquipments(rooms, requestDto.getEquipment());
         uploadImages(rooms, files);
-
 
         return RoomsConverter.toDto(rooms);
     }
@@ -72,6 +74,7 @@ public class RoomsServiceImplV1 implements RoomsService {
         return RoomsConverter.toDto(requestDto, rooms);
     }
 
+    @Transactional
     @Override
     public UpdateRoomsImagesResponseDto updateRoomsImages(
             UpdateRoomsImagesRequestDto requestDto,
@@ -80,14 +83,15 @@ public class RoomsServiceImplV1 implements RoomsService {
             Users users) {
         Rooms rooms = findById(roomsId);
 
-        //TODO 데이터 없으면 리턴
+        validateUserIsRoomsHost(rooms, users);
 
-        if (!rooms.getUsers().getId().equals(users.getId())) {
-            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
+        if (requestDto != null) {
+            deleteImage(rooms, requestDto.getRemoveImages());
         }
 
-        deleteImage(rooms, requestDto.getRemoveImages());
-        uploadImages(rooms, files);
+        if (files != null) {
+            uploadImages(rooms, files);
+        }
 
         return RoomsConverter.toImagesDto(rooms);
 
@@ -95,7 +99,41 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     @Override
     public void deleteRooms(Long roomsId, Users users) {
+        Rooms rooms = findById(roomsId);
 
+        validateUserIsRoomsHost(rooms, users);
+
+        roomsRepository.delete(rooms);
+    }
+
+    @Override
+    public void CreateRoomsRestSchedule(
+            CreateRoomsRestScheduleRequestDto requestDto,
+            Long roomsId,
+            Users users) {
+        Rooms rooms = findById(roomsId);
+
+        validateUserIsRoomsHost(rooms, users);
+
+        rooms.addRestSchedule(
+                restScheduleService.createRestSchedule(
+                        rooms, requestDto.getStartDate(), requestDto.getEndDate()
+                )
+        );
+    }
+
+    @Transactional
+    @Override
+    public void DeleteRoomsRestSchedule(
+            DeleteRoomsRestScheduleRequestDto requestDto,
+            Long roomsId,
+            Users users) {
+
+        Rooms rooms = findById(roomsId);
+
+        validateUserIsRoomsHost(rooms, users);
+
+        restScheduleService.deleteRestSchedule(requestDto.getRestScheduleId(), rooms);
     }
 
     @Override
@@ -114,6 +152,12 @@ public class RoomsServiceImplV1 implements RoomsService {
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
     }
 
+    private void validateUserIsRoomsHost(Rooms rooms, Users users) {
+        if (!rooms.getUsers().getId().equals(users.getId())) {
+            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
+        }
+    }
+
     private void updateEquipments(Rooms rooms, List<Long> equipments) {
         equipments.stream().distinct().forEach(
                 equipment -> rooms.addEquipments(
@@ -126,12 +170,19 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     private void uploadImages(Rooms rooms, List<MultipartFile> files) {
         for(MultipartFile file : files) {
+            if (file == null) continue;
+
             //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
             rooms.addImage(imagesService.createImages(rooms, file));
         }
     }
 
     private void deleteImage(Rooms rooms, List<Long> removeImages) {
+        if (!rooms.getImagesList().stream().map(Images::getId).toList()
+                .containsAll(removeImages)) {
+            throw new RoomsCustomException(RoomsExceptionCode.IMAGES_NOT_EXIST);
+        }
+
         removeImages.forEach(images -> imagesService.deleteImages(images, rooms));
     }
 }
