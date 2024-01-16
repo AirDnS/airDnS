@@ -5,6 +5,7 @@ import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface ReservationService {
 
@@ -60,10 +61,17 @@ public interface ReservationService {
                                                                  ReservationRequestDto.UpdateReservationDto requestDto);
 
     /**
-     * 예약 정보중 체크인 시간과 체크 아웃 시간을 수정한다
+     * 해당 예약 정보를 조회한다.
      * @Param 유저 Id
      * @Param 해당 예약 Id
      * @return 예약 정보
      */
     ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId, Long reservationId);
+
+    /**
+     * 유저의 예약 목록을 조회한다.
+     * @Param 유저 Id
+     * @return 예약 정보 목록
+     */
+    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long id);
 }

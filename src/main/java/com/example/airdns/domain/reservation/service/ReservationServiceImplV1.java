@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -96,6 +97,11 @@ public class ReservationServiceImplV1 implements ReservationService {
         }
 
         return ReservationResponseDto.ReadReservationResponseDto.of(reservation);
+    }
+
+    @Override
+    public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long userId) {
+        return reservationRepository.findAllByUsersId(userId).stream().map(ReservationResponseDto.ReadReservationResponseDto::of).toList();
     }
 
     @Override

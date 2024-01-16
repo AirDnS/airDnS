@@ -20,6 +20,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -87,4 +89,19 @@ public class ReservationController {
                 new CommonResponse(HttpStatus.OK, "해당 예약 조회 성공", reservationResponseDto)
         );
     }
+
+    @GetMapping("/reservation")
+    @Operation(summary = "예약 전체 조회", description = "유저의 예약 목록을 조회한다.")
+    @ApiResponse(responseCode = "200", description = "예약 목록 조회에 성공")
+    public ResponseEntity<CommonResponse> readReservationList(
+            @AuthenticationPrincipal UserDetailsImpl userDetails
+    ) {
+        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationService.readReservationList(
+                userDetails.getUser().getId()
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse(HttpStatus.OK, "예약 목록 조회 성공", reservationResponseDtoList)
+        );
+    }
+
 }
