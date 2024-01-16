@@ -10,7 +10,6 @@ import com.example.airdns.domain.restschedule.repository.RestScheduleRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
-//import com.example.airdns.domain.user.service.UsersService;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
@@ -57,15 +56,15 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
 
-    @Transactional
     @Override
+    @Transactional
     public ReservationResponseDto.UpdateReservationResponseDto updateReservation(Long userId,
-                                                                        Long roomsId,
-                                                                        Long reservationId,
-                                                                        ReservationRequestDto.UpdateReservationDto requestDto) {
+                                                                                 Long roomsId,
+                                                                                 Long reservationId,
+                                                                                 ReservationRequestDto.UpdateReservationDto requestDto) {
         Reservation reservation = findById(reservationId);
 
-        if(!Objects.equals(reservation.getUsers().getId(), userId)) {
+        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
@@ -92,7 +91,7 @@ public class ReservationServiceImplV1 implements ReservationService {
     public ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId, Long reservationId) {
         Reservation reservation = findById(reservationId);
 
-        if(!Objects.equals(reservation.getUsers().getId(), userId)) {
+        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
             throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
         }
 
@@ -102,6 +101,18 @@ public class ReservationServiceImplV1 implements ReservationService {
     @Override
     public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long userId) {
         return reservationRepository.findAllByUsersId(userId).stream().map(ReservationResponseDto.ReadReservationResponseDto::of).toList();
+    }
+
+    @Override
+    @Transactional
+    public void deleteReservation(Long userId, Long reservationId) {
+        Reservation reservation = findById(reservationId);
+
+        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
+            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+        }
+
+        reservation.isDeleted();
     }
 
     @Override

@@ -50,4 +50,9 @@ public class Reservation extends CommonEntity {
         this.checkIn = requestDto.getCheckInTime();
         this.checkOut = requestDto.getCheckOutTime();
     }
+
+    public void isDeleted() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }

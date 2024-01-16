@@ -12,9 +12,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -34,7 +34,7 @@ public class ReservationController {
     @PostMapping("/rooms/{roomsId}/reservation")
     @Operation(summary = "예약 생성", description = "해당 방에 대해 예약을 한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "스터디 룸 예약 성공"),
+            @ApiResponse(responseCode = "201", description = "예약 성공"),
             @ApiResponse(responseCode = "400", description = "예약 시간 입력값이 잘못 입력 되었습니다."),
             @ApiResponse(responseCode = "400", description = "해당 예약 시간에 예약을 못합니다.")
     })
@@ -43,8 +43,10 @@ public class ReservationController {
             @PathVariable Long roomsId,
             @Valid @RequestBody ReservationRequestDto.CreateReservationDto createReservation) {
         reservationService.createReservation(userDetails.getUser().getId(), roomsId, createReservation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CommonResponse(HttpStatus.CREATED, "스터디 룸 예약 성공", null)
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
+                        HttpStatus.CREATED,
+                        "예약 성공"
+                )
         );
     }
 
@@ -101,6 +103,25 @@ public class ReservationController {
         );
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse(HttpStatus.OK, "예약 목록 조회 성공", reservationResponseDtoList)
+        );
+    }
+
+    @PatchMapping("/reservation/{reservationId}")
+    @Operation(summary = "해당 예약 삭제", description = "해당 예약을 삭제한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "해당 예약 성공"),
+            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
+    })
+    public ResponseEntity<CommonResponse> deleteReservation(
+            HttpServletRequest request,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long reservationId
+    ) {
+        reservationService.deleteReservation(userDetails.getUser().getId(), reservationId);
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                        HttpStatus.OK,
+                        "예약 삭제 성공"
+                )
         );
     }
 
