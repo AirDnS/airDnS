@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
 public class Reservation extends CommonEntity {
 
     @Id
