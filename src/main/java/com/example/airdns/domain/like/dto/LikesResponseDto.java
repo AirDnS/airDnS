@@ -35,7 +35,6 @@ public class LikesResponseDto {
         private LocalDateTime createdAt;
     }
 
-
     @Getter
     @Builder
     @NoArgsConstructor
@@ -46,5 +45,4 @@ public class LikesResponseDto {
         private String nickName;
         private String roomName;
     }
-
 }
