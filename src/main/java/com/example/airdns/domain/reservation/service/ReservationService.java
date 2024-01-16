@@ -58,4 +58,12 @@ public interface ReservationService {
                                                                  Long roomsId,
                                                                  Long reservationId,
                                                                  ReservationRequestDto.UpdateReservationDto requestDto);
+
+    /**
+     * 예약 정보중 체크인 시간과 체크 아웃 시간을 수정한다
+     * @Param 유저 Id
+     * @Param 해당 예약 Id
+     * @return 예약 정보
+     */
+    ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId, Long reservationId);
 }

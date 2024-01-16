@@ -38,7 +38,30 @@ public class ReservationResponseDto {
                     .usersId(reservation.getUsers().getId())
                     .build();
         }
+    }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadReservationResponseDto implements Serializable {
+        private Long id;
+
+        private LocalDateTime checkIn;
+
+        private LocalDateTime checkOut;
+
+        private Long roomsId;
+
+
+        public static ReadReservationResponseDto of(Reservation reservation) {
+            return ReadReservationResponseDto.builder()
+                    .id(reservation.getId())
+                    .checkIn(reservation.getCheckIn())
+                    .checkOut(reservation.getCheckOut())
+                    .roomsId(reservation.getRooms().getId())
+                    .build();
+        }
     }
 
 }

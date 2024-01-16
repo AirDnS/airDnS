@@ -89,6 +89,17 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
     @Override
+    public ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId, Long reservationId) {
+        Reservation reservation = findById(reservationId);
+
+        if(!Objects.equals(reservation.getUsers().getId(), userId)) {
+            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+        }
+
+        return ReservationResponseDto.ReadReservationResponseDto.of(reservation);
+    }
+
+    @Override
     public Reservation findById(Long reservationId) {
         return reservationRepository.findById(reservationId).orElseThrow(
                 () -> new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION));

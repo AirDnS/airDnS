@@ -6,12 +6,15 @@ import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,8 +62,25 @@ public class ReservationController {
                 reservationId,
                 requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse(HttpStatus.OK, "스터디 룸 수정 성공",  reservationResponse)
+                new CommonResponse(HttpStatus.OK, "예약 수정 성공", reservationResponse)
         );
     }
 
+    @GetMapping("/reservation/{reservationId}")
+    @Operation(summary = "예약 단건 조회", description = "해당 예약을 조회한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "해당 예약 조회에 성공",
+                    content = {@Content(schema = @Schema(implementation = ReservationResponseDto.ReadReservationResponseDto.class))}),
+            @ApiResponse(responseCode = "400", description = "해당 예약 정보가 없습니다.")
+    })
+    public ResponseEntity<CommonResponse> readReservation(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long reservationId) {
+        ReservationResponseDto.ReadReservationResponseDto reservationResponseDto = reservationService.readReservation(
+                userDetails.getUser().getId(),
+                reservationId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse(HttpStatus.OK, "해당 예약 조회 성공", reservationResponseDto)
+        );
+    }
 }
