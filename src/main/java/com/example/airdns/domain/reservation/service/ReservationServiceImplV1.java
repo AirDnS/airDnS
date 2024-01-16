@@ -36,20 +36,8 @@ public class ReservationServiceImplV1 implements ReservationService {
                                   ReservationRequestDto.CreateReservationDto requestDto) {
         Users users = usersService.findById(userId);
         Rooms rooms = roomsService.findById(roomId);
-        LocalDateTime now = LocalDateTime.now();
 
-        if (requestDto.getCheckInTime().isBefore(now)
-                || requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
-        }
-        if (requestDto.getCheckInTime().isEqual(requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
-        }
-
-        if (isReserved(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())
-                || isRested(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
-        }
+        isValidatedRequestSchedule(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime());
 
         Reservation reservation = requestDto.toEntity(users, rooms);
         reservationRepository.save(reservation);
@@ -59,7 +47,7 @@ public class ReservationServiceImplV1 implements ReservationService {
     @Override
     @Transactional
     public ReservationResponseDto.UpdateReservationResponseDto updateReservation(Long userId,
-                                                                                 Long roomsId,
+                                                                                 Long roomId,
                                                                                  Long reservationId,
                                                                                  ReservationRequestDto.UpdateReservationDto requestDto) {
         Reservation reservation = findById(reservationId);
@@ -67,22 +55,7 @@ public class ReservationServiceImplV1 implements ReservationService {
         if (!Objects.equals(reservation.getUsers().getId(), userId)) {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
-
-        LocalDateTime now = LocalDateTime.now();
-
-        if (requestDto.getCheckInTime().isBefore(now)
-                || requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
-        }
-
-        if (requestDto.getCheckInTime().isEqual(requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
-        }
-
-        if (isReserved(roomsId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())
-                || isRested(roomsId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
-        }
+        isValidatedRequestSchedule(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime());
         reservation.updateReservationTime(requestDto);
         return ReservationResponseDto.UpdateReservationResponseDto.of(reservation);
     }
@@ -92,7 +65,7 @@ public class ReservationServiceImplV1 implements ReservationService {
         Reservation reservation = findById(reservationId);
 
         if (!Objects.equals(reservation.getUsers().getId(), userId)) {
-            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+            throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
         return ReservationResponseDto.ReadReservationResponseDto.of(reservation);
@@ -100,7 +73,7 @@ public class ReservationServiceImplV1 implements ReservationService {
 
     @Override
     public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long userId) {
-        return reservationRepository.findAllByUsersId(userId).stream().map(ReservationResponseDto.ReadReservationResponseDto::of).toList();
+        return reservationRepository.findAllByUsersIdAndIsDeletedFalse(userId).stream().map(ReservationResponseDto.ReadReservationResponseDto::of).toList();
     }
 
     @Override
@@ -109,26 +82,45 @@ public class ReservationServiceImplV1 implements ReservationService {
         Reservation reservation = findById(reservationId);
 
         if (!Objects.equals(reservation.getUsers().getId(), userId)) {
-            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+            throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
         reservation.isDeleted();
     }
 
     @Override
+    public void isValidatedRequestSchedule(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        LocalDateTime now = LocalDateTime.now();
+        if (checkIn.isBefore(now)
+                || checkIn.isAfter(checkOut)) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        }
+
+        if (checkIn.isEqual(checkOut)) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        }
+
+        if (isReserved(roomId, checkIn, checkOut)
+                || isRested(roomId, checkIn, checkOut)) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
+        }
+    }
+
+    @Override
     public Reservation findById(Long reservationId) {
-        return reservationRepository.findById(reservationId).orElseThrow(
+        return reservationRepository.findByIdAndIsDeletedFalse(reservationId).orElseThrow(
                 () -> new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION));
     }
 
     @Override
-    public boolean isReserved(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        return reservationRepository.findFirstByRoomsIdAndCheckInBeforeAndCheckOutAfter(roomsId, checkOut, checkIn).isPresent();
+    public boolean isReserved(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return reservationRepository.
+                findFirstByRoomsIdAndIsDeletedFalseAndCheckInBeforeAndCheckOutAfter(roomId, checkOut, checkIn).isPresent();
     }
 
     @Override
-    public boolean isRested(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomsId, checkOut, checkIn).isPresent();
+    public boolean isRested(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomId, checkOut, checkIn).isPresent();
     }
 
 }

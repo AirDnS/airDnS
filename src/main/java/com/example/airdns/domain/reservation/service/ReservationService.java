@@ -83,4 +83,13 @@ public interface ReservationService {
      * @return void
      */
     void deleteReservation(Long userId, Long reservationId);
+
+    /**
+     * 해당 예약 시간이 가능한지 체크한다.
+     * @Param 해당 방 Id
+     * @Param 체크인 시간
+     * @Param 체크아웃 시간
+     * @return void
+     */
+    void isValidatedRequestSchedule(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut);
 }

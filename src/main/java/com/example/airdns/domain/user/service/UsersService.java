@@ -8,4 +8,5 @@ public interface UsersService {
 
     UsersResponseDto.UpdateUsersResponseDto updateUser(Long userId, UsersRequestDto.UpdateUserInfoRequestDto userRequestDto);
     Users findById(Long userId);
+
 }

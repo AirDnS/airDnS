@@ -78,8 +78,8 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 조회에 성공",
                     content = {@Content(schema = @Schema(implementation = ReservationResponseDto.ReadReservationResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "해당 예약 정보가 없습니다."),
-            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
+            @ApiResponse(responseCode = "404", description = "해당 예약이 없습니다."),
+            @ApiResponse(responseCode = "403", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> readReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -110,7 +110,7 @@ public class ReservationController {
     @Operation(summary = "해당 예약 삭제", description = "해당 예약을 삭제한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 성공"),
-            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
+            @ApiResponse(responseCode = "403", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> deleteReservation(
             HttpServletRequest request,
