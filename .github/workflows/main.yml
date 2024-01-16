@@ -1,0 +1,60 @@
+name: Java CI/CD with Gradle
+
+on:
+  #push:
+  #  branches: [ "master" ]
+  #pull_request:
+  #  branches: [ "develop" ]
+  #release:
+  #  types: [ created ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2 # 만약 v1이라면 with의 distribution는 생략해도 된다.
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+
+      # 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Build Gradle
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # DockerHub 계정 로그인
+      - name: DockerHub Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME}}
+          password: ${{ secrets.DOCKERHUB_PASSWORD}}
+
+      # *.jar -> Docker Image Build
+      - name: Docker Image Build
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns .
+
+      # DockerHub's Image push
+      - name: DockerHub Push
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+
+      # run application, ec2 client name : appleboy
+      - name: Run Application
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            sudo docker kill air_dns
+            sudo docker rm -f air_dns
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+            sudo docker run -p 8080:8080 \
+                        --name air_dns \
+                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns
