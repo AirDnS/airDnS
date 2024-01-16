@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
@@ -51,9 +52,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        Users users = saveOrUpdate(oAuth2UserInfo);
+        saveOrUpdate(oAuth2UserInfo);
 
-        return new OAuth2UserPrincipal(oAuth2UserInfo, users);
+        return new OAuth2UserPrincipal(oAuth2UserInfo);
     }
 
     private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {

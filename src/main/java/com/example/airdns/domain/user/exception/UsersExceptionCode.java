@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UsersExceptionCode {
     // BAD_REQUEST 400
-    BAD_REQUEST_NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "USER-001", "비밀번호가 일치하지 않습니다"),
-
     BAD_REQUEST_NOT_MATCH_AUTH_CODE(HttpStatus.BAD_REQUEST, "USER-012", "이메일 인증번호가 일치하지 않습니다"),
 
     // UNAUTHORIZED 401

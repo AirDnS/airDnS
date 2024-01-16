@@ -2,6 +2,7 @@ package com.example.airdns.global.jwt;
 
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -47,6 +48,8 @@ public class JwtUtil {
     public static final String BEARER_PREFIX = "Bearer ";
 
     private final RefreshTokenRepository refreshTokenRepository;
+
+    private final UserDetailsServiceImpl userDetailsServieImpl;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -140,8 +143,8 @@ public class JwtUtil {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails user = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(user, "", authorities);
+        UserDetails user = userDetailsServieImpl.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(user, null, authorities);
     }
 
     public String substringToken(String tokenValue) {

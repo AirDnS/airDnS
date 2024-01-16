@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -42,8 +43,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     private void successValidatedToken(String tokenValue) {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         Authentication authentication = jwtUtil.getAuthentication(tokenValue);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        securityContext.setAuthentication(authentication);
+        SecurityContextHolder.setContext(securityContext);
     }
 
     private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response) {
