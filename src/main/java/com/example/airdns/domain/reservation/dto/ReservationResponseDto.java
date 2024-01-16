@@ -25,15 +25,17 @@ public class ReservationResponseDto {
 
         private LocalDateTime checkOut;
 
-        private Rooms rooms;
+        private Long roomsId;
 
-        private Users users;
+        private Long usersId;
 
         public static UpdateReservationResponseDto of(Reservation reservation) {
             return UpdateReservationResponseDto.builder()
                     .id(reservation.getId())
                     .checkIn(reservation.getCheckIn())
                     .checkOut(reservation.getCheckOut())
+                    .roomsId(reservation.getRooms().getId())
+                    .usersId(reservation.getUsers().getId())
                     .build();
         }
 
