@@ -19,4 +19,6 @@ public interface OAuth2UserInfo {
     String getNickname();
 
     Users toEntity();
+
+    String makeNickname();
 }

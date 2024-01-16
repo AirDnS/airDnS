@@ -35,7 +35,7 @@ public class Users extends CommonEntity {
     private OAuth2Provider provider;
 
     @Column
-    private String nickName;
+    private String nickname;
 
     @Column
     private String contact;
@@ -79,6 +79,6 @@ public class Users extends CommonEntity {
     public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
         this.address = userRequestDto.getAddress();
         this.contact = userRequestDto.getContact();
-        this.nickName = userRequestDto.getNickName();
+        this.nickname = userRequestDto.getNickname();
     }
 }

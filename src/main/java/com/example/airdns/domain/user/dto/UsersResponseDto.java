@@ -17,7 +17,7 @@ public class UsersResponseDto {
     public static class UpdateUsersResponseDto {
 
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
-        private String nickName;
+        private String nickname;
 
         @Schema(description = "주소", example = "서울특별시 서초구 서초대로77길 54", defaultValue = "서울특별시 서초구 서초대로77길 54")
         private String address;
@@ -30,7 +30,7 @@ public class UsersResponseDto {
 
         public static UpdateUsersResponseDto of(Users user) {
             return UpdateUsersResponseDto.builder()
-                    .nickName(user.getNickName())
+                    .nickname(user.getNickname())
                     .address(user.getAddress())
                     .contact(user.getContact())
                     .role(user.getRole())

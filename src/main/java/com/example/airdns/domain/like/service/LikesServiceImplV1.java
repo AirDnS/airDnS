@@ -33,7 +33,7 @@ public class LikesServiceImplV1 implements LikesService {
                 .map(like -> LikesResponseDto.ReadLikeResponseDto.builder()
                         .roomName(room.getName())
                         .roomAddress(room.getAddress())
-                        .nickName(user.getNickName())
+                        .nickName(user.getNickname())
                         .createdAt(like.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
@@ -53,7 +53,7 @@ public class LikesServiceImplV1 implements LikesService {
 
         return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
-                .nickName(user.getNickName())
+                .nickName(user.getNickname())
                 .createdAt(likes.getCreatedAt())
                 .build();
     }
@@ -71,7 +71,7 @@ public class LikesServiceImplV1 implements LikesService {
 
         return LikesResponseDto.DeleteLikeResponseDto.builder()
                 .roomName(room.getName())
-                .nickName(user.getNickName())
+                .nickName(user.getNickname())
                 .build();
     }
 

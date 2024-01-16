@@ -5,6 +5,9 @@ import com.example.airdns.domain.oauth2.common.OAuth2UserInfo;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
@@ -64,9 +67,21 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     public Users toEntity() {
         return Users.builder()
                 .email(email)
-                .nickName(nickName)
+                .nickname(makeNickname())
                 .provider(OAuth2Provider.KAKAO)
                 .role(UserRole.USER)
                 .build();
+    }
+
+    @Override
+    public String makeNickname() {
+        List<String> adjective = Arrays.asList("행복한", "슬픈", "게으른", "슬기로운", "수줍은",
+                "그리운", "더러운", "섹시한", "배고픈", "배부른", "부자", "재벌", "웃고있는", "깨발랄한");
+        String[] splitEmail = email.split("@");
+        String name = splitEmail[0];
+        String number = (int)(Math.random() * 99)+1 +"";
+        Collections.shuffle(adjective);
+        String adj = adjective.get(0);
+        return adj+name+number;
     }
 }
