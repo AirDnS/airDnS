@@ -1,5 +1,6 @@
 package com.example.airdns.review;
 
+import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
 import com.example.airdns.domain.review.entity.QReviews;
@@ -13,7 +14,6 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.repository.RoomsRepository;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -120,7 +120,7 @@ public class ReviewsServiceTest {
     void addReviewReviewAlreadyExists() {
         // given
         Long roomsId = 1L;
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
+        OAuth2UserPrincipal userDetails = mock(OAuth2UserPrincipal.class);
         Rooms room = Rooms.builder().id(roomsId).name("Room Number1").build();
 
         ReviewsRequestDto.AddReviewRequestDto requestDto = ReviewsRequestDto.AddReviewRequestDto.builder()
@@ -231,7 +231,7 @@ public class ReviewsServiceTest {
     }
 
     private Users saveUsersInfo(){
-        UserDetailsImplV1 userDetails = mock(UserDetailsImplV1.class);
+        OAuth2UserPrincipal userDetails = mock(OAuth2UserPrincipal.class);
         Users mockUser = Users.builder().id(1L).nickName("test").build();
         when(userDetails.getUser()).thenReturn(mockUser);
 

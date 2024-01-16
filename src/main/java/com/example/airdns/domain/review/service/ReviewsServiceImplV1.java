@@ -37,7 +37,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         Reviews review = reviewsRepository.findByRoomsId(roomsId).orElse(null);
 
         return ReviewsResponseDto.ReadReviewResponseDto.builder()
-                .nickName(review.getUsers().getNickName())
+                .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
                 .modifiedAt(review.getModifiedAt())
@@ -64,7 +64,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                 .stream()
                 .map(review -> ReviewsResponseDto.ReadReviewResponseDto.builder()
                         .roomName(room.getName())
-                        .nickName(review.getUsers().getNickName())
+                        .nickName(review.getUsers().getNickname())
                         .content(review.getContent())
                         .createdAt(review.getCreatedAt())
                         .modifiedAt(review.getModifiedAt())
@@ -102,7 +102,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         room.addReview(review);
 
         return ReviewsResponseDto.CreateReviewResponseDto.builder()
-                .nickName(review.getUsers().getNickName())
+                .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
                 .content(review.getContent())
@@ -125,7 +125,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         reviewsRepository.save(review);
 
         return ReviewsResponseDto.UpdateReviewResponseDto.builder()
-                .nickName(review.getUsers().getNickName())
+                .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
                 .modifiedAt(review.getModifiedAt())
@@ -148,7 +148,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         reviewsRepository.deleteById(reviewId);
 
         return ReviewsResponseDto.DeleteReviewResponseDto.builder()
-                .nickName(review.getUsers().getNickName())
+                .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
                 .modifiedAt(review.getModifiedAt())

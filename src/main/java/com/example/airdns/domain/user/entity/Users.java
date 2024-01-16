@@ -1,18 +1,15 @@
 package com.example.airdns.domain.user.entity;
 
-import com.example.airdns.domain.chattinguser.entity.ChattingUsers;
 import com.example.airdns.domain.like.entity.Likes;
+import com.example.airdns.domain.oauth2.common.OAuth2Provider;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.review.entity.Reviews;
 import com.example.airdns.domain.room.entity.Rooms;
+import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,8 +20,7 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
-@SQLDelete(sql = "UPDATE users SET deleted = true WHERE id = ?")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends CommonEntity {
 
     @Id
@@ -35,10 +31,11 @@ public class Users extends CommonEntity {
     private String email;
 
     @Column
-    private String password;
+    @Enumerated(EnumType.STRING)
+    private OAuth2Provider provider;
 
     @Column
-    private String nickName;
+    private String nickname;
 
     @Column
     private String contact;
@@ -48,25 +45,18 @@ public class Users extends CommonEntity {
 
     @Column
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private UserRole role = UserRole.USER;
+    private UserRole role;
 
+    @Builder.Default
     @Column
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     @Column
     private LocalDateTime deletedAt;
 
-    @Column
-    private Long kakaoId;
-
     @Builder.Default
     @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
     private List<Reviews> reviewsList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<ChattingUsers> chattingUsersList = new ArrayList<>();
 
     @Builder.Default
     @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
@@ -79,4 +69,16 @@ public class Users extends CommonEntity {
     @Builder.Default
     @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
     private List<Reservation> reservationList = new ArrayList<>();
+
+    public Users update(String email, OAuth2Provider provider) {
+        this.email = email;
+        this.provider = provider;
+        return this;
+    }
+
+    public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
+        this.address = userRequestDto.getAddress();
+        this.contact = userRequestDto.getContact();
+        this.nickname = userRequestDto.getNickname();
+    }
 }

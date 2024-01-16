@@ -1,156 +1,173 @@
 package com.example.airdns.global.jwt;
 
+import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
-import com.example.airdns.global.redis.dto.TokenDto;
+import com.example.airdns.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Base64;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.stream.Collectors;
 
-@Slf4j(topic = "JwtUtil")
 @Component
+@RequiredArgsConstructor
+@Slf4j
 public class JwtUtil {
-    // Header KEY 값
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    private static final String REFRESH_TOKEN_HEADER = "RefreshToken";
-    public static final String AUTHORIZATION_KEY = "auth";
-    // Token 식별자
-    public static final String BEARER_PREFIX = "Bearer ";
-    // 토큰 만료시간
-    private final long ACCESS_TOKEN_TIME = 60 * 60 * 1000L; // 60분
-    private final long REFRESH_TOKEN_TIME = 24 * 60 * 60 * 1000L; // 1일
 
-    @Value("${spring.jwt.secret}") // Base64 Encode 한 SecretKey
-    private String secretKey;
+    public static final long ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 30; // 30min
+    public static final long REFRESH_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 60; // 1 hour
+
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    // 사용자 권한 값의 KEY
+    public static final String AUTHORIZATION_KEY = "auth";
+    // Token 식별자(Convention)
+    public static final String BEARER_PREFIX = "Bearer ";
+
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    private final UserDetailsServiceImpl userDetailsServieImpl;
+
+    @Value("${jwt.secret}")
+    private String secret;
     private Key key;
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
     @PostConstruct
     public void init() {
-        byte[] bytes = Base64.getDecoder().decode(secretKey);
-        key = Keys.hmacShaKeyFor(bytes);
+        byte[] key = Decoders.BASE64URL.decode(secret);
+        this.key = Keys.hmacShaKeyFor(key);
     }
 
-    // 1. 토큰 생성
-    public TokenDto createToken(String username, UserRole role) {
+    public JwtStatus validateToken(String token) {
+
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            return JwtStatus.ACCESS;
+        } catch (UnsupportedJwtException | MalformedJwtException exception) {
+            return JwtStatus.FAIL;
+        } catch (SignatureException exception) {
+            return JwtStatus.FAIL;
+        } catch (ExpiredJwtException exception) {
+            return JwtStatus.EXPIRED;
+        } catch (IllegalArgumentException exception) {
+            return JwtStatus.FAIL;
+        } catch (Exception exception) {
+            return JwtStatus.FAIL;
+        }
+    }
+
+    public String createAccessToken(Authentication authentication) {
+
         Date date = new Date();
+        Date expiryDate = new Date(date.getTime() + ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
 
-        String accessToken =
+        return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(username) // 사용자 식별자값(ID)
-                        .setExpiration(new Date(date.getTime() + ACCESS_TOKEN_TIME)) // 만료 시간
-                        .setIssuedAt(date) // 발급일
-                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
+                        .setSubject(authentication.getName())
+                        .setIssuedAt(date)
+                        .claim(AUTHORIZATION_KEY, UserRole.USER)
+                        .setExpiration(expiryDate)
+                        .signWith(key, SignatureAlgorithm.HS512)
                         .compact();
-
-        String refreshToken =
-                Jwts.builder()
-                        .setSubject(username) // 사용자 식별자값(ID)
-                        .setExpiration(new Date(date.getTime() + REFRESH_TOKEN_TIME)) // 만료 시간
-                        .setIssuedAt(date) // 발급일
-                        .claim(AUTHORIZATION_KEY, role) // 사용자 권한
-                        .signWith(key, signatureAlgorithm) // 암호화 알고리즘
-                        .compact();
-
-        return TokenDto.of(accessToken, refreshToken);
     }
 
-    // header 에서 JWT 가져오기
-    public String getJwtFromHeader(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+    public String createRefreshToken(Authentication authentication) {
+
+        Date date = new Date();
+        Date expiryDate = new Date(date.getTime() + REFRESH_TOKEN_EXPIRE_TIME_IN_MILLISECONDS);
+
+        return BEARER_PREFIX +
+                Jwts.builder()
+                        .setSubject(authentication.getName())
+                        .setIssuedAt(date)
+                        .claim(AUTHORIZATION_KEY, UserRole.USER)
+                        .setExpiration(expiryDate)
+                        .signWith(key, SignatureAlgorithm.HS512)
+                        .compact();
+    }
+
+
+    public void saveRefreshToken(String username, String refreshToken) {
+        refreshTokenRepository.saveRefreshToken(username, refreshToken);
+    }
+
+    public void addJwtToCookie(String token, HttpServletResponse res) {
+        try {
+            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+            cookie.setPath("/");
+
+            res.addCookie(cookie);
+        } catch (UnsupportedEncodingException e) {
+            log.error("Not Encoding");
+        }
+    }
+
+    public Authentication getAuthentication(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        Collection<? extends GrantedAuthority> authorities =
+                Arrays.stream(claims.get(AUTHORIZATION_KEY).toString().split(","))
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList());
+
+        UserDetails user = userDetailsServieImpl.loadUserByUsername(claims.getSubject());
+        return new UsernamePasswordAuthenticationToken(user, null, authorities);
+    }
+
+    public String substringToken(String tokenValue) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+            return tokenValue.substring(7);
+        }
+        throw new NullPointerException("Not Found Token");
+    }
+
+    public String getTokenFromRequestCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
+                }
+            }
         }
         return null;
     }
 
-    // 토큰 검증
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            log.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {
-            log.error("Expired JWT token, 만료된 JWT token 입니다.");
-        } catch (UnsupportedJwtException e) {
-            log.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
-        } catch (IllegalArgumentException e) {
-            log.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
-        }
-        return false;
-    }
-
-    // 토큰에서 사용자 정보 가져오기
-    public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-    }
-
-    public void setTokenResponse(TokenDto tokenDto, HttpServletResponse response) {
-        setHeaderAccessToken(tokenDto.getAccessToken(), response);
-        setCookieRefreshToken(tokenDto.getRefreshToken(), response);
-    }
-
-    private void setHeaderAccessToken(String accessToken, HttpServletResponse response) {
-        response.setHeader(AUTHORIZATION_HEADER, BEARER_PREFIX + accessToken);
-    }
-
-    private void setCookieRefreshToken(String refreshToken, HttpServletResponse response) {
-        refreshToken = URLEncoder.encode(BEARER_PREFIX + refreshToken, StandardCharsets.UTF_8).replaceAll("\\+", "%20"); // Cookie Value 에는 공백이 불가능해서 encoding 진행
-
-        Cookie cookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken); // Name-Value
-        cookie.setSecure(true);
-        cookie.setPath("/");
-
-        // Response 객체에 Cookie 추가
-        response.addCookie(cookie);
-    }
-
-    public String getRefreshTokenFromCookie(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-
-        if (cookies == null) {
-            return null;
-        }
-
-        String token = "";
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(REFRESH_TOKEN_HEADER)) {
-                token = URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8); // Encode 되어 넘어간 Value 다시 Decode
-            }
-        }
-        return substringToken(token);
-    }
-
-    private String substringToken(String tokenValue) {
-        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
-            return tokenValue.substring(7);
-        }
-
-        log.error("Can not Substring Token Value");
-        throw new IllegalArgumentException();
-    }
-
-    public Long getExpiration(String accessToken) {
-        //에세스 토큰 만료시간
-        Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody()
-                .getExpiration();
-        //현재시간
-        long now = new Date().getTime();
-        return (expiration.getTime() - now);
-    }
 }

@@ -3,7 +3,7 @@ package com.example.airdns.domain.like.controller;
 import com.example.airdns.domain.like.dto.LikesResponseDto;
 import com.example.airdns.domain.like.service.LikesService;
 import com.example.airdns.global.common.dto.CommonResponse;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
+import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ public class LikesController {
     @GetMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<List<LikesResponseDto.ReadLikeResponseDto>>> getLikeList(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails){
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
         List<LikesResponseDto.ReadLikeResponseDto> responseDto = likesService.getLikeList(roomsId, userDetails.getUser());
 
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -41,7 +41,7 @@ public class LikesController {
     })
     public ResponseEntity<CommonResponse<LikesResponseDto.CreateLikeResponseDto>> addLike(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails){
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
         LikesResponseDto.CreateLikeResponseDto responseDto = likesService.addLike(roomsId, userDetails.getUser());
         // ok
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -58,7 +58,7 @@ public class LikesController {
     @DeleteMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> cancelLike(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails){
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
         LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.cancelLike(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 취소 성공", responseDto)
