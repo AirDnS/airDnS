@@ -33,7 +33,8 @@ public class ReservationController {
     @Operation(summary = "예약 생성", description = "해당 방에 대해 예약을 한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "스터디 룸 예약 성공"),
-            @ApiResponse(responseCode = "400", description = "예약 정보가 잘못 입력 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "예약 시간 입력값이 잘못 입력 되었습니다."),
+            @ApiResponse(responseCode = "400", description = "해당 예약 시간에 예약을 못합니다.")
     })
     public ResponseEntity<CommonResponse> createReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -48,8 +49,10 @@ public class ReservationController {
     @PatchMapping("/rooms/{roomsId}/reservation/{reservationId}")
     @Operation(summary = "예약 수정", description = "해당 예약을 수정한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "스터디 룸 예약 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "수정 정보가 잘못 입력 되었습니다.")
+            @ApiResponse(responseCode = "200", description = "스터디 룸 예약 수정 성공",
+                    content = {@Content(schema = @Schema(implementation = ReservationResponseDto.UpdateReservationResponseDto.class))}),
+            @ApiResponse(responseCode = "400", description = "수정 정보가 잘못 입력 되었습니다."),
+            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> updateReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -71,7 +74,8 @@ public class ReservationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 조회에 성공",
                     content = {@Content(schema = @Schema(implementation = ReservationResponseDto.ReadReservationResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "해당 예약 정보가 없습니다.")
+            @ApiResponse(responseCode = "400", description = "해당 예약 정보가 없습니다."),
+            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> readReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,

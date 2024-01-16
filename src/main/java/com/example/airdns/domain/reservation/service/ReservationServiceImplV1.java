@@ -62,11 +62,10 @@ public class ReservationServiceImplV1 implements ReservationService {
                                                                         Long roomsId,
                                                                         Long reservationId,
                                                                         ReservationRequestDto.UpdateReservationDto requestDto) {
-        Users users = usersService.findById(userId);
         Reservation reservation = findById(reservationId);
 
-        if(!Objects.equals(users.getId(), userId)) {
-            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+        if(!Objects.equals(reservation.getUsers().getId(), userId)) {
+            throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
         LocalDateTime now = LocalDateTime.now();
