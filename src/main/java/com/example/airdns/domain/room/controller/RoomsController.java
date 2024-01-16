@@ -75,8 +75,6 @@ public class RoomsController {
     public ResponseEntity readRoomsList(
             @PageableDefault(size=8, sort="createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
-            RoomsRequestDto.ReadRoomsListRequestDto requestDto,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
@@ -153,7 +151,7 @@ public class RoomsController {
     public ResponseEntity CreateRoomsRestSchedule(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
@@ -171,7 +169,7 @@ public class RoomsController {
     public ResponseEntity DeleteRoomsRestSchedule(
         @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
         @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
-        @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
         roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
