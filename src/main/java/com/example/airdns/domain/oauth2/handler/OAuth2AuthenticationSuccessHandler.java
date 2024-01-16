@@ -1,9 +1,15 @@
 package com.example.airdns.domain.oauth2.handler;
 
+import com.example.airdns.domain.oauth2.common.OAuth2Provider;
+import com.example.airdns.domain.oauth2.common.OAuth2UserInfo;
 import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
+import com.example.airdns.domain.oauth2.common.OAuth2UserUnlinkManager;
 import com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.repository.UsersRepository;
 import com.example.airdns.global.cookie.CookieUtil;
 import com.example.airdns.global.jwt.JwtUtil;
+import com.example.airdns.global.redis.RedisService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,6 +23,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.IOException;
 import java.util.Optional;
 
+import static com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME;
 import static com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository.REDIRECT_URI_PARAM_COOKIE_NAME;
 
 @Slf4j
@@ -26,6 +33,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
     private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
     private final JwtUtil jwtUtil;
+    private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
+    private final RedisService redisService;
+    private final UsersRepository usersRepository;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
@@ -48,27 +58,59 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .map(Cookie::getValue);
 
         String targetUrl = redirectUri.orElse(getDefaultTargetUrl());
-        log.info(targetUrl);
+
+        String mode = CookieUtil.getCookie(request, MODE_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue)
+                .orElse("");
 
         OAuth2UserPrincipal principal = getOAuth2UserPrincipal(authentication);
 
+        if (principal == null) {
+            return UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("error", "Login failed")
+                    .build().toUriString();
+        }
 
-        log.info("email={}, nickname={}, accessToken={}",
-                principal.getUserInfo().getEmail(),
-                principal.getUserInfo().getNickname(),
-                principal.getUserInfo().getAccessToken()
-        );
+        if ("login".equalsIgnoreCase(mode)) {
+            // TODO: DB 저장
+            // TODO: 액세스 토큰, 리프레시 토큰 발급
+            // TODO: 리프레시 토큰 DB 저장
+            log.info("email={}, nickname={}, accessToken={}",
+                    principal.getUserInfo().getEmail(),
+                    principal.getUserInfo().getNickname(),
+                    principal.getUserInfo().getAccessToken()
+            );
 
-        String accessToken = jwtUtil.createAccessToken(authentication);
-        String refreshToken = jwtUtil.createRefreshToken(authentication);
+            String accessToken = jwtUtil.createAccessToken(authentication);
+            String refreshToken = jwtUtil.createRefreshToken(authentication);
+            // User 정보 저장
 
-        //redis에 저장
-        jwtUtil.saveRefreshToken(principal.getName(), refreshToken);
+            saveOrUpdate(principal.getUserInfo());
 
-        jwtUtil.addJwtToCookie(refreshToken, response);
-        // Cookie 방식 전달로 수정
+            //redis에 저장
+            jwtUtil.saveRefreshToken(principal.getName(), refreshToken);
+
+            jwtUtil.addJwtToCookie(refreshToken, response);
+
+            return UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("token",accessToken)
+                    .build().toUriString();
+
+        } else if ("unlink".equalsIgnoreCase(mode)) {
+
+            String accessToken = principal.getUserInfo().getAccessToken();
+            OAuth2Provider provider = principal.getUserInfo().getProvider();
+
+            // TODO: 리프레시 토큰 삭제
+            oAuth2UserUnlinkManager.unlink(provider, accessToken);
+            redisService.deleteValues(principal.getName());
+
+            return UriComponentsBuilder.fromUriString(targetUrl)
+                    .build().toUriString();
+        }
+
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("token",accessToken)
+                .queryParam("error", "Login failed")
                 .build().toUriString();
     }
 
@@ -84,5 +126,13 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+    }
+
+    private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
+        Users users = usersRepository.findByEmail(oAuth2UserInfo.getEmail())
+                .map(entity -> entity.update(oAuth2UserInfo.getEmail(), oAuth2UserInfo.getProvider()))
+                .orElse(oAuth2UserInfo.toEntity());
+
+        return usersRepository.save(users);
     }
 }

@@ -21,7 +21,6 @@ import org.springframework.util.StringUtils;
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
-    private final UsersRepository usersRepository;
     @Override
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
 
@@ -52,17 +51,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        saveOrUpdate(oAuth2UserInfo);
-
         return new OAuth2UserPrincipal(oAuth2UserInfo);
-    }
-
-    private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
-        Users users = usersRepository.findByEmail(oAuth2UserInfo.getEmail())
-                .map(entity -> entity.update(oAuth2UserInfo.getEmail(), oAuth2UserInfo.getProvider()))
-                .orElse(oAuth2UserInfo.toEntity());
-
-        return usersRepository.save(users);
     }
 
 }

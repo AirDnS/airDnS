@@ -41,26 +41,31 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
+    // Access Token 성공시 , user 가 로그아웃일 경우 체크
     private void successValidatedToken(String tokenValue) {
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+        // redis에서 해당 email을 refresh Token이 있는지 확인
         Authentication authentication = jwtUtil.getAuthentication(tokenValue);
+        if(!refreshTokenRepository.existsByUsername(authentication.getName())){
+            return;
+        }
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         securityContext.setAuthentication(authentication);
         SecurityContextHolder.setContext(securityContext);
     }
 
+    // Access Token 기간이 만료시 Refresh Token을 체크해야 한다.
     private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = jwtUtil.getTokenFromRequestCookie(request);
-        String tokenValue = jwtUtil.substringToken(refreshToken);
-        JwtStatus jwtStatus = jwtUtil.validateToken(tokenValue);
+        String refreshTokenValue = jwtUtil.substringToken(refreshToken);
+        JwtStatus jwtStatus = jwtUtil.validateToken(refreshTokenValue);
         switch (jwtStatus) {
             case FAIL -> throw new JwtCustomException(GlobalExceptionCode.INVALID_TOKEN_VALUE);
-            case ACCESS -> makeNewAccessToken(tokenValue, response);
+            case ACCESS -> makeNewAccessToken(refreshTokenValue, response);
             case EXPIRED -> throw new JwtCustomException(GlobalExceptionCode.UNAUTHORIZED_REFRESH_TOKEN_VALUE);
         }
     }
 
-    // Refresh Token이 유효 기간이 지났을 경우
+    // Refresh Token이 멀쩡할 시 새로 발급
     private void makeNewAccessToken(String tokenValue, HttpServletResponse response) {
         Authentication authentication = jwtUtil.getAuthentication(tokenValue);
         if (refreshTokenRepository.existsByUsername(authentication.getName())) {
