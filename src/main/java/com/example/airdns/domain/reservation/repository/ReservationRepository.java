@@ -9,6 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
-
-    Optional<Reservation> findByRoomsIdAndCheckInAfterOrCheckOutBefore(Long roomsId, LocalDateTime checkOut, LocalDateTime checkIn);
+    Optional<Reservation> findFirstByRoomsIdAndCheckInBeforeAndCheckOutAfter(Long roomsId, LocalDateTime checkOut, LocalDateTime checkIn);
 }

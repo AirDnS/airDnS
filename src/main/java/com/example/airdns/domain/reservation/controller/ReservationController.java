@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.controller;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
+import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
@@ -25,9 +26,8 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    // Login 구현이 끝나면 AuthenticationPrincipal로 수정
     @PostMapping("/rooms/{roomsId}/reservation")
-    @Operation(summary = "Create Reservation", description = "해당 방에 대해 예약을 한다.")
+    @Operation(summary = "예약 생성", description = "해당 방에 대해 예약을 한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "스터디 룸 예약 성공"),
             @ApiResponse(responseCode = "400", description = "예약 정보가 잘못 입력 되었습니다."),
@@ -39,6 +39,27 @@ public class ReservationController {
         reservationService.createReservation(userDetails.getUser().getId(), roomsId, createReservation);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CommonResponse(HttpStatus.CREATED, "스터디 룸 예약 성공", null)
+        );
+    }
+
+    @PatchMapping("/rooms/{roomsId}/reservation/{reservationId}")
+    @Operation(summary = "예약 수정", description = "해당 예약을 수정한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "스터디 룸 예약 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "수정 정보가 잘못 입력 되었습니다.")
+    })
+    public ResponseEntity<CommonResponse> updateReservation(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable Long roomsId,
+            @PathVariable Long reservationId,
+            @Valid @RequestBody ReservationRequestDto.UpdateReservationDto requestDto) {
+        ReservationResponseDto.UpdateReservationResponseDto reservationResponse = reservationService.updateReservation(
+                userDetails.getUser().getId(),
+                roomsId,
+                reservationId,
+                requestDto);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse(HttpStatus.OK, "스터디 룸 수정 성공",  reservationResponse)
         );
     }
 

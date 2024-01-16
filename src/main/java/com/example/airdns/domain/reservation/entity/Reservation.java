@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.entity;
 
 
+import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
@@ -45,4 +46,8 @@ public class Reservation extends CommonEntity {
     @JoinColumn(name = "users_id")
     private Users users;
 
+    public void updateReservationTime(ReservationRequestDto.UpdateReservationDto requestDto) {
+        this.checkIn = requestDto.getCheckInTime();
+        this.checkOut = requestDto.getCheckOutTime();
+    }
 }

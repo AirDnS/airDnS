@@ -25,7 +25,7 @@ public class ReservationRequestDto {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkInTime;
 
-        @Schema(description = "checkInTime", example = "2024-05-10T12:00:00")
+        @Schema(description = "checkOutTime", example = "2024-05-10T12:00:00")
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkOutTime;
 
@@ -33,9 +33,27 @@ public class ReservationRequestDto {
             return Reservation.builder()
                     .users(users)
                     .rooms(rooms)
+                    .isDeleted(false)
                     .checkIn(checkInTime)
                     .checkOut(checkOutTime)
                     .build();
         }
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "Create Reservation request")
+    public static class UpdateReservationDto {
+
+        @Schema(description = "checkInTime", example = "2024-05-10T10:00:00")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime checkInTime;
+
+        @Schema(description = "checkOutTime", example = "2024-05-10T12:00:00")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+        private LocalDateTime checkOutTime;
+
     }
 }

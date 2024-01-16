@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.service;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
+import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
@@ -10,11 +11,15 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
 //import com.example.airdns.domain.user.service.UsersService;
+import com.example.airdns.domain.user.exception.UsersCustomException;
+import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -35,10 +40,13 @@ public class ReservationServiceImplV1 implements ReservationService {
 
         if (requestDto.getCheckInTime().isBefore(now)
                 || requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION);
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        }
+        if (requestDto.getCheckInTime().isEqual(requestDto.getCheckOutTime())) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
         }
 
-        if(isReserved(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())
+        if (isReserved(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())
                 || isRested(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
         }
@@ -48,6 +56,37 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
 
+    @Transactional
+    @Override
+    public ReservationResponseDto.UpdateReservationResponseDto updateReservation(Long userId,
+                                                                        Long roomsId,
+                                                                        Long reservationId,
+                                                                        ReservationRequestDto.UpdateReservationDto requestDto) {
+        Users users = usersService.findById(userId);
+        Reservation reservation = findById(reservationId);
+
+        if(!Objects.equals(users.getId(), userId)) {
+            throw new UsersCustomException(UsersExceptionCode.BAD_REQUEST_NOT_MATCH_AUTH_CODE);
+        }
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (requestDto.getCheckInTime().isBefore(now)
+                || requestDto.getCheckInTime().isAfter(requestDto.getCheckOutTime())) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        }
+
+        if (requestDto.getCheckInTime().isEqual(requestDto.getCheckOutTime())) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        }
+
+        if (isReserved(roomsId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())
+                || isRested(roomsId, requestDto.getCheckInTime(), requestDto.getCheckOutTime())) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
+        }
+        reservation.updateReservationTime(requestDto);
+        return ReservationResponseDto.UpdateReservationResponseDto.of(reservation);
+    }
 
     @Override
     public Reservation findById(Long reservationId) {
@@ -56,12 +95,13 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
     @Override
-    public boolean isReserved(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut){
-        return reservationRepository.findByRoomsIdAndCheckInAfterOrCheckOutBefore(roomsId, checkOut, checkIn).isPresent();
+    public boolean isReserved(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return reservationRepository.findFirstByRoomsIdAndCheckInBeforeAndCheckOutAfter(roomsId, checkOut, checkIn).isPresent();
     }
 
     @Override
     public boolean isRested(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        return restScheduleRepository.findByRoomsIdAndRestStartTimeAfterOrRestEndTimeBefore(roomsId, checkOut, checkIn).isPresent();
+        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomsId, checkOut, checkIn).isPresent();
     }
+
 }

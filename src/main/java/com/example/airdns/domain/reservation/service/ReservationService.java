@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.service;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
+import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 
 import java.time.LocalDateTime;
@@ -44,4 +45,17 @@ public interface ReservationService {
      * @return true/false
      */
     boolean isRested(Long roomsId, LocalDateTime checkIn, LocalDateTime checkOut);
+
+    /**
+     * 예약 정보중 체크인 시간과 체크 아웃 시간을 수정한다
+     * @Param 유저 Id
+     * @Param 방 Id
+     * @Param 해당 예약 Id
+     * @Param 수정 시간
+     * @return true/false
+     */
+    ReservationResponseDto.UpdateReservationResponseDto updateReservation(Long userId,
+                                                                 Long roomsId,
+                                                                 Long reservationId,
+                                                                 ReservationRequestDto.UpdateReservationDto requestDto);
 }
