@@ -64,6 +64,7 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
     public Users toEntity() {
         return Users.builder()
                 .email(email)
+                .nickName(nickName)
                 .provider(OAuth2Provider.KAKAO)
                 .role(UserRole.USER)
                 .build();

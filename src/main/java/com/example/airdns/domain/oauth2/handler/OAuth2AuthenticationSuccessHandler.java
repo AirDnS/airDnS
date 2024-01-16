@@ -63,7 +63,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         String refreshToken = jwtUtil.createRefreshToken(authentication);
 
         //redis에 저장
-        jwtUtil.saveRefreshToken(principal.getUsername(), refreshToken);
+        jwtUtil.saveRefreshToken(principal.getName(), refreshToken);
 
         jwtUtil.addJwtToCookie(refreshToken, response);
         // Cookie 방식 전달로 수정

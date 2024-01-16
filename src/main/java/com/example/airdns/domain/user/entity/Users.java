@@ -5,14 +5,11 @@ import com.example.airdns.domain.oauth2.common.OAuth2Provider;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.review.entity.Reviews;
 import com.example.airdns.domain.room.entity.Rooms;
+import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLDelete;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,7 +20,7 @@ import java.util.List;
 @Builder
 @Getter
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Users extends CommonEntity {
 
     @Id
@@ -50,8 +47,9 @@ public class Users extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
+    @Builder.Default
     @Column
-    private Boolean isDeleted;
+    private Boolean isDeleted = false;
 
     @Column
     private LocalDateTime deletedAt;
@@ -76,5 +74,11 @@ public class Users extends CommonEntity {
         this.email = email;
         this.provider = provider;
         return this;
+    }
+
+    public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
+        this.address = userRequestDto.getAddress();
+        this.contact = userRequestDto.getContact();
+        this.nickName = userRequestDto.getNickName();
     }
 }

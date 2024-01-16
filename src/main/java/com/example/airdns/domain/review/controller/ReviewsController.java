@@ -1,10 +1,10 @@
 package com.example.airdns.domain.review.controller;
 
-import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
 import com.example.airdns.domain.review.service.ReviewsService;
 import com.example.airdns.global.common.dto.CommonResponse;
+import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -61,7 +61,7 @@ public class ReviewsController {
     })
     public ResponseEntity<CommonResponse<ReviewsResponseDto.CreateReviewResponseDto>> addReview(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid ReviewsRequestDto.AddReviewRequestDto requestDto){
         ReviewsResponseDto.CreateReviewResponseDto responseDto = reviewsService.addReview(roomsId, userDetails.getUser(), requestDto);
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -77,7 +77,7 @@ public class ReviewsController {
     public ResponseEntity<CommonResponse<ReviewsResponseDto.UpdateReviewResponseDto>> modifyReview(
             @PathVariable Long roomsId,
             @PathVariable Long reviewId,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         ReviewsResponseDto.UpdateReviewResponseDto responseDto = reviewsService.modifyReview(roomsId, reviewId, userDetails.getUser(), requestDto);
         return ResponseEntity.status(HttpStatus.OK)
@@ -93,7 +93,7 @@ public class ReviewsController {
     public ResponseEntity<CommonResponse<ReviewsResponseDto.DeleteReviewResponseDto>> removeReview(
             @PathVariable Long roomsId,
             @PathVariable Long reviewId,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails){
+            @AuthenticationPrincipal UserDetailsImpl userDetails){
         ReviewsResponseDto.DeleteReviewResponseDto responseDto = reviewsService.removeReview(roomsId, reviewId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 삭제 성공", responseDto)

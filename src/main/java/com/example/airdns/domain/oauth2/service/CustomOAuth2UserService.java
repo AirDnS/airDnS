@@ -51,9 +51,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
-        Users users = saveOrUpdate(oAuth2UserInfo);
+        saveOrUpdate(oAuth2UserInfo);
 
-        return new OAuth2UserPrincipal(oAuth2UserInfo, users);
+        return new OAuth2UserPrincipal(oAuth2UserInfo);
     }
 
     private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {

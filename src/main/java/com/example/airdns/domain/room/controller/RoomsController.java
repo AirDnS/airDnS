@@ -1,9 +1,9 @@
 package com.example.airdns.domain.room.controller;
 
-import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.global.common.dto.CommonResponse;
+import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -38,7 +38,7 @@ public class RoomsController {
     public ResponseEntity createRooms(
             @RequestPart(value = "data") RoomsRequestDto.CreateRoomsRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
                 HttpStatus.CREATED,
                 "스터디 룸 등록에 성공했습니다",
@@ -70,7 +70,7 @@ public class RoomsController {
     })
     public ResponseEntity readRoomsList(
             RoomsRequestDto.ReadRoomsListRequestDto requestDto,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
@@ -88,7 +88,7 @@ public class RoomsController {
     public ResponseEntity updateRooms(
             @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 수정에 성공했습니다",
@@ -110,7 +110,7 @@ public class RoomsController {
             @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "이미지 변경에 성공했습니다",
@@ -127,7 +127,7 @@ public class RoomsController {
     })
     public ResponseEntity deleteRooms(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal OAuth2UserPrincipal userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
         roomsService.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
@@ -146,7 +146,7 @@ public class RoomsController {
     public ResponseEntity CreateRoomsRestSchedule(
             @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
-            @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
         roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
@@ -164,7 +164,7 @@ public class RoomsController {
     public ResponseEntity DeleteRoomsRestSchedule(
         @PathVariable("roomsId") Long roomsId,
         @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
-        @AuthenticationPrincipal UserDetailsImplV1 userDetails) {
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
