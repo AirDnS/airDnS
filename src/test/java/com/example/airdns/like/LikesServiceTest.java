@@ -57,7 +57,7 @@ public class LikesServiceTest {
         // then
         assertEquals(likesList.size(), result.size());
         for (int i = 0; i < likesList.size(); i++) {
-            Likes like = likesList.get(i);
+            likesList.get(i);
             LikesResponseDto.ReadLikeResponseDto responseDto = result.get(i);
 
             assertEquals(room.getName(), responseDto.getRoomName());

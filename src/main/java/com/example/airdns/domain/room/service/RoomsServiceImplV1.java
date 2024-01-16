@@ -7,6 +7,7 @@ import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
+import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
@@ -15,6 +16,8 @@ import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,17 +29,15 @@ import java.util.List;
 public class RoomsServiceImplV1 implements RoomsService {
 
     private final RoomsRepository roomsRepository;
-
     private final ImagesService imagesService;
-
     private final RoomEquipmentsService roomEquipmentsService;
-
     private final RestScheduleService restScheduleService;
-
     private final EquipmentsService equipmentsService;
 
     @Override
-    public ReadRoomsResponseDto createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users) {
+    public ReadRoomsResponseDto createRooms(
+            CreateRoomsRequestDto requestDto,
+            List<MultipartFile> files, Users users) {
         if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
             throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
         }
@@ -56,16 +57,19 @@ public class RoomsServiceImplV1 implements RoomsService {
     }
 
     @Override
-    public List<ReadRoomsResponseDto> readRoomsList(ReadRoomsListRequestDto requestDto) {
-        //TODO 조건추가
-        return roomsRepository.findAll().stream()
-                .map(RoomsConverter::toDto)
-                .toList();
+    public Page<ReadRoomsResponseDto> readRoomsList(
+            Pageable pageable,
+            ReadRoomsListRequestDto requestDto) {
+        return roomsRepository.findAllSearchFilter(
+                pageable, RoomsConverter.toRoomsSearchCondition(requestDto));
     }
 
     @Transactional
     @Override
-    public ReadRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long roomsId, Users users) {
+    public ReadRoomsResponseDto updateRooms(
+            UpdateRoomsRequestDto requestDto,
+            Long roomsId,
+            Users users) {
         Rooms rooms = findById(roomsId);
 
         rooms.resetEquipments();
