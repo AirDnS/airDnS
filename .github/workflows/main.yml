@@ -3,8 +3,9 @@ name: Java CI/CD with Gradle
 on:
   #push:
   #  branches: [ "master" ]
-  #pull_request:
-  #  branches: [ "develop" ]
+  # pull request가 develop에서 이루어질 때 ci/cd 실행
+  pull_request:
+    branches: [ "develop" ]
   #release:
   #  types: [ created ]
 
