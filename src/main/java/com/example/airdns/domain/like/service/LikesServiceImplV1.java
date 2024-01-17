@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,7 +23,23 @@ public class LikesServiceImplV1 implements LikesService {
     private final LikesRepository likesRepository;
     private final RoomsService roomsService;
 
+    // 해당 룸에 대한 모든 좋아요 조회
     @Override
+    @Transactional(readOnly = true)
+    public LikesResponseDto.ReadLikeResponseDto getRoomLike(Long roomsId, Users user){
+        Rooms room = roomsService.findById(roomsId);
+
+        Integer roomLikeCount = room.getLikesList().size();
+
+        return LikesResponseDto.ReadLikeResponseDto.builder()
+                .likeCount(roomLikeCount)
+                .roomName(room.getName())
+                .roomAddress(room.getAddress())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    /*@Override
     @Transactional(readOnly = true)
     public List<LikesResponseDto.ReadLikeResponseDto> getLikeList(Long roomsId, Users user){
         Rooms room = roomsService.findById(roomsId);
@@ -37,7 +54,7 @@ public class LikesServiceImplV1 implements LikesService {
                         .createdAt(like.getCreatedAt())
                         .build())
                 .collect(Collectors.toList());
-    }
+    }*/
     @Override
     @Transactional
     public LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user){

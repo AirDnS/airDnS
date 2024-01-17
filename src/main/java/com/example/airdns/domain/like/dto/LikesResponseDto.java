@@ -21,6 +21,7 @@ public class LikesResponseDto {
         private String roomName;
         private String roomAddress;
         private LocalDateTime createdAt;
+        private Integer likeCount;
     }
 
     @Getter

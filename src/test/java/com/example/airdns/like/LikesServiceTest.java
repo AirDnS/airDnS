@@ -37,41 +37,11 @@ public class LikesServiceTest {
     private RoomsService roomsService;
 
     @Test
-    @DisplayName("LikeService getLikeList Success")
-    void getLikeListSuccess() {
-        // given
-        Long roomId = 1L;
-        Users user = Users.builder().nickName("User1").build();
-        Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
-        List<Likes> likesList = Arrays.asList(
-                Likes.builder().build(),
-                Likes.builder().build()
-        );
-
-        when(roomsService.findById(roomId)).thenReturn(room);
-        when(likesRepository.findAllByRoomsId(roomId)).thenReturn(likesList);
-
-        // when
-        List<LikesResponseDto.ReadLikeResponseDto> result = likesService.getLikeList(roomId, user);
-
-        // then
-        assertEquals(likesList.size(), result.size());
-        for (int i = 0; i < likesList.size(); i++) {
-            likesList.get(i);
-            LikesResponseDto.ReadLikeResponseDto responseDto = result.get(i);
-
-            assertEquals(room.getName(), responseDto.getRoomName());
-            assertEquals(room.getAddress(), responseDto.getRoomAddress());
-            assertEquals(user.getNickName(), responseDto.getNickName());
-        }
-    }
-
-    @Test
     @DisplayName("LikeService addLike Success")
     void addLikeSuccess() {
         // given
         Long roomId = 1L;
-        Users user = Users.builder().nickName("User1").build();
+        Users user = Users.builder().nickname("User1").build();
         Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
         Likes savedLike = Likes.builder()
                 .rooms(room)
@@ -86,7 +56,7 @@ public class LikesServiceTest {
 
         // then
         assertEquals(room.getName(), result.getRoomName());
-        assertEquals(user.getNickName(), result.getNickName());
+        assertEquals(user.getNickname(), result.getNickName());
         assertEquals(savedLike.getCreatedAt(), result.getCreatedAt());
     }
 
@@ -95,7 +65,7 @@ public class LikesServiceTest {
     void cancelLikeSuccess() {
         // given
         Long roomId = 1L;
-        Users user = Users.builder().nickName("User1").build();
+        Users user = Users.builder().nickname("User1").build();
         Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
         Likes existingLike = Likes.builder().rooms(room).users(user).build();
 
@@ -107,7 +77,7 @@ public class LikesServiceTest {
 
         // then
         assertEquals(room.getName(), result.getRoomName());
-        assertEquals(user.getNickName(), result.getNickName());
+        assertEquals(user.getNickname(), result.getNickName());
     }
 
     @Test
@@ -115,7 +85,7 @@ public class LikesServiceTest {
     void cancelLikeUserNotLikedException() {
         // given
         Long roomId = 1L;
-        Users user = Users.builder().nickName("User1").build();
+        Users user = Users.builder().nickname("User1").build();
 
         when(likesRepository.findByRoomsId(roomId)).thenReturn(Optional.empty());
 
