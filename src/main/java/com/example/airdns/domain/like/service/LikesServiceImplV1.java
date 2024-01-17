@@ -23,7 +23,6 @@ public class LikesServiceImplV1 implements LikesService {
     private final LikesRepository likesRepository;
     private final RoomsService roomsService;
 
-    // 해당 룸에 대한 모든 좋아요 조회
     @Override
     @Transactional(readOnly = true)
     public LikesResponseDto.ReadLikeResponseDto getRoomLike(Long roomsId, Users user){
