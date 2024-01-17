@@ -20,6 +20,7 @@ import java.util.List;
 public class LikesController {
 
     private final LikesService likesService;
+
     // 해당 룸에 대한 좋아요 조회
     @ApiResponses(value =  {
             @ApiResponse(responseCode = "200", description = "룸에 대한 좋아요 갯수 조회"),
