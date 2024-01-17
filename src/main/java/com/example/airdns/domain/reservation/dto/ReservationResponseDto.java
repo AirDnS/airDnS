@@ -54,7 +54,7 @@ public class ReservationResponseDto {
         private Long roomsId;
 
 
-        public static ReadReservationResponseDto of(Reservation reservation) {
+        public static ReadReservationResponseDto from(Reservation reservation) {
             return ReadReservationResponseDto.builder()
                     .id(reservation.getId())
                     .checkIn(reservation.getCheckIn())

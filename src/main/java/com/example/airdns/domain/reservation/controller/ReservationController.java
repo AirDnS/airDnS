@@ -43,7 +43,8 @@ public class ReservationController {
             @PathVariable Long roomsId,
             @Valid @RequestBody ReservationRequestDto.CreateReservationDto createReservation) {
         reservationService.createReservation(userDetails.getUser().getId(), roomsId, createReservation);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                new CommonResponse<>(
                         HttpStatus.CREATED,
                         "예약 성공"
                 )
@@ -69,7 +70,9 @@ public class ReservationController {
                 reservationId,
                 requestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse(HttpStatus.OK, "예약 수정 성공", reservationResponse)
+                new CommonResponse(HttpStatus.OK,
+                        "예약 수정 성공",
+                        reservationResponse)
         );
     }
 
@@ -88,7 +91,9 @@ public class ReservationController {
                 userDetails.getUser().getId(),
                 reservationId);
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse(HttpStatus.OK, "해당 예약 조회 성공", reservationResponseDto)
+                new CommonResponse(HttpStatus.OK,
+                        "해당 예약 조회 성공",
+                        reservationResponseDto)
         );
     }
 
@@ -102,7 +107,9 @@ public class ReservationController {
                 userDetails.getUser().getId()
         );
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse(HttpStatus.OK, "예약 목록 조회 성공", reservationResponseDtoList)
+                new CommonResponse(HttpStatus.OK,
+                        "예약 목록 조회 성공",
+                        reservationResponseDtoList)
         );
     }
 
@@ -118,7 +125,8 @@ public class ReservationController {
             @PathVariable Long reservationId
     ) {
         reservationService.deleteReservation(userDetails.getUser().getId(), reservationId);
-        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(
                         HttpStatus.OK,
                         "예약 삭제 성공"
                 )

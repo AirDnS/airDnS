@@ -68,12 +68,16 @@ public class ReservationServiceImplV1 implements ReservationService {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
-        return ReservationResponseDto.ReadReservationResponseDto.of(reservation);
+        return ReservationResponseDto.ReadReservationResponseDto.from(reservation);
     }
 
     @Override
     public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long userId) {
-        return reservationRepository.findAllByUsersIdAndIsDeletedFalse(userId).stream().map(ReservationResponseDto.ReadReservationResponseDto::of).toList();
+        return reservationRepository.
+                findAllByUsersIdAndIsDeletedFalse(userId).
+                stream().
+                map(ReservationResponseDto.ReadReservationResponseDto::from).
+                toList();
     }
 
     @Override
@@ -85,7 +89,7 @@ public class ReservationServiceImplV1 implements ReservationService {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
-        reservation.isDeleted();
+        reservation.deleteReservation();
     }
 
     @Override
@@ -115,12 +119,14 @@ public class ReservationServiceImplV1 implements ReservationService {
     @Override
     public boolean isReserved(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
         return reservationRepository.
-                findFirstByRoomsIdAndIsDeletedFalseAndCheckInBeforeAndCheckOutAfter(roomId, checkOut, checkIn).isPresent();
+                findFirstByRoomsIdAndIsDeletedFalseAndCheckInBeforeAndCheckOutAfter(roomId, checkOut, checkIn).
+                isPresent();
     }
 
     @Override
     public boolean isRested(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomId, checkOut, checkIn).isPresent();
+        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomId, checkOut, checkIn).
+                isPresent();
     }
 
 }
