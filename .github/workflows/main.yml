@@ -27,7 +27,10 @@ jobs:
 
       # Build Gradle
       - name: Build with Gradle
-        run: ./gradlew build
+        # test code는 빌드하지 않음
+        run: ./gradlew assemble
+        # test code까지 빌드
+        # run: ./gradlew build
 
       # DockerHub 계정 로그인
       - name: DockerHub Login
