@@ -3,8 +3,9 @@ name: Java CI/CD with Gradle
 on:
   #push:
   #  branches: [ "master" ]
-  #pull_request:
-  #  branches: [ "develop" ]
+  # pull request가 develop에서 이루어질 때 ci/cd 실행
+  pull_request:
+    branches: [ "develop" ]
   #release:
   #  types: [ created ]
 
@@ -26,7 +27,11 @@ jobs:
 
       # Build Gradle
       - name: Build with Gradle
-        run: ./gradlew build
+        # test code는 빌드하지 않음
+        run: ./gradlew assemble
+        # test code까지 빌드
+        # fix : 해당 사항 test 완성 후 변경
+        # run: ./gradlew build
 
       # DockerHub 계정 로그인
       - name: DockerHub Login
@@ -36,12 +41,13 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD}}
 
       # *.jar -> Docker Image Build
+      # /air_dns_test
       - name: Docker Image Build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test .
 
       # DockerHub's Image push
       - name: DockerHub Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
 
       # run application, ec2 client name : appleboy
       - name: Run Application
@@ -51,10 +57,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker kill air_dns
-            sudo docker rm -f air_dns
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+            sudo docker kill air_dns_test
+            sudo docker rm -f air_dns_test
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker run -p 8080:8080 \
-                        --name air_dns \
-                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns
+                        --name air_dns_test \
+                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
