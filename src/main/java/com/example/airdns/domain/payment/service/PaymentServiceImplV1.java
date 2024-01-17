@@ -1,69 +1,89 @@
 package com.example.airdns.domain.payment.service;
 
-import com.example.airdns.domain.payment.dto.PaymentResponseDto;
+import com.example.airdns.domain.payment.dto.PaymentRequestDto;
+import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.payment.repository.PaymentRepository;
+import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.reservation.repository.ReservationRepository;
+import java.net.URI;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONObject;
+import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.RequestEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
 public class PaymentServiceImplV1 implements PaymentService {
 
+    private final PaymentRepository paymentsRepository;
+    private final ReservationRepository reservationRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${payment.toss.secret_api_key}")
+    private String secretApiKey;
+
+    @Value("${payment.toss.url}")
+    private String tossPaymentsApiUrl;
+
     @Override
-    public PaymentResponseDto.ReadPaymentResponseDto getPaymentResult(String authorizations, Long orderId, Long amount, Long paymentKey){
-        /*URL url = new URL("https://api.tosspayments.com/v1/payments/" + paymentKey);
+    public String requestPayment(Long reservationId,
+            PaymentRequestDto.RequestPaymentDto requestDto) {
 
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        connection.setRequestProperty("Authorization", authorizations);
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        JSONObject obj = new JSONObject();
-        obj.put("orderId", orderId);
-        obj.put("amount", amount);
+        Optional<Reservation> optionalReservation = reservationRepository.findById(reservationId);
 
-        OutputStream outputStream = connection.getOutputStream();
-        outputStream.write(obj.toString().getBytes("UTF-8"));
+        if (optionalReservation.isPresent()) {
+            Reservation reservation = optionalReservation.get();
+            String paymentKey = requestToTossPaymentsApi(requestDto);
 
-        int code = connection.getResponseCode();
-        boolean isSuccess = code == 200 ? true : false;
-        model.addAttribute("isSuccess", isSuccess);
+            Payments payments = Payments.builder()
+                    .reservation(reservation)
+                    .paymentKey(paymentKey)
+                    .build();
 
-        InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
+            paymentsRepository.save(payments);
 
-        Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) parser.parse(reader);
-        responseStream.close();
-        model.addAttribute("responseStr", jsonObject.toJSONString());
-        System.out.println(jsonObject.toJSONString());
-
-        model.addAttribute("method", (String) jsonObject.get("method"));
-        model.addAttribute("orderName", (String) jsonObject.get("orderName"));
-
-        if (((String) jsonObject.get("method")) != null) {
-            if (((String) jsonObject.get("method")).equals("카드")) {
-                model.addAttribute("cardNumber", (String) ((JSONObject) jsonObject.get("card")).get("number"));
-            } else if (((String) jsonObject.get("method")).equals("가상계좌")) {
-                model.addAttribute("accountNumber", (String) ((JSONObject) jsonObject.get("virtualAccount")).get("accountNumber"));
-            } else if (((String) jsonObject.get("method")).equals("계좌이체")) {
-                model.addAttribute("bank", (String) ((JSONObject) jsonObject.get("transfer")).get("bank"));
-            } else if (((String) jsonObject.get("method")).equals("휴대폰")) {
-                model.addAttribute("customerMobilePhone", (String) ((JSONObject) jsonObject.get("mobilePhone")).get("customerMobilePhone"));
-            }
-        } else {
-            model.addAttribute("code", (String) jsonObject.get("code"));
-            model.addAttribute("message", (String) jsonObject.get("message"));
+            return paymentKey;
+        } else{
+            return "Reservation Not Found";
         }
-        */
-        return null;
+    }
+
+    private String requestToTossPaymentsApi(PaymentRequestDto.RequestPaymentDto requestDto) {
+
+        String authHeader = "Basic " + base64Encode(secretApiKey + ":");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set(HttpHeaders.AUTHORIZATION, authHeader);
+
+        String orderId = requestDto.getOrderId();
+        Long amount = requestDto.getAmount();
+        String paymentKey = requestDto.getPaymentKey();
+
+        JSONObject requestData = new JSONObject();
+        requestData.put("orderId", orderId);
+        requestData.put("amount", amount);
+        requestData.put("paymentKey", paymentKey);
+
+        // HTTP 요청
+        RequestEntity<String> requestEntity = new RequestEntity<>(requestData.toJSONString(),
+                headers, HttpMethod.POST, URI.create(tossPaymentsApiUrl), String.class);
+
+        // 토스페이먼츠 API에 HTTP POST 요청 작업
+        ResponseEntity<String> response = restTemplate.exchange(requestEntity, String.class);
+
+        return response.getBody();
+
+    }
+
+    private String base64Encode(String value) {
+        return java.util.Base64.getEncoder().encodeToString(value.getBytes());
     }
 }

@@ -27,7 +27,7 @@ public class Payments extends CommonEntity {
     private String orderName;
 
     @Column(nullable = false, name = "order_id")
-    private Long orderId;
+    private String orderId;
 
     @Column
     private Boolean isCanceled;

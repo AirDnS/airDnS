@@ -26,4 +26,7 @@ public class CommonResponse<T> {
     public CommonResponse(HttpStatus httpStatus, String message) {
         this(httpStatus.value(), message, null);
     }
+
+    public CommonResponse(T paymentKey) {
+    }
 }
