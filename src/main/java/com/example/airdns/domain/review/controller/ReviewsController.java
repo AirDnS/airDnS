@@ -87,7 +87,7 @@ public class ReviewsController {
 
     @DeleteMapping("/{roomsId}/review/{reviewId}")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "룸 리뷰 수정 성공"),
+            @ApiResponse(responseCode = "200", description = "룸 리뷰 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 삭제할 권한이 없습니다."),
     })
     public ResponseEntity<CommonResponse<ReviewsResponseDto.DeleteReviewResponseDto>> removeReview(
