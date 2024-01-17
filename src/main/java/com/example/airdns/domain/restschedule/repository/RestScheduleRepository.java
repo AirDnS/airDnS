@@ -12,4 +12,6 @@ public interface RestScheduleRepository extends JpaRepository<RestSchedule, Long
      * 시작시간과 종료시간 사이에 있는 데이터가 있는지 확인
      */
     Optional<RestSchedule> findFirstByRestEndTimeGreaterThanAndRestStartTimeLessThan(LocalDateTime startDate, LocalDateTime endDate);
+
+    Optional<RestSchedule> findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(Long roomsId, LocalDateTime checkOut, LocalDateTime checkIn);
 }

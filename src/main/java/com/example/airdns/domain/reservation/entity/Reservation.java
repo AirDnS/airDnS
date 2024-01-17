@@ -1,14 +1,13 @@
 package com.example.airdns.domain.reservation.entity;
 
 
+import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,7 +16,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE reservation SET is_deleted = true WHERE id = ?")
 public class Reservation extends CommonEntity {
 
     @Id
@@ -46,4 +44,13 @@ public class Reservation extends CommonEntity {
     @JoinColumn(name = "users_id")
     private Users users;
 
+    public void updateReservationTime(ReservationRequestDto.UpdateReservationDto requestDto) {
+        this.checkIn = requestDto.getCheckInTime();
+        this.checkOut = requestDto.getCheckOutTime();
+    }
+
+    public void delete() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+    }
 }
