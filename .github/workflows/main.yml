@@ -41,11 +41,11 @@ jobs:
 
       # *.jar -> Docker Image Build
       - name: Docker Image Build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test .
 
       # DockerHub's Image push
       - name: DockerHub Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
 
       # run application, ec2 client name : appleboy
       - name: Run Application
@@ -55,10 +55,10 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           script: |
-            sudo docker kill air_dns
-            sudo docker rm -f air_dns
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns
+            sudo docker kill air_dns_test
+            sudo docker rm -f air_dns_test
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker run -p 8080:8080 \
-                        --name air_dns \
-                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns
+                        --name air_dns_test \
+                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
