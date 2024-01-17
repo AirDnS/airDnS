@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/rooms/users")
+@RequestMapping("/api/v1/rooms")
 public class LikesController {
 
     private final LikesService likesService;
