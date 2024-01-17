@@ -39,22 +39,6 @@ public class LikesServiceImplV1 implements LikesService {
                 .build();
     }
 
-    /*@Override
-    @Transactional(readOnly = true)
-    public List<LikesResponseDto.ReadLikeResponseDto> getLikeList(Long roomsId, Users user){
-        Rooms room = roomsService.findById(roomsId);
-
-        List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
-
-        return likesList.stream()
-                .map(like -> LikesResponseDto.ReadLikeResponseDto.builder()
-                        .roomName(room.getName())
-                        .roomAddress(room.getAddress())
-                        .nickName(user.getNickname())
-                        .createdAt(like.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
-    }*/
     @Override
     @Transactional
     public LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user){

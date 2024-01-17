@@ -34,20 +34,6 @@ public class LikesController {
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 조회 성공", responseDto)
         );
     }
-    // 해당 룸에 대한 전체 좋아요 조회
-    /*@ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "룸 좋아요 목록 조회 성공"),
-    })
-    @GetMapping("/{roomsId}/likes")
-    public ResponseEntity<CommonResponse<List<LikesResponseDto.ReadLikeResponseDto>>> getLikeList(
-            @PathVariable Long roomsId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        List<LikesResponseDto.ReadLikeResponseDto> responseDto = likesService.getLikeList(roomsId, userDetails.getUser());
-
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 목록 조회 성공", responseDto)
-        );
-    }*/
 
     // 좋아요 요청
     @PostMapping("/{roomsId}/likes")
