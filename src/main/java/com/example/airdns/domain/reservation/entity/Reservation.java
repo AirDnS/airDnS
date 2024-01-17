@@ -7,9 +7,7 @@ import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.SQLDelete;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -51,7 +49,7 @@ public class Reservation extends CommonEntity {
         this.checkOut = requestDto.getCheckOutTime();
     }
 
-    public void deleteReservation() {
+    public void delete() {
         this.isDeleted = true;
         this.deletedAt = LocalDateTime.now();
     }

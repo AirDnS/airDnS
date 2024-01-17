@@ -3,7 +3,6 @@ package com.example.airdns.domain.reservation.service;
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.user.entity.Users;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,10 +63,11 @@ public interface ReservationService {
      * @Param 수정 시간
      * @return true/false
      */
-    ReservationResponseDto.UpdateReservationResponseDto updateReservation(Long userId,
-                                                                 Long roomsId,
-                                                                 Long reservationId,
-                                                                 ReservationRequestDto.UpdateReservationDto requestDto
+    ReservationResponseDto.UpdateReservationResponseDto updateReservation(
+            Long userId,
+            Long roomsId,
+            Long reservationId,
+            ReservationRequestDto.UpdateReservationDto requestDto
     );
 
     /**
@@ -76,8 +76,9 @@ public interface ReservationService {
      * @Param 해당 예약 Id
      * @return 예약 정보
      */
-    ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId,
-                                                                      Long reservationId
+    ReservationResponseDto.ReadReservationResponseDto readReservation(
+            Long userId,
+            Long reservationId
     );
 
     /**
@@ -93,8 +94,9 @@ public interface ReservationService {
      * @Param 예약 Id
      * @return void
      */
-    void deleteReservation(Long userId,
-                           Long reservationId
+    void deleteReservation(
+            Long userId,
+            Long reservationId
     );
 
     /**
@@ -104,8 +106,9 @@ public interface ReservationService {
      * @Param 체크아웃 시간
      * @return void
      */
-    void isValidatedRequestSchedule(Long roomsId,
-                                    LocalDateTime checkIn,
-                                    LocalDateTime checkOut
+    void isValidatedRequestSchedule(
+            Long roomsId,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut
     );
 }

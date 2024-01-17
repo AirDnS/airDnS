@@ -1,15 +1,12 @@
 package com.example.airdns.domain.reservation.dto;
 
 import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.room.entity.Rooms;
-import com.example.airdns.domain.user.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class ReservationResponseDto {

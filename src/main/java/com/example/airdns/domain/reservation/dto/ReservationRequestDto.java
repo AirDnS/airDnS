@@ -3,7 +3,6 @@ package com.example.airdns.domain.reservation.dto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

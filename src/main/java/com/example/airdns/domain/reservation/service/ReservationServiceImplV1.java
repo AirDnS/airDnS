@@ -89,7 +89,7 @@ public class ReservationServiceImplV1 implements ReservationService {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
-        reservation.deleteReservation();
+        reservation.delete();
     }
 
     @Override
