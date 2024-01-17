@@ -33,9 +33,6 @@ public class LikesServiceImplV1 implements LikesService {
 
         return LikesResponseDto.ReadLikeResponseDto.builder()
                 .likeCount(roomLikeCount)
-                .roomName(room.getName())
-                .roomAddress(room.getAddress())
-                .createdAt(LocalDateTime.now())
                 .build();
     }
 
@@ -55,7 +52,6 @@ public class LikesServiceImplV1 implements LikesService {
         return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickname())
-                .createdAt(likes.getCreatedAt())
                 .build();
     }
 

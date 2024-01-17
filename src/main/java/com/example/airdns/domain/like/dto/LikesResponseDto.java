@@ -17,10 +17,6 @@ public class LikesResponseDto {
     @Schema(description = "좋아요 조회 응답 dto")
     public static class ReadLikeResponseDto {
         @Schema(description = "좋아요 조회 응답 내용", defaultValue = "get like response")
-        private String nickName;
-        private String roomName;
-        private String roomAddress;
-        private LocalDateTime createdAt;
         private Integer likeCount;
     }
 

@@ -21,7 +21,6 @@ public class LikesController {
 
     private final LikesService likesService;
 
-    // 해당 룸에 대한 좋아요 조회
     @ApiResponses(value =  {
             @ApiResponse(responseCode = "200", description = "룸에 대한 좋아요 갯수 조회"),
     })
@@ -35,7 +34,6 @@ public class LikesController {
         );
     }
 
-    // 좋아요 요청
     @PostMapping("/{roomsId}/likes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 성공"),
@@ -52,7 +50,6 @@ public class LikesController {
         );
     }
 
-    // 좋아요 취소
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 취소 성공"),
             @ApiResponse(responseCode = "400", description = "해당 사용자가 좋아요를 누르지 않았습니다."),
