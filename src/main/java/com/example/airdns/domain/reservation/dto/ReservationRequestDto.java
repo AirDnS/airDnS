@@ -22,11 +22,9 @@ public class ReservationRequestDto {
     public static class CreateReservationDto {
 
         @Schema(description = "checkInTime", example = "2024-05-10 10:00:00")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime checkInTime;
 
         @Schema(description = "checkOutTime", example = "2024-05-10 12:00:00")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         private LocalDateTime checkOutTime;
 
         public Reservation toEntity(Users users, Rooms rooms) {
@@ -47,11 +45,9 @@ public class ReservationRequestDto {
     public static class UpdateReservationDto {
 
         @Schema(description = "checkInTime", example = "2024-05-10T10:00:00")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkInTime;
 
         @Schema(description = "checkOutTime", example = "2024-05-10T12:00:00")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
         private LocalDateTime checkOutTime;
 
     }
