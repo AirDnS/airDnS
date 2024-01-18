@@ -14,6 +14,7 @@ public class RoomsResponseDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadRoomsResponseDto {
+        private Long roomsId;
         private String name;
         private BigDecimal price;
         private String address;

@@ -39,6 +39,7 @@ public class RoomsConverter {
 
     public static RoomsResponseDto.ReadRoomsResponseDto toDto(Rooms rooms) {
         return RoomsResponseDto.ReadRoomsResponseDto.builder()
+                .roomsId(rooms.getId())
                 .name(rooms.getName())
                 .price(rooms.getPrice())
                 .address(rooms.getAddress())
