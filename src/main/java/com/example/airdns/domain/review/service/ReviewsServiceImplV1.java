@@ -59,7 +59,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         Rooms room = roomsService.findById(roomsId);
 
         reviewsRepository.existsByRoomsId(roomsId).orElseThrow(
-                ()-> new ReviewAlreadyExistsException(ReviewsExceptionCode.ALREADY_EXISTS_REVIEW)
+                ()-> new ReviewsCustomException(ReviewsExceptionCode.ALREADY_EXISTS_REVIEW)
         );
 
         Reviews review = Reviews.builder()
@@ -87,11 +87,11 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         roomsService.findById(roomsId);
 
         Reviews review = reviewsRepository.findById(reviewId).orElseThrow(
-                ()-> new NotFoundReviewsException(ReviewsExceptionCode.NOT_FOUND_REVIEW)
+                ()-> new ReviewsCustomException(ReviewsExceptionCode.NOT_FOUND_REVIEW)
         );
 
         if(!review.getUsers().getId().equals(user.getId())){
-            throw new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW);
+            throw new ReviewsCustomException(ReviewsExceptionCode.NOT_MODIFY_REVIEW);
         }
 
         review.update(requestDto);
@@ -112,7 +112,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         roomsService.findById(roomsId);
 
         Reviews review = reviewsRepository.findByIdAndUsersId(reviewId, user.getId()).orElseThrow(
-                ()-> new NotRemoveReviewException(ReviewsExceptionCode.NOT_DELETE_REVIEW)
+                ()-> new ReviewsCustomException(ReviewsExceptionCode.NOT_DELETE_REVIEW)
         );
 
         reviewsRepository.deleteById(reviewId);
