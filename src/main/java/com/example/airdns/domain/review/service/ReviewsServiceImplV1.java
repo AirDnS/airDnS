@@ -86,9 +86,13 @@ public class ReviewsServiceImplV1 implements ReviewsService{
             ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         roomsService.findById(roomsId);
 
-        Reviews review = reviewsRepository.findByIdAndUsersId(user.getId(), reviewId).orElseThrow(
-                ()-> new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW)
+        Reviews review = reviewsRepository.findById(reviewId).orElseThrow(
+                ()-> new NotFoundReviewsException(ReviewsExceptionCode.NOT_FOUND_REVIEW)
         );
+
+        if(!review.getUsers().getId().equals(user.getId())){
+            throw new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW);
+        }
 
         review.update(requestDto);
         reviewsRepository.save(review);

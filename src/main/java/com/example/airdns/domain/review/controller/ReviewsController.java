@@ -28,7 +28,6 @@ public class ReviewsController {
 
     private final ReviewsService reviewsService;
 
-    // 전체 리뷰 조회를 생성 날짜 내림 차순 정렬로 10개마다 페이징 처리 구현
     @GetMapping("/{roomsId}/review")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 전체 조회 성공"),
