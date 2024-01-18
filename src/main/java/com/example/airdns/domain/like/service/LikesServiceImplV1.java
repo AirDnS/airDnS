@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,20 +25,16 @@ public class LikesServiceImplV1 implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LikesResponseDto.ReadLikeResponseDto> getLikeList(Long roomsId, Users user){
+    public LikesResponseDto.ReadLikeResponseDto getRoomLike(Long roomsId, Users user){
         Rooms room = roomsService.findById(roomsId);
 
-        List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
+        Integer roomLikeCount = room.getLikesList().size();
 
-        return likesList.stream()
-                .map(like -> LikesResponseDto.ReadLikeResponseDto.builder()
-                        .roomName(room.getName())
-                        .roomAddress(room.getAddress())
-                        .nickName(user.getNickname())
-                        .createdAt(like.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
+        return LikesResponseDto.ReadLikeResponseDto.builder()
+                .likeCount(roomLikeCount)
+                .build();
     }
+
     @Override
     @Transactional
     public LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user){
@@ -54,7 +51,6 @@ public class LikesServiceImplV1 implements LikesService {
         return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickname())
-                .createdAt(likes.getCreatedAt())
                 .build();
     }
 
