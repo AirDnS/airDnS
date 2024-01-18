@@ -74,22 +74,22 @@ public class RoomsConverter {
     }
 
     private static List<Map<String, Object>> getEquipmentListByRooms(Rooms rooms) {
-        List<Map<String, Object>> equipments = new ArrayList<>();
+        List<Map<String, Object>> equipmentList = new ArrayList<>();
 
         // map (CategoryId, equipment) 생성
         Map<EquipmentCategories, List<EquipmentsResponseDto.ReadEquipmentsResponseDto>> equipmentsMap = new HashMap<>();
 
         rooms.getRoomEquipmentsList()
                 .forEach((roomEquipments) -> {
-                    Equipments _equipments = roomEquipments.getEquipments();
-                    EquipmentCategories category = _equipments.getEquipmentCategories();
+                    Equipments equipments = roomEquipments.getEquipments();
+                    EquipmentCategories category = equipments.getEquipmentCategories();
                     List<EquipmentsResponseDto.ReadEquipmentsResponseDto> responseList =
                             equipmentsMap.getOrDefault(category, new ArrayList<>());
 
                     responseList.add(
                             EquipmentsResponseDto.ReadEquipmentsResponseDto.builder()
-                                    .id(_equipments.getId())
-                                    .name(_equipments.getName())
+                                    .id(equipments.getId())
+                                    .name(equipments.getName())
                                     .build()
                     );
 
@@ -101,10 +101,10 @@ public class RoomsConverter {
                             Map<String, Object> categoryResponseMap = new HashMap<>();
                             categoryResponseMap.put("label", category.getName());
                             categoryResponseMap.put("options", equipmentsMap.get(category));
-                            equipments.add(categoryResponseMap);
+                            equipmentList.add(categoryResponseMap);
                         }
                 );
 
-        return equipments;
+        return equipmentList;
     }
 }
