@@ -24,11 +24,11 @@ public class LikesController {
     @ApiResponses(value =  {
             @ApiResponse(responseCode = "200", description = "룸에 대한 좋아요 갯수 조회"),
     })
-    @GetMapping("/{roomsId}/likes")
-    public ResponseEntity<CommonResponse<LikesResponseDto.ReadLikeResponseDto>> getRoomLike(
+    @GetMapping("/{roomsId}/likes/{likeId}")
+    public ResponseEntity<CommonResponse<LikesResponseDto.ReadLikeResponseDto>> readRoomLike(
             @PathVariable Long roomsId,
-            @AuthenticationPrincipal UserDetailsImpl userDetails){
-        LikesResponseDto.ReadLikeResponseDto responseDto = likesService.getRoomLike(roomsId, userDetails.getUser());
+            @PathVariable Long likeId){
+        LikesResponseDto.ReadLikeResponseDto responseDto = likesService.readRoomLike(roomsId, likeId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 조회 성공", responseDto)
         );
@@ -38,10 +38,10 @@ public class LikesController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 성공"),
     })
-    public ResponseEntity<CommonResponse<LikesResponseDto.CreateLikeResponseDto>> addLike(
+    public ResponseEntity<CommonResponse<LikesResponseDto.CreateLikeResponseDto>> createLike(
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
-        LikesResponseDto.CreateLikeResponseDto responseDto = likesService.addLike(roomsId, userDetails.getUser());
+        LikesResponseDto.CreateLikeResponseDto responseDto = likesService.createLike(roomsId, userDetails.getUser());
         // ok
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
@@ -54,11 +54,12 @@ public class LikesController {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 취소 성공"),
             @ApiResponse(responseCode = "400", description = "해당 사용자가 좋아요를 누르지 않았습니다."),
     })
-    @DeleteMapping("/{roomsId}/likes")
-    public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> cancelLike(
+    @DeleteMapping("/{roomsId}/likes/{likeId}")
+    public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> deleteLike(
             @PathVariable Long roomsId,
+            @PathVariable Long likeId,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
-        LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.cancelLike(roomsId, userDetails.getUser());
+        LikesResponseDto.DeleteLikeResponseDto responseDto = likesService.deleteLike(roomsId, likeId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 취소 성공", responseDto)
         );

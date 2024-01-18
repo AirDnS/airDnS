@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LikesService {
 
-    LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user);
-    LikesResponseDto.DeleteLikeResponseDto cancelLike(Long roomsId, Users user);
-    LikesResponseDto.ReadLikeResponseDto getRoomLike(Long roomsId, Users user);
+    LikesResponseDto.CreateLikeResponseDto createLike(Long roomsId, Users user);
+    LikesResponseDto.DeleteLikeResponseDto deleteLike(Long roomsId, Long likeId, Users user);
+    LikesResponseDto.ReadLikeResponseDto readRoomLike(Long roomsId, Long likeId);
 }
