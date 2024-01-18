@@ -1,5 +1,6 @@
 package com.example.airdns.domain.user.dto;
 
+import com.example.airdns.domain.user.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -30,4 +31,14 @@ public class UsersRequestDto {
         private String address;
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "유저 권한 수정 dto")
+    public static class UpdateUserRoleRequestDto {
+
+        @Schema(description = "권한", example = "HOST", defaultValue = "HOST")
+        private UserRole role;
+    }
 }

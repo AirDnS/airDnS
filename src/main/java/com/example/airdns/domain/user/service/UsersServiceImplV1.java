@@ -25,11 +25,27 @@ public class UsersServiceImplV1 implements UsersService {
         return UsersResponseDto.UpdateUsersResponseDto.of(user);
     }
 
+    @Override
+    @Transactional
+    public UsersResponseDto.UpdateRoleUsersResponseDto updateUserRole(Long userId
+            , UsersRequestDto.UpdateUserRoleRequestDto userRequestDto) {
+        Users user = findById(userId);
+        user.updateRole(userRequestDto);
+        return UsersResponseDto.UpdateRoleUsersResponseDto.of(user);
+    }
+
+    @Override
+    public UsersResponseDto.GetUserResponseDto getUserInfo(Long userId) {
+        Users user = findById(userId);
+        return UsersResponseDto.GetUserResponseDto.of(user);
+    }
 
     @Override
     public Users findById(Long userId) {
         return usersRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() ->
                 new UsersCustomException(UsersExceptionCode.NOT_FOUND_USER));
     }
+
+
 
 }
