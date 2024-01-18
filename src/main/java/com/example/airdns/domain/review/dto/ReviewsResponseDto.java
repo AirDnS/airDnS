@@ -48,7 +48,6 @@ public class ReviewsResponseDto {
         private String nickName;
         private String roomName;
         private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
         private String content;
     }
 
@@ -62,7 +61,6 @@ public class ReviewsResponseDto {
         private String nickName;
         private String roomName;
         private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
         private String content;
     }
 }
