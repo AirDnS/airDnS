@@ -13,7 +13,7 @@ public class ReviewsRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "리뷰 단건 추가 요청 dto")
-    public static class AddReviewRequestDto {
+    public static class CreateReviewRequestDto {
         @Schema(description = "추가할 이름", defaultValue = "review Content")
         private String content;
     }

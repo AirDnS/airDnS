@@ -48,7 +48,6 @@ public class ReviewsResponseDto {
         private String nickName;
         private String roomName;
         private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
         private String content;
     }
 
@@ -58,11 +57,10 @@ public class ReviewsResponseDto {
     @AllArgsConstructor
     @Schema(description = "리뷰 단건 삭제 응답 dto")
     public static class DeleteReviewResponseDto {
-        @Schema(description = "리뷰 삭제 내용", defaultValue = "update Review")
+        @Schema(description = "리뷰 삭제 내용", defaultValue = "delete Review")
         private String nickName;
         private String roomName;
         private LocalDateTime createdAt;
-        private LocalDateTime modifiedAt;
         private String content;
     }
 }

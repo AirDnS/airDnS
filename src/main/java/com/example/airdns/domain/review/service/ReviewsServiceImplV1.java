@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,67 +26,36 @@ import java.util.stream.Collectors;
 public class ReviewsServiceImplV1 implements ReviewsService{
     private final ReviewsRepository reviewsRepository;
     private final RoomsService roomsService;
-    private final JPAQueryFactory queryFactory;
 
-    // 단건 조회
     @Override
     @Transactional(readOnly = true)
-    public ReviewsResponseDto.ReadReviewResponseDto getReview(Long roomsId, Long reivewId){
-        roomsService.findById(roomsId);
-
-        // 조회를 하는데, 없다고 이게 오류일 필요가 없을 듯?
-        Reviews review = reviewsRepository.findByRoomsId(roomsId).orElse(null);
-
-        return ReviewsResponseDto.ReadReviewResponseDto.builder()
-                .nickName(review.getUsers().getNickname())
-                .roomName(review.getRooms().getName())
-                .createdAt(review.getCreatedAt())
-                .modifiedAt(review.getModifiedAt())
-                .content(review.getContent())
-                .build();
-    }
-
-    // 리스트 조회
-    @Override
-    @Transactional(readOnly = true)
-    public Page<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomsId, Pageable pageable) {
+    public List<ReviewsResponseDto.ReadReviewResponseDto> readReviewList(Long roomsId) {
         Rooms room = roomsService.findById(roomsId);
 
-        QReviews qReviews = QReviews.reviews;
+        List<Reviews> reviews = room.getReviewsList();
 
-        List<ReviewsResponseDto.ReadReviewResponseDto> reviewResponseDtos = queryFactory
-                .select(qReviews)
-                .from(qReviews)
-                .leftJoin(qReviews.users).fetchJoin()
-                .where(qReviews.rooms.id.eq(roomsId))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch()
-                .stream()
-                .map(review -> ReviewsResponseDto.ReadReviewResponseDto.builder()
-                        .roomName(room.getName())
-                        .nickName(review.getUsers().getNickname())
-                        .content(review.getContent())
-                        .createdAt(review.getCreatedAt())
-                        .modifiedAt(review.getModifiedAt())
-                        .build())
-                .collect(Collectors.toList());
+        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = new ArrayList<>();
 
-        long total = queryFactory
-                .select(qReviews)
-                .from(qReviews)
-                .where(qReviews.rooms.id.eq(roomsId))
-                .fetchCount();
+        for (Reviews review : reviews) {
+            ReviewsResponseDto.ReadReviewResponseDto responseDto
+                    = ReviewsResponseDto.ReadReviewResponseDto.builder()
+                    .nickName(review.getUsers().getNickname())
+                    .roomName(room.getName())
+                    .content(review.getContent())
+                    .createdAt(review.getCreatedAt())
+                    .build();
 
-        return new PageImpl<>(reviewResponseDtos, pageable, total);
+            responseDtoList.add(responseDto);
+        }
+
+        return responseDtoList;
     }
 
-    // 리뷰 작성
     @Override
     @Transactional
-    public ReviewsResponseDto.CreateReviewResponseDto addReview(
+    public ReviewsResponseDto.CreateReviewResponseDto createReview(
             Long roomsId, Users user,
-            ReviewsRequestDto.AddReviewRequestDto requestDto){
+            ReviewsRequestDto.CreateReviewRequestDto requestDto){
         Rooms room = roomsService.findById(roomsId);
 
         reviewsRepository.existsByRoomsId(roomsId).orElseThrow(
@@ -109,10 +79,9 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                 .build();
     }
 
-    // 리뷰 수정
     @Override
     @Transactional
-    public ReviewsResponseDto.UpdateReviewResponseDto modifyReview(
+    public ReviewsResponseDto.UpdateReviewResponseDto updateReview(
             Long roomsId, Long reviewId, Users user,
             ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         roomsService.findById(roomsId);
@@ -121,26 +90,23 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                 ()-> new NotModifyReviewException(ReviewsExceptionCode.NOT_MODIFY_REVIEW)
         );
 
-        review.modify(requestDto);
+        review.update(requestDto);
         reviewsRepository.save(review);
 
         return ReviewsResponseDto.UpdateReviewResponseDto.builder()
                 .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
-                .modifiedAt(review.getModifiedAt())
                 .content(review.getContent())
                 .build();
     }
 
-    // 리뷰 삭제
     @Override
     @Transactional
-    public ReviewsResponseDto.DeleteReviewResponseDto removeReview(
+    public ReviewsResponseDto.DeleteReviewResponseDto deleteReview(
             Long roomsId, Long reviewId, Users user){
         roomsService.findById(roomsId);
 
-        // 해당 로그인한 유저가 작성한 리뷰가 존재하는지?
         Reviews review = reviewsRepository.findByIdAndUsersId(reviewId, user.getId()).orElseThrow(
                 ()-> new NotRemoveReviewException(ReviewsExceptionCode.NOT_DELETE_REVIEW)
         );
@@ -151,7 +117,6 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                 .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
-                .modifiedAt(review.getModifiedAt())
                 .content(review.getContent())
                 .build();
     }
