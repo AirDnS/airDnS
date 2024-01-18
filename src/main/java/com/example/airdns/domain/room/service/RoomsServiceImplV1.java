@@ -76,7 +76,16 @@ public class RoomsServiceImplV1 implements RoomsService {
         rooms.resetEquipments();
         updateEquipments(rooms, requestDto.getEquipment());
 
-        return RoomsConverter.toDto(requestDto, rooms);
+        rooms.updateRooms(
+                requestDto.getName(),
+                requestDto.getPrice(),
+                requestDto.getAddress(),
+                requestDto.getSize(),
+                requestDto.getDesc(),
+                requestDto.getIsClosed()
+        );
+
+        return RoomsConverter.toDto(rooms);
     }
 
     @Transactional
