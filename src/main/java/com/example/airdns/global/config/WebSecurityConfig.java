@@ -59,6 +59,7 @@ public class WebSecurityConfig {
                 .cors(corsConfigure -> corsConfigure.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/equipments").permitAll()
                         // swagger v3
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/login").permitAll()
