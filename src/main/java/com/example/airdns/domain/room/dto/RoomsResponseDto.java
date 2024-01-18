@@ -3,6 +3,7 @@ package com.example.airdns.domain.room.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class RoomsResponseDto {
@@ -20,6 +21,7 @@ public class RoomsResponseDto {
         private String desc;
         private List<Long> equipment;
         private List<String> imageUrl;
+        private List<List<LocalDateTime>> reservatedTimeList;
     }
 
     @Getter

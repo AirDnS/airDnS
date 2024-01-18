@@ -7,6 +7,7 @@ import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class RoomsConverter {
@@ -46,12 +47,19 @@ public class RoomsConverter {
                 .equipment(
                         rooms.getRoomEquipmentsList().stream()
                             .map((roomEquipments) -> roomEquipments.getEquipments().getId())
-                            .collect(Collectors.toList())
+                            .toList()
                 )
                 .imageUrl(
                         rooms.getImagesList().stream()
                             .map((Images::getImageUrl))
-                            .collect(Collectors.toList())
+                            .toList()
+                )
+                .reservatedTimeList(
+                        rooms.getReservationList().stream()
+                                .map(reservation -> Arrays.asList(
+                                        reservation.getCheckIn(), reservation.getCheckOut()
+                                ))
+                                .toList()
                 )
                 .build();
     }
