@@ -33,9 +33,9 @@ public class ReviewsController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 전체 조회 성공"),
     })
-    public ResponseEntity<CommonResponse<List<ReviewsResponseDto.ReadReviewResponseDto>>> readReviews(
+    public ResponseEntity<CommonResponse<List<ReviewsResponseDto.ReadReviewResponseDto>>> readReviewList(
             @PathVariable Long roomsId){
-        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = reviewsService.readReviews(roomsId);
+        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = reviewsService.readReviewList(roomsId);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(new CommonResponse<>(HttpStatus.OK, "룸 리뷰 전체 조회 성공", responseDtoList)
                 );

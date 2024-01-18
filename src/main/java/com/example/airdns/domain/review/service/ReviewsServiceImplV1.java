@@ -29,7 +29,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
 
     @Override
     @Transactional(readOnly = true)
-    public List<ReviewsResponseDto.ReadReviewResponseDto> readReviews(Long roomsId) {
+    public List<ReviewsResponseDto.ReadReviewResponseDto> readReviewList(Long roomsId) {
         Rooms room = roomsService.findById(roomsId);
 
         List<Reviews> reviews = room.getReviewsList();

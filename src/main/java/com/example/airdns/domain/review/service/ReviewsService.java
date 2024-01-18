@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ReviewsService {
 
-    List<ReviewsResponseDto.ReadReviewResponseDto> readReviews(Long roomId);
+    List<ReviewsResponseDto.ReadReviewResponseDto> readReviewList(Long roomId);
 
     ReviewsResponseDto.CreateReviewResponseDto createReview(
             Long roomsId, Users user,
