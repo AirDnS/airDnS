@@ -38,7 +38,6 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         JPQLQuery<Rooms> query = queryFactory
                 .select(rooms)
                 .from(rooms)
-                .leftJoin(rooms.imagesList, images).fetchJoin()
                 .where(
                         eqName(condition.getKeyword())
                                 .or(eqAddress(condition.getKeyword())),
