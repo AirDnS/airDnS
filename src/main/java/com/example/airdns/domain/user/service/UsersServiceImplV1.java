@@ -3,6 +3,7 @@ package com.example.airdns.domain.user.service;
 import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.dto.UsersResponseDto;
 import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.repository.UsersRepository;
@@ -27,10 +28,14 @@ public class UsersServiceImplV1 implements UsersService {
 
     @Override
     @Transactional
-    public UsersResponseDto.UpdateRoleUsersResponseDto updateUserRole(Long userId
-            , UsersRequestDto.UpdateUserRoleRequestDto userRequestDto) {
+    public UsersResponseDto.UpdateRoleUsersResponseDto updateUserRole(Long userId) {
         Users user = findById(userId);
-        user.updateRole(userRequestDto);
+        if(user.getRole().equals(UserRole.USER)){
+            user.updateRole(UserRole.HOST);
+        } else {
+            user.updateRole(UserRole.USER);
+        }
+
         return UsersResponseDto.UpdateRoleUsersResponseDto.of(user);
     }
 

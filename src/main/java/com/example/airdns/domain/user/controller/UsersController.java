@@ -53,17 +53,15 @@ public class UsersController {
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "유저 권한 수정", description = "사용중 유저의 권한을 변경")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "유저 정보 변경 성공",
+            @ApiResponse(responseCode = "200", description = "유저 권한 변경 성공",
                     content = {@Content(schema = @Schema(implementation = UsersResponseDto.UpdateRoleUsersResponseDto.class))}),
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
     public ResponseEntity<CommonResponse<UsersResponseDto.UpdateRoleUsersResponseDto>> updateRole(
-            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl,
-            @RequestBody UsersRequestDto.UpdateUserRoleRequestDto userRequestDto) {
+            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
-        UsersResponseDto.UpdateRoleUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId()
-                , userRequestDto);
+        UsersResponseDto.UpdateRoleUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "권한 변경 성공", responseDto)
         );
@@ -78,7 +76,8 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
-    public ResponseEntity getUserInfo(@AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
+    public ResponseEntity getUserInfo(
+            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
         UsersResponseDto.GetUserResponseDto responseDto = usersService.getUserInfo(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(

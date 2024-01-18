@@ -38,7 +38,7 @@ public class UsersRequestDto {
     @Schema(description = "유저 권한 수정 dto")
     public static class UpdateUserRoleRequestDto {
 
-        @Schema(description = "권한", example = "HOST", defaultValue = "HOST")
+        @Schema(description = "권한", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
     }
 }
