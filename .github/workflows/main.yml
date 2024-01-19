@@ -25,16 +25,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # mysql setup
-      - name: MySQL Setting
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          host port: 3306
-          container port: 3306
-          mysql database: 'aridns'
-          mysql user: 'root'
-          mysql password: ${{ secrets.DB_PASSWORD }}
-
       # Build Gradle
       - name: Build with Gradle
         # test code는 빌드하지 않음
@@ -73,4 +63,8 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker run -p 8080:8080 \
                         --name air_dns_test \
+                        -e DB_DRIVER=${{ secrets.DB_DRIVER }}
+                        -e DB_USER=${{ secrets.DB_USER }} \
+                        -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                        -e DB_URL=${{ secrets.DB_URL }}
                         -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
