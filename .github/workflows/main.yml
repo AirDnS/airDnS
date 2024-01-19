@@ -41,7 +41,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD}}
 
       # *.jar -> Docker Image Build
-      # /air_dns_test
+      # 디렉토리 이름은 마음대로 /air_dns_test
       - name: Docker Image Build
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test .
 
@@ -49,13 +49,15 @@ jobs:
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
 
+
       # run application, ec2 client name : appleboy
       - name: Run Application
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          port: 22
           script: |
             sudo docker kill air_dns_test
             sudo docker rm -f air_dns_test
@@ -63,4 +65,16 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker run -p 8080:8080 \
                         --name air_dns_test \
-                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
+                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test \
+                        -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+                        -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+                        -e DB_DRIVER=${{ secrets.DB_DRIVER }} \
+                        -e DB_USER=${{ secrets.DB_USER }} \
+                        -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+                        -e DB_URL=${{ secrets.DB_URL }} \
+                        -e AWS_ACCESSKEY=${{ secrets.AWS_ACCESSKEY}} \
+                        -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME}} \
+                        -e AWS_SECRETKEY=${{ secrets.AWS_SECRETKEY }} \
+                        -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+                        -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+                        -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
