@@ -3,6 +3,7 @@ package com.example.airdns.domain.room.service;
 import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.image.service.ImagesService;
+import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
@@ -75,7 +76,16 @@ public class RoomsServiceImplV1 implements RoomsService {
         rooms.resetEquipments();
         updateEquipments(rooms, requestDto.getEquipment());
 
-        return RoomsConverter.toDto(requestDto, rooms);
+        rooms.updateRooms(
+                requestDto.getName(),
+                requestDto.getPrice(),
+                requestDto.getAddress(),
+                requestDto.getSize(),
+                requestDto.getDesc(),
+                requestDto.getIsClosed()
+        );
+
+        return RoomsConverter.toDto(rooms);
     }
 
     @Transactional

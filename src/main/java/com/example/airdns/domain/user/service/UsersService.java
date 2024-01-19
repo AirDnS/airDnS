@@ -9,4 +9,7 @@ public interface UsersService {
     UsersResponseDto.UpdateUsersResponseDto updateUser(Long userId, UsersRequestDto.UpdateUserInfoRequestDto userRequestDto);
     Users findById(Long userId);
 
+    UsersResponseDto.UpdateRoleUsersResponseDto updateUserRole(Long userId);
+
+    UsersResponseDto.GetUserResponseDto getUserInfo(Long userId);
 }

@@ -2,8 +2,8 @@ package com.example.airdns.domain.like.service;
 
 import com.example.airdns.domain.like.dto.LikesResponseDto;
 import com.example.airdns.domain.like.entity.Likes;
+import com.example.airdns.domain.like.exception.LikesCustomException;
 import com.example.airdns.domain.like.exception.LikesExceptionCode;
-import com.example.airdns.domain.like.exception.UserNotLikedException;
 import com.example.airdns.domain.like.repository.LikesRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
@@ -11,9 +11,6 @@ import com.example.airdns.domain.user.entity.Users;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,20 +21,16 @@ public class LikesServiceImplV1 implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<LikesResponseDto.ReadLikeResponseDto> getLikeList(Long roomsId, Users user){
+    public LikesResponseDto.ReadLikeResponseDto getRoomLike(Long roomsId, Users user){
         Rooms room = roomsService.findById(roomsId);
 
-        List<Likes> likesList = likesRepository.findAllByRoomsId(roomsId);
+        Integer roomLikeCount = room.getLikesList().size();
 
-        return likesList.stream()
-                .map(like -> LikesResponseDto.ReadLikeResponseDto.builder()
-                        .roomName(room.getName())
-                        .roomAddress(room.getAddress())
-                        .nickName(user.getNickname())
-                        .createdAt(like.getCreatedAt())
-                        .build())
-                .collect(Collectors.toList());
+        return LikesResponseDto.ReadLikeResponseDto.builder()
+                .likeCount(roomLikeCount)
+                .build();
     }
+
     @Override
     @Transactional
     public LikesResponseDto.CreateLikeResponseDto addLike(Long roomsId, Users user){
@@ -54,7 +47,6 @@ public class LikesServiceImplV1 implements LikesService {
         return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickname())
-                .createdAt(likes.getCreatedAt())
                 .build();
     }
 
@@ -64,7 +56,7 @@ public class LikesServiceImplV1 implements LikesService {
         Rooms room = roomsService.findById(roomsId);
 
         likesRepository.findByRoomsId(roomsId).orElseThrow(
-                ()-> new UserNotLikedException(LikesExceptionCode.USER_NOT_LIKED)
+                ()-> new LikesCustomException(LikesExceptionCode.USER_NOT_LIKED)
         );
 
         likesRepository.deleteByRoomsId(roomsId);

@@ -6,23 +6,23 @@ import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ReviewsService {
 
-    ReviewsResponseDto.ReadReviewResponseDto getReview(Long roomId, Long reviewId);
+    List<ReviewsResponseDto.ReadReviewResponseDto> readReviewList(Long roomId);
 
-    Page<ReviewsResponseDto.ReadReviewResponseDto> getReviews(Long roomId, Pageable pageable);
-
-    ReviewsResponseDto.CreateReviewResponseDto addReview(
+    ReviewsResponseDto.CreateReviewResponseDto createReview(
             Long roomsId, Users user,
-            ReviewsRequestDto.AddReviewRequestDto requestDto
+            ReviewsRequestDto.CreateReviewRequestDto requestDto
     );
 
-    ReviewsResponseDto.UpdateReviewResponseDto modifyReview(
+    ReviewsResponseDto.UpdateReviewResponseDto updateReview(
             Long roomsId, Long reviewId, Users user,
             ReviewsRequestDto.UpdateReviewRequestDto requestDto
     );
 
-    ReviewsResponseDto.DeleteReviewResponseDto removeReview(
+    ReviewsResponseDto.DeleteReviewResponseDto deleteReview(
             Long roomsId, Long reviewId, Users user
     );
 }

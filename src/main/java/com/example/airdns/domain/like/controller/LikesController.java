@@ -16,22 +16,21 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/users/rooms")
+@RequestMapping("/api/v1/rooms")
 public class LikesController {
 
     private final LikesService likesService;
 
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "룸 좋아요 목록 조회 성공"),
+    @ApiResponses(value =  {
+            @ApiResponse(responseCode = "200", description = "룸에 대한 좋아요 갯수 조회"),
     })
     @GetMapping("/{roomsId}/likes")
-    public ResponseEntity<CommonResponse<List<LikesResponseDto.ReadLikeResponseDto>>> getLikeList(
+    public ResponseEntity<CommonResponse<LikesResponseDto.ReadLikeResponseDto>> getRoomLike(
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
-        List<LikesResponseDto.ReadLikeResponseDto> responseDto = likesService.getLikeList(roomsId, userDetails.getUser());
-
+        LikesResponseDto.ReadLikeResponseDto responseDto = likesService.getRoomLike(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 목록 조회 성공", responseDto)
+                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 조회 성공", responseDto)
         );
     }
 

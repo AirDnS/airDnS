@@ -24,14 +24,14 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.STARTTIME_IS_AFTER_ENDTIME);
         }
 
-        if (restScheduleRepository.findFirstByRestEndTimeGreaterThanAndRestStartTimeLessThan(startDate, endDate).isPresent()) {
+        if (restScheduleRepository.findFirstByEndTimeGreaterThanAndStartTimeLessThan(startDate, endDate).isPresent()) {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.DUPLICATE_DATETIME);
         }
 
         return restScheduleRepository.save(RestSchedule.builder()
                 .rooms(rooms)
-                .restStartTime(startDate)
-                .restEndTime(endDate)
+                .startTime(startDate)
+                .endTime(endDate)
                 .build());
     }
 

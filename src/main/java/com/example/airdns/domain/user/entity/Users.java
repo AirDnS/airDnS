@@ -81,4 +81,8 @@ public class Users extends CommonEntity {
         this.contact = userRequestDto.getContact();
         this.nickname = userRequestDto.getNickname();
     }
+
+    public void updateRole(UserRole role) {
+        this.role = role;
+    }
 }

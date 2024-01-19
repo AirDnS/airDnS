@@ -32,7 +32,7 @@ public class Reviews extends CommonEntity {
     private Users users;
 
     // 편의 메서드
-    public void modify(ReviewsRequestDto.UpdateReviewRequestDto requestDto){
+    public void update(ReviewsRequestDto.UpdateReviewRequestDto requestDto){
         this.content = requestDto.getContent();
     }
 }
