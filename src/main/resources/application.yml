@@ -19,8 +19,8 @@ spring:
     secret: ${JWT_SECRET}
   data:
     redis:
-      host: dsadsadsa
-      port: 6379
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
   servlet:
     multipart:
       max-file-size: 10MB # 한개 파일의 최대 사이즈 (default: 1MB)
