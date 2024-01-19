@@ -31,7 +31,7 @@ public class PaymentServiceImplV1 implements PaymentService {
     @Value("${payment.toss.url}")
     private String tossPaymentsApiUrl;
 
-    @Value("${payment.toss.WIDGET_SECRET_KEY")
+    @Value("${payment.toss.secret_api_key}")
     private String secretApiKey;
 
     @Override
