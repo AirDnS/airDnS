@@ -24,6 +24,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
+      # Test code 미포함 빌드
       - name: Spring Boot Application Build
         run: ./gradlew build -x test
 
@@ -55,11 +56,11 @@ jobs:
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
             sudo docker run \
-            -e REDIS_HOST: ${{ secrets.REDIS_HOST }} \
-            -e REDIS_PORT: ${{ secrets.REDIS_PORT }} \
-            -e DB_DRIVER: ${{ secrets.DB_DRIVER }} \
-            -e DB_USER: ${{ secrets.DB_USER }} \
-            -e AWS_ACCESSKEY: ${{ secrets.AWS_ACCESSKEY }} \
-            -e JWT_SECRET: ${{ secrets.JWT_SECRET }} \
-            -e KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }} \
-            -e KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+            -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
+            -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
+            -e DB_DRIVER=${{ secrets.DB_DRIVER }} \
+            -e DB_USER=${{ secrets.DB_USER }} \
+            -e AWS_ACCESSKEY=${{ secrets.AWS_ACCESSKEY }} \
+            -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
+            -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
