@@ -54,18 +54,18 @@ jobs:
       - name: Run Application
         uses: appleboy/ssh-action@v0.1.9
         env:
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          REDIS_PORT: ${{ secrets.REDIS_PORT }}
-          DB_DRIVER: ${{ secrets.DB_DRIVER }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_URL: ${{ secrets.DB_URL }}
-          AWS_ACCESSKEY: ${{ secrets.AWS_ACCESSKEY}}
-          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME}}
-          AWS_SECRETKEY: ${{ secrets.AWS_SECRETKEY }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
-          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}            
+          REDIS_HOST: "${{ secrets.REDIS_HOST }}"
+          REDIS_PORT: "${{ secrets.REDIS_PORT }}"
+          DB_DRIVER: "${{ secrets.DB_DRIVER }}"
+          DB_USER: "${{ secrets.DB_USER }}"
+          DB_PASSWORD: "${{ secrets.DB_PASSWORD }}"
+          DB_URL: "${{ secrets.DB_URL }}"
+          AWS_ACCESSKEY: "${{ secrets.AWS_ACCESSKEY}}"
+          AWS_BUCKET_NAME: "${{ secrets.AWS_BUCKET_NAME}}"
+          AWS_SECRETKEY: "${{ secrets.AWS_SECRETKEY }}"
+          JWT_SECRET: "${{ secrets.JWT_SECRET }}"
+          KAKAO_CLIENT_ID: "${{ secrets.KAKAO_CLIENT_ID }}"
+          KAKAO_CLIENT_SECRET: "${{ secrets.KAKAO_CLIENT_SECRET }}"    
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
