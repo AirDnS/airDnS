@@ -9,12 +9,6 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class PaymentConfig {
 
-    @Value("${payment.toss.client_api_key}")
-    private String testClientApiKey;
-
-    @Value("${payment.toss.secret_api_key}")
-    private String testSecretKey;
-
     @Value("${payment.toss.success_url}")
     private String successUrl;
 

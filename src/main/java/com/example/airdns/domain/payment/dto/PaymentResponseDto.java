@@ -1,22 +1,27 @@
 package com.example.airdns.domain.payment.dto;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
+@Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class PaymentResponseDto {
 
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "결제 조회 응답 dto")
-    public static class ReadPaymentResponseDto {
-        @Schema(description = "좋아요 조회 응답 내용", defaultValue = "get like response")
-        private String nickName;
-    }
+    private String payType;
+    private Long amount;
+    private String orderId;
+    private String customerEmail;
+    private String successUrl;
+    private String failUrl;
+    private String failReason;
+    private boolean cancelYN;
+    private String cancelReason;
+    private String createdAt;
+    private String paymentKey;
+
+
 }
