@@ -25,6 +25,16 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # mysql setup
+      - name: MySQL Setting
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306
+          container port: 3306
+          mysql database: 'aridns'
+          mysql user: 'root'
+          mysql password: ${{ secrets.DB_PASSWORD }}
+
       # Build Gradle
       - name: Build with Gradle
         # test code는 빌드하지 않음
