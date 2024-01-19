@@ -63,4 +63,4 @@ jobs:
             sudo docker rm -f air_dns_test
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test:latest
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
-            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_ENV }} -name air_dns_test -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test:latest
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_ENV }} --name air_dns_test -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test:latest
