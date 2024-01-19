@@ -3,7 +3,6 @@
 # 명령어가 bash 환경에서 실행됨을 명시해줍니다.
 APP_NAME= airDnS
 REPOSITORY=/home/ubuntu/
-
 echo "> Check the currently running container"
 CONTAINER_ID=$(docker ps -aqf "name=$APP_NAME")
 
