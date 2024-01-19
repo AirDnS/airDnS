@@ -49,6 +49,7 @@ jobs:
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
 
+
       # run application, ec2 client name : appleboy
       - name: Run Application
         uses: appleboy/ssh-action@v0.1.6
