@@ -48,6 +48,8 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_KEY }}
+          timeout: 2m
+          command_timeout: 10m
 
           script: |
             sudo docker kill ${{ secrets.PROJECT_NAME }}
