@@ -58,7 +58,7 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          run: |
+          script: |
             sudo docker kill air_dns_test
             sudo docker rm -f air_dns_test
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
