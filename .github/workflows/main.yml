@@ -61,7 +61,7 @@ jobs:
             sudo docker rm -f air_dns_test
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
-            sudo docker run -p 8080:8080 \
+            sudo docker run \
                         -e DB_DRIVER=${{ secrets.DB_DRIVER }} \
                         -e DB_USER=${{ secrets.DB_USER }} \
                         -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
@@ -74,5 +74,6 @@ jobs:
                         -e KAKAO_CLIENT_SECRET = ${{ secrets.KAKAO_CLIENT_SECRET }} \
                         -e REDIS_HOST = ${{ secrets.REDIS_HOST }} \
                         -e REDIS_PORT = ${{ secrets.REDIS_PORT }} \
+                        -p 8080:8080
                         --name air_dns_test \
                         -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
