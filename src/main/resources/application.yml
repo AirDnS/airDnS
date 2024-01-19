@@ -61,7 +61,7 @@ springdoc:
   swagger-ui:
     tags-sorter: alpha
 
-#Toss Payment
+#TOSS Payment
 payment :
   toss :
     client_api_key : ${CLIENT_API_KEY}
