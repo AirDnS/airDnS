@@ -1,6 +1,5 @@
 FROM openjdk:17-oracle
-ARG JAR_FILE=./build/libs/*-SNAPSHOT.jar
-COPY ${JAR_FILE} app.jar
+COPY ./build/libs/*-SNAPSHOT.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 #FROM openjdk:17
