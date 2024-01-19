@@ -68,3 +68,11 @@ jobs:
                         -e DB_USER=${{ secrets.DB_USER }} \
                         -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
                         -e DB_URL=${{ secrets.DB_URL }}
+                        -e AWS_ACCESSKEY=${{ secret.AWS_ACCESSKEY}}
+                        -e AWS_BUCKET_NAME= ${{ secret.AWS_BUCKET_NAME}}
+                        -e AWS_SECRETKEY= ${{ secret.AWS_SECRETKEY }}
+                        -e JWT_SECRET = ${{ secret.JWT_SECRET }}
+                        -e KAKAO_CLIENT_ID = ${{ secret.KAKAO_CLIENT_ID }}
+                        -e KAKAO_CLIENT_SECRET = ${{ secret.KAKAO_CLIENT_SECRET }}
+                        -e REDIS_HOST = ${{ secret.REDIS_HOST }}
+                        -e REDIS_PORT = ${{ secret.REDIS_PORT }}
