@@ -125,7 +125,7 @@ public class ReservationServiceImplV1 implements ReservationService {
 
     @Override
     public boolean isRested(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
-        return restScheduleRepository.findFirstByRoomsIdAndRestStartTimeBeforeAndRestEndTimeAfter(roomId, checkOut, checkIn).
+        return restScheduleRepository.findFirstByRoomsIdAndStartTimeBeforeAndEndTimeAfter(roomId, checkOut, checkIn).
                 isPresent();
     }
 

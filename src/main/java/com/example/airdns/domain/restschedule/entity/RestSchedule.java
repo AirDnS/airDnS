@@ -20,10 +20,10 @@ public class RestSchedule extends CommonEntity {
     private Long id;
 
     @Column
-    private LocalDateTime restStartTime;
+    private LocalDateTime startTime;
 
     @Column
-    private LocalDateTime restEndTime;
+    private LocalDateTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rooms_id")
