@@ -19,7 +19,6 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
           cache: gradle
-
       # 권한 부여
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
