@@ -1,4 +1,7 @@
-FROM openjdk:17 as build
-ARG JAR_FILE=build/libs/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-Dspring.profiles.active=prod","-jar","/app.jar"]
+FROM openjdk:17-jdk
+
+# JAR 파일 메인 디렉토리에 복사
+COPY build/libs/*.jar app.jar
+
+# 시스템 진입점 정의
+ENTRYPOINT ["java","-jar","app.jar"]
