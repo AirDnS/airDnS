@@ -66,6 +66,8 @@ jobs:
             sudo docker run -p 8080:8080 \
                         --name air_dns_test \
                         -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test \
+                        -e "REDIS_HOST = ${{ secrets.REDIS_HOST }}" \
+                        -e "REDIS_PORT = ${{ secrets.REDIS_PORT }}" \
                         -e "DB_DRIVER=${{ secrets.DB_DRIVER }}" \
                         -e "DB_USER=${{ secrets.DB_USER }}" \
                         -e "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" \
@@ -75,6 +77,4 @@ jobs:
                         -e "AWS_SECRETKEY= ${{ secrets.AWS_SECRETKEY }}" \
                         -e "JWT_SECRET = ${{ secrets.JWT_SECRET }}" \
                         -e "KAKAO_CLIENT_ID = ${{ secrets.KAKAO_CLIENT_ID }}" \
-                        -e "KAKAO_CLIENT_SECRET = ${{ secrets.KAKAO_CLIENT_SECRET }}" \
-                        -e "REDIS_HOST = ${{ secrets.REDIS_HOST }}" \
-                        -e "REDIS_PORT = ${{ secrets.REDIS_PORT }}"
+                        -e "KAKAO_CLIENT_SECRET = ${{ secrets.KAKAO_CLIENT_SECRET }}"
