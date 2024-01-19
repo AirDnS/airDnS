@@ -1,0 +1,51 @@
+name: 'air_DnS backend'
+on:
+  pull_request:
+    branches:
+      - "develop"
+permissions: write-all
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      DB_DRIVER: ${{ secrets.DB_DRIVER }}
+      DB_USER: ${{ secrets.DB_USER }}
+      AWS_ACCESSKEY: ${{ secrets.AWS_ACCESSKEY }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+      KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: setup jdk
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'zulu'
+          cache: gradle
+
+      # Redis
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - name: Grant execute permission for gradlew
+        # test code는 빌드하지 않음
+        run: ./gradlew assemble
+
+      #- name: gradlew test
+      #  run: ./gradlew test
+
+      # UNIT Test
+      #- name: Publish Unit Test Results
+      #  uses: EnricoMi/publish-unit-test-result-action@v1
+      #  if: ${{ always() }}
+      #  with:
+      #    files: build/test-results/**/*.xml
