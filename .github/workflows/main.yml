@@ -52,7 +52,7 @@ jobs:
 
       # run application, ec2 client name : appleboy
       - name: Run Application
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@v0.1.9
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
