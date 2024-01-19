@@ -49,6 +49,7 @@ jobs:
       - name: DockerHub Push
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
 
+
       # run application, ec2 client name : appleboy
       - name: Run Application
         uses: appleboy/ssh-action@v0.1.9
@@ -62,6 +63,4 @@ jobs:
             sudo docker rm -f air_dns_test
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/air_dns_test
-            sudo docker run -p 8080:8080 \
-                        --name air_dns_test \
-                        -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
+            sudo docker run -d -p 8080:8080 ${{ secrets.DOCKER_ENV }} -name air_dns_test -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test
