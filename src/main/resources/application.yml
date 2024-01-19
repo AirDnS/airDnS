@@ -19,7 +19,7 @@ spring:
     secret: ${JWT_SECRET}
   data:
     redis:
-      host: ${REDIS_HOST}
+      host: dsadsadsa
       port: ${REDIS_PORT}
   servlet:
     multipart:
