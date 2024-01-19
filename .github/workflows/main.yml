@@ -53,11 +53,25 @@ jobs:
       # run application, ec2 client name : appleboy
       - name: Run Application
         uses: appleboy/ssh-action@v0.1.9
+        env:
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          REDIS_PORT: ${{ secrets.REDIS_PORT }}
+          DB_DRIVER: ${{ secrets.DB_DRIVER }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_URL: ${{ secrets.DB_URL }}
+          AWS_ACCESSKEY: ${{ secrets.AWS_ACCESSKEY}}
+          AWS_BUCKET_NAME: ${{ secrets.AWS_BUCKET_NAME}}
+          AWS_SECRETKEY: ${{ secrets.AWS_SECRETKEY }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          KAKAO_CLIENT_ID: ${{ secrets.KAKAO_CLIENT_ID }}
+          KAKAO_CLIENT_SECRET: ${{ secrets.KAKAO_CLIENT_SECRET }}            
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
+          envs: REDIS_HOST, REDIS_PORT,DB_DRIVER,DB_USER,DB_PASSWORD,DB_URL,AWS_ACCESSKEY,AWS_BUCKET_NAME,AWS_SECRETKEY,JWT_SECRET,KAKAO_CLIENT_ID,KAKAO_CLIENT_SECRET
           script: |
             sudo docker kill air_dns_test
             sudo docker rm -f air_dns_test
@@ -66,15 +80,15 @@ jobs:
             sudo docker run -p 8080:8080 \
                         --name air_dns_test \
                         -d ${{ secrets.DOCKERHUB_USERNAME}}/air_dns_test \
-                        -e REDIS_HOST=${{ secrets.REDIS_HOST }} \
-                        -e REDIS_PORT=${{ secrets.REDIS_PORT }} \
-                        -e DB_DRIVER=${{ secrets.DB_DRIVER }} \
-                        -e DB_USER=${{ secrets.DB_USER }} \
-                        -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                        -e DB_URL=${{ secrets.DB_URL }} \
-                        -e AWS_ACCESSKEY=${{ secrets.AWS_ACCESSKEY}} \
-                        -e AWS_BUCKET_NAME=${{ secrets.AWS_BUCKET_NAME}} \
-                        -e AWS_SECRETKEY=${{ secrets.AWS_SECRETKEY }} \
-                        -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
-                        -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
-                        -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }}
+                        -e REDIS_HOST=$REDIS_HOST \
+                        -e REDIS_PORT=$REDIS_PORT \
+                        -e DB_DRIVER=$DB_DRIVER \
+                        -e DB_USER=$DB_USER \
+                        -e DB_PASSWORD=$DB_PASSWORD \
+                        -e DB_URL=$DB_URL \
+                        -e AWS_ACCESSKEY=$AWS_ACCESSKEY \
+                        -e AWS_BUCKET_NAME=$AWS_BUCKET_NAME \
+                        -e AWS_SECRETKEY=$AWS_SECRETKEY \
+                        -e JWT_SECRET=$JWT_SECRET \
+                        -e KAKAO_CLIENT_ID=$KAKAO_CLIENT_ID \
+                        -e KAKAO_CLIENT_SECRET=$KAKAO_CLIENT_SECRET
