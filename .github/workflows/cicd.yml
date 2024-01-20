@@ -48,12 +48,12 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_TAG }}
 
-    deploy:
-      needs: build-docker-image
-      name: Deploy
-      runs-on: [ self-hosted, label-development ]
-      steps:
-        - name: Docker run
-          run: |
-            sudo docker stop airDns && docker rm airDns && docker rmi ${{ secrets.DOCKERHUB_TAG }}
-            sudo docker run -d -p 80:8080 ${{ secrets.PROD_ENV }} --name airDns ${{ secrets.DOCKERHUB_TAG }}
+  deploy:
+    needs: build-docker-image
+    name: Deploy
+    runs-on: [ self-hosted, label-development ]
+    steps:
+      - name: Docker run
+        run: |
+          sudo docker stop airDns && docker rm airDns && docker rmi ${{ secrets.DOCKERHUB_TAG }}
+          sudo docker run -d -p 80:8080 ${{ secrets.PROD_ENV }} --name airDns ${{ secrets.DOCKERHUB_TAG }}
