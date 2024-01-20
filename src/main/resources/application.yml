@@ -78,3 +78,6 @@ cloud:
     credentials:
       accessKey: ${AWS_ACCESSKEY}
       secretKey: ${AWS_SECRETKEY}
+
+server:
+  port: ${SERVER_PORT}
