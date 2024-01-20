@@ -32,7 +32,6 @@ jobs:
         # test code는 빌드하지 않음
         run: ./gradlew assemble
         # run: ./gradlew clean build test
-
       #- name: Build with Gradle
       #  run: ./gradlew clean build
 
