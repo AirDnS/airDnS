@@ -17,6 +17,8 @@ public class ReviewsResponseDto {
     @AllArgsConstructor
     @Schema(description = "룸의 리뷰 조회 응답 dto")
     public static class ReadReviewResponseDto {
+        private Long reviewsId;
+        private Long usersId;
         @Schema(description = "추가할 이름", defaultValue = "read Review")
         private String nickName;
         private String roomName;
@@ -43,6 +45,8 @@ public class ReviewsResponseDto {
     @AllArgsConstructor
     @Schema(description = "리뷰 단건 수정 응답 dto")
     public static class UpdateReviewResponseDto {
+        private Long reviewsId;
+        private Long usersId;
         @Schema(description = "리뷰 수정 내용", defaultValue = "update Review")
         private String nickName;
         private String roomName;
