@@ -60,7 +60,10 @@ public class UsersResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class GetUserResponseDto {
+    public static class ReadUserResponseDto {
+
+        @Schema(description = "유저 ID", example = "DB에 저장 ID", defaultValue = "2")
+        private Long userId;
 
         @Schema(description = "이메일", example = "qwer1234@gmail.com", defaultValue = "qwer1234@gmail.com")
         private String email;
@@ -77,8 +80,9 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static GetUserResponseDto of(Users user) {
-            return GetUserResponseDto.builder()
+        public static ReadUserResponseDto of(Users user) {
+            return ReadUserResponseDto.builder()
+                    .userId(user.getId())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
                     .address(user.getAddress())

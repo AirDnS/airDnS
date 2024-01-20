@@ -40,9 +40,9 @@ public class UsersServiceImplV1 implements UsersService {
     }
 
     @Override
-    public UsersResponseDto.GetUserResponseDto getUserInfo(Long userId) {
+    public UsersResponseDto.ReadUserResponseDto getUserInfo(Long userId) {
         Users user = findById(userId);
-        return UsersResponseDto.GetUserResponseDto.of(user);
+        return UsersResponseDto.ReadUserResponseDto.of(user);
     }
 
     @Override
