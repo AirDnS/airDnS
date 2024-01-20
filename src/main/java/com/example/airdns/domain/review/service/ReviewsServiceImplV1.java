@@ -39,6 +39,8 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         for (Reviews review : reviews) {
             ReviewsResponseDto.ReadReviewResponseDto responseDto
                     = ReviewsResponseDto.ReadReviewResponseDto.builder()
+                    .reviewsId(review.getId())
+                    .usersId(review.getUsers().getId())
                     .nickName(review.getUsers().getNickname())
                     .roomName(room.getName())
                     .content(review.getContent())
@@ -98,6 +100,8 @@ public class ReviewsServiceImplV1 implements ReviewsService{
         reviewsRepository.save(review);
 
         return ReviewsResponseDto.UpdateReviewResponseDto.builder()
+                .reviewsId(review.getId())
+                .usersId(review.getUsers().getId())
                 .nickName(review.getUsers().getNickname())
                 .roomName(review.getRooms().getName())
                 .createdAt(review.getCreatedAt())
