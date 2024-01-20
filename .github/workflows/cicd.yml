@@ -53,7 +53,7 @@ jobs:
         uses: einaregilsson/beanstalk-deploy@v20
         with:
           aws_access_key: ${{ secrets.AWS_ACCESSKEY }}
-          aws_secret_key: ${{ secrets.AWS_AWS_SECRETKEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRETKEY }}
           application_name: airdns-1
           environment_name: airdns-env-1
           version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
