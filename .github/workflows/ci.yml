@@ -39,7 +39,6 @@ jobs:
       - name: Grant execute permission for gradlew
         # test code는 빌드하지 않음
         run: ./gradlew assemble
-
       #- name: gradlew test
       #  run: ./gradlew test
 
