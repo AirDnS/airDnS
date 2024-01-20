@@ -67,5 +67,5 @@ jobs:
               -e KAKAO_CLIENT_ID=${{ secrets.KAKAO_CLIENT_ID }} \
               -e KAKAO_CLIENT_SECRET=${{ secrets.KAKAO_CLIENT_SECRET }} \
               -p ${{ secrets.PORT }}:${{ secrets.PORT }} \
-                      --name ${{ secrets.PROJECT_NAME }} \
-                      -d ${{ secrets.DOCKERHUB_USERNAME}}/${{ secrets.PROJECT_NAME }}
+              --name ${{ secrets.PROJECT_NAME }} \
+              -d ${{ secrets.DOCKERHUB_USERNAME}}/${{ secrets.PROJECT_NAME }}
