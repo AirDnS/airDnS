@@ -54,7 +54,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESSKEY }}
           aws_secret_key: ${{ secrets.AWS_SECRETKEY }}
           application_name: airdns-1
-          environment_name: Airdns-env-1
+          environment_name: Airdns-1-env
           version_label: github-action-${{ steps.current-time.outputs.formattedTime }}
           region: ap-northeast-2
           deployment_package: ./build/libs/${{ env.artifact }}
