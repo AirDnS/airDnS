@@ -52,6 +52,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_TAG }}
 
+  # docker image
   deploy:
     needs: build-docker-image
     name: Deploy
