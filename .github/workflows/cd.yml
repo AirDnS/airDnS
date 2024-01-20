@@ -28,6 +28,7 @@ jobs:
       - name: Spring Boot Application Build
         run: ./gradlew build -x test
 
+      # Dokcerhub login
       - name: DockerHub Login
         uses: docker/login-action@v2
         with:
