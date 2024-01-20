@@ -1,5 +1,5 @@
 # 워크 플로우의 이름
-name : airDnS CI/CD
+name: airDnS CI/CD
 
 # 워크 플로우가 시작될 브랜치 지정
 on:
