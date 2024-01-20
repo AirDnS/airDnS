@@ -8,12 +8,7 @@ on:
 
 jobs:
   build:
-  #build-docker-image:
-  #  if: github.event.pull_request.merged == true # PR이 머지가 됬을 때(승인)
     runs-on: ubuntu-latest
-
-    # github repository에 접근하기 위해 check-out 하는 GitHub Action 공식 작업
-    # link : https://github.com/actions/checkout
     steps:
       - uses: actions/checkout@v3
       - name: Checkout
