@@ -23,7 +23,7 @@ public class Payments extends CommonEntity {
     @Column(nullable = false)
     private Long amount;
 
-    @Column(nullable = false, name = "order_name")
+    @Column
     private String orderName;
 
     @Column(nullable = false, name = "order_id")
