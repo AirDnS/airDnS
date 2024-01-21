@@ -28,10 +28,24 @@ jobs:
           echo "${{ secrets.PROPERTIES }}" > ./application.properties
         shell: bash
 
+      # 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # gradle caching
+      - name: gradle caching
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # test code를 제외한 build gradle
       - name: Build with Gradle
-        run: |
-          chmod +x ./gradlew
-          ./gradlew clean build -x test
+        run: ./gradlew assemble
 
       - name: Docker build & push to docker repo
         run: |
