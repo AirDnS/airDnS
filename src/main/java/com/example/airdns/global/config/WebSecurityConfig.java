@@ -42,7 +42,7 @@ public class WebSecurityConfig {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowCredentials(true);
-            config.setAllowedOrigins(List.of("https://airdns.netlify.app"));
+            config.setAllowedOrigins(List.of("http://airdns.s3-website.ap-northeast-2.amazonaws.com"));
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
             config.setAllowedHeaders(List.of("*"));
             config.setExposedHeaders(List.of("*"));
