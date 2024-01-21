@@ -81,6 +81,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                     principal.getUserInfo().getAccessToken()
             );
 
+            log.info("test");
             String accessToken = jwtUtil.createAccessToken(authentication);
             String refreshToken = jwtUtil.createRefreshToken(authentication);
             // User 정보 저장
