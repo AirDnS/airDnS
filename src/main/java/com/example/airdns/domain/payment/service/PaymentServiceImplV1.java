@@ -1,9 +1,12 @@
 package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
+import com.example.airdns.domain.payment.dto.PaymentRequestDto.RequestPaymentDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
 import com.example.airdns.domain.payment.entity.Payments;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
+import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -25,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class PaymentServiceImplV1 implements PaymentService {
 
+    private final ReservationService reservationService;
     private final PaymentRepository paymentsRepository;
     private final RestTemplate restTemplate;
 
@@ -35,7 +39,11 @@ public class PaymentServiceImplV1 implements PaymentService {
     private String secretApiKey;
 
     @Override
-    public PaymentResponseDto requestPayment(PaymentRequestDto.RequestPaymentDto requestDto) {
+    public PaymentResponseDto requestPayment(Long reservationId,
+            PaymentRequestDto.RequestPaymentDto requestDto) {
+
+        Reservation reservation = reservationService.findById(reservationId);
+
         try {
             String authorizations = encodeSecretKey(secretApiKey);
 
@@ -45,7 +53,8 @@ public class PaymentServiceImplV1 implements PaymentService {
 
             HttpEntity<JSONObject> requestEntity = new HttpEntity<>(requestData, headers);
 
-            ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(tossPaymentsApiUrl, requestEntity, JSONObject.class);
+            ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(
+                    tossPaymentsApiUrl, requestEntity, JSONObject.class);
 
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 return handleSuccessfulResponse(requestDto, responseEntity.getBody());
@@ -82,7 +91,8 @@ public class PaymentServiceImplV1 implements PaymentService {
         return requestData;
     }
 
-    private PaymentResponseDto handleSuccessfulResponse(PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
+    private PaymentResponseDto handleSuccessfulResponse(
+            PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
         // 성공 시 결제 정보 저장
         savePaymentInfo((String) responseBody.get("paymentKey"), requestDto, responseBody);
 
@@ -95,13 +105,14 @@ public class PaymentServiceImplV1 implements PaymentService {
                 .build();
     }
 
-    private void savePaymentInfo(String paymentKey, PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
+    private void savePaymentInfo(String paymentKey, RequestPaymentDto requestDto,
+            JSONObject responseBody) {
         Payments payments = Payments.builder()
                 .orderId(requestDto.getOrderId())
                 .amount(requestDto.getAmount())
                 .paymentKey(paymentKey)
+                .reservation(requestDto.getReservationId())
                 .build();
-
         paymentsRepository.save(payments);
     }
 
@@ -122,5 +133,5 @@ public class PaymentServiceImplV1 implements PaymentService {
             log.error("Error parsing error response", e);
         }
     }
-}
 
+}

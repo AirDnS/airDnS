@@ -1,6 +1,7 @@
 package com.example.airdns.domain.payment.dto;
 
 import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.reservation.entity.Reservation;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class PaymentRequestDto {
     private Boolean isPaySuccess;
     private String failReason;
     private String cancelReason;
+    private Long reservationId;
 
     @Getter
     @Builder
@@ -33,16 +35,22 @@ public class PaymentRequestDto {
         private String paymentType;
         private Long amount;
         private String orderId;
-        private Long reservationId;
         private String paymentKey;
         private String payName;
+        private Reservation reservation;
+
         public Payments toEntity() {
             return Payments.builder()
                     .paymentType(paymentType)
                     .amount(amount)
                     .orderId(orderId)
                     .paymentKey(paymentKey)
+                    .reservation(reservation)
                     .build();
+        }
+
+        public Reservation getReservationId() {
+            return getReservation();
         }
     }
 }

@@ -7,8 +7,10 @@ import java.util.NoSuchElementException;
 
 public interface PaymentService {
     /**
-//     * @param reservationId 예약 ID
+     * @param reservationId 예약 ID
      * @param requestDto 결제 요청 DTO
      */
-    PaymentResponseDto requestPayment(PaymentRequestDto.RequestPaymentDto requestDto);
+    PaymentResponseDto requestPayment(Long reservationId, PaymentRequestDto.RequestPaymentDto requestDto);
+
+
 }

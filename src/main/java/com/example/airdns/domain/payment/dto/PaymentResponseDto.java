@@ -22,6 +22,7 @@ public class PaymentResponseDto {
     private String cancelReason;
     private String createdAt;
     private String paymentKey;
+    private Long reservationId;
 
 
 }
