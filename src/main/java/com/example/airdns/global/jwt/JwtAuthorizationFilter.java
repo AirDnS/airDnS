@@ -29,7 +29,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         System.out.println("test");
         String token = request.getHeader(AUTHORIZATION_HEADER);
-
+        System.out.println(request.getMethod() + "  :   " + request.getRequestURI() + " . ");
         if (StringUtils.hasText(token)) {
             String tokenValue = jwtUtil.substringToken(token);
             JwtStatus jwtStatus = jwtUtil.validateToken(tokenValue);
