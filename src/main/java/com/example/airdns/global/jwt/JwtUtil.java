@@ -1,6 +1,6 @@
 package com.example.airdns.global.jwt;
 
-import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.oauth2.dto.ResponseTokenDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.security.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
@@ -18,7 +18,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -29,7 +28,6 @@ import java.net.URLEncoder;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 
@@ -38,10 +36,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JwtUtil {
 
-    public static final long ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 60; // 30min
-    public static final long REFRESH_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 120; // 1 hour
+    public static final long ACCESS_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 60; // One Hour
+    public static final long REFRESH_TOKEN_EXPIRE_TIME_IN_MILLISECONDS = 1000 * 60 * 60 * 24; // One Day
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
+
+    public static final String REFRESH_TOKEN_HEADER = "Refresh";
     // 사용자 권한 값의 KEY
     public static final String AUTHORIZATION_KEY = "auth";
     // Token 식별자(Convention)
@@ -118,14 +118,17 @@ public class JwtUtil {
         refreshTokenRepository.saveRefreshToken(username, refreshToken);
     }
 
-    public void addJwtToCookie(String token, HttpServletResponse res) {
+    public void addJwtToCookie(ResponseTokenDto token, HttpServletResponse res) {
         try {
-            token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+            String accessToken = URLEncoder.encode(token.getAccessToken(), "utf-8").replaceAll("\\+", "%20");
+            String refreshToken = URLEncoder.encode(token.getRefreshToken(), "utf-8").replaceAll("\\+", "%20");
 
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-            cookie.setPath("/");
-
-            res.addCookie(cookie);
+            Cookie accessCookie = new Cookie(AUTHORIZATION_HEADER,accessToken);
+            Cookie refreshCookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
+            accessCookie.setPath("/");
+            refreshCookie.setPath("/");
+            res.addCookie(accessCookie);
+            res.addCookie(refreshCookie);
         } catch (UnsupportedEncodingException e) {
             log.error("Not Encoding");
         }
@@ -154,11 +157,27 @@ public class JwtUtil {
         throw new NullPointerException("Not Found Token");
     }
 
-    public String getTokenFromRequestCookie(HttpServletRequest req) {
+    public String getAccessTokenFromRequestCookie(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    try {
+                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                    } catch (UnsupportedEncodingException e) {
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public String getRefreshTokenFromRequestCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(REFRESH_TOKEN_HEADER)) {
                     try {
                         return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
                     } catch (UnsupportedEncodingException e) {

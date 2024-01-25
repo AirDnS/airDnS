@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     // Access Token 기간이 만료시 Refresh Token을 체크해야 한다.
     private void checkRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = jwtUtil.getTokenFromRequestCookie(request);
+        String refreshToken = jwtUtil.getRefreshTokenFromRequestCookie(request);
         String refreshTokenValue = jwtUtil.substringToken(refreshToken);
         JwtStatus jwtStatus = jwtUtil.validateToken(refreshTokenValue);
         switch (jwtStatus) {

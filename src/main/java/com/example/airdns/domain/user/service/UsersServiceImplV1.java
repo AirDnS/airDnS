@@ -23,7 +23,7 @@ public class UsersServiceImplV1 implements UsersService {
             , UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
         Users user = findById(userId);
         user.updateInfo(userRequestDto);
-        return UsersResponseDto.UpdateUsersResponseDto.of(user);
+        return UsersResponseDto.UpdateUsersResponseDto.from(user);
     }
 
     @Override
@@ -36,13 +36,13 @@ public class UsersServiceImplV1 implements UsersService {
             user.updateRole(UserRole.USER);
         }
 
-        return UsersResponseDto.UpdateRoleUsersResponseDto.of(user);
+        return UsersResponseDto.UpdateRoleUsersResponseDto.from(user);
     }
 
     @Override
     public UsersResponseDto.ReadUserResponseDto getUserInfo(Long userId) {
         Users user = findById(userId);
-        return UsersResponseDto.ReadUserResponseDto.of(user);
+        return UsersResponseDto.ReadUserResponseDto.from(user);
     }
 
     @Override

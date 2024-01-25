@@ -27,7 +27,6 @@ public class RedisConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         redisTemplate.setConnectionFactory(redisConnectionFactory());
-        //redisConnectionFactory() 메서드를 사용하여 RedisConnectionFactory를 가져와서 RedisTemplate에 설정합니다.
         return redisTemplate;
     }
 

@@ -2,6 +2,7 @@ package com.example.airdns.domain.user.dto;
 
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -9,11 +10,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class UsersResponseDto {
+
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "유저 정보 수정 응당 dto")
+    @Schema(description = "유저 정보 수정 응답 dto")
     public static class UpdateUsersResponseDto {
 
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
@@ -28,7 +30,7 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static UpdateUsersResponseDto of(Users user) {
+        public static UpdateUsersResponseDto from(Users user) {
             return UpdateUsersResponseDto.builder()
                     .nickname(user.getNickname())
                     .address(user.getAddress())
@@ -48,7 +50,7 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static UpdateRoleUsersResponseDto of(Users user) {
+        public static UpdateRoleUsersResponseDto from(Users user) {
             return UpdateRoleUsersResponseDto.builder()
                     .role(user.getRole())
                     .build();
@@ -80,7 +82,7 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static ReadUserResponseDto of(Users user) {
+        public static ReadUserResponseDto from(Users user) {
             return ReadUserResponseDto.builder()
                     .userId(user.getId())
                     .email(user.getEmail())
