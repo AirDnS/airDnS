@@ -37,7 +37,6 @@ public class Reservation extends CommonEntity {
     @Column
     private LocalDateTime deletedAt;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rooms_id")
     private Rooms rooms;

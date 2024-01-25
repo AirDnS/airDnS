@@ -51,26 +51,10 @@ public class Users extends CommonEntity {
 
     @Builder.Default
     @Column
-    private Boolean isDeleted = false;
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column
     private LocalDateTime deletedAt;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Reviews> reviewsList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Rooms> roomsList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Likes> likesList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Reservation> reservationList = new ArrayList<>();
 
     public Users update(String email, OAuth2Provider provider) {
         this.email = email;
