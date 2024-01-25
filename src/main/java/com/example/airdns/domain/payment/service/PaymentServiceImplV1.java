@@ -1,15 +1,18 @@
 package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
-import com.example.airdns.domain.payment.dto.PaymentRequestDto.RequestPaymentDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
-import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.payment.entity.Payment;
+import com.example.airdns.domain.payment.exception.PaymentCustomException;
+import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.service.ReservationService;
+import jakarta.persistence.EntityNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -26,23 +29,29 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j(topic = "토스페이먼츠 API 요청")
 @RequiredArgsConstructor
-public class PaymentServiceImplV1 implements PaymentService {
+public abstract class PaymentServiceImplV1 implements PaymentService {
 
     private final ReservationService reservationService;
-    private final PaymentRepository paymentsRepository;
+    private final PaymentRepository paymentRepository;
     private final RestTemplate restTemplate;
 
     @Value("${payment.toss.url}")
-    private String tossPaymentsApiUrl;
+    private String tossPaymentApiUrl;
 
     @Value("${payment.toss.secret_api_key}")
     private String secretApiKey;
 
     @Override
-    public PaymentResponseDto requestPayment(Long reservationId,
-            PaymentRequestDto.RequestPaymentDto requestDto) {
+    public PaymentResponseDto.CreatePaymentResponseDto createPayment(
+            Long reservationId,
+            Long userId,
+            PaymentRequestDto.CreatePaymentRequestDto requestDto) {
 
         Reservation reservation = reservationService.findById(reservationId);
+
+        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
+            throw new PaymentCustomException(PaymentExceptionCode.FORBIDDEN_RESERVATION_NOT_USER);
+        }
 
         try {
             String authorizations = encodeSecretKey(secretApiKey);
@@ -54,10 +63,10 @@ public class PaymentServiceImplV1 implements PaymentService {
             HttpEntity<JSONObject> requestEntity = new HttpEntity<>(requestData, headers);
 
             ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(
-                    tossPaymentsApiUrl, requestEntity, JSONObject.class);
+                    tossPaymentApiUrl, requestEntity, JSONObject.class);
 
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                return handleSuccessfulResponse(requestDto, responseEntity.getBody());
+                return handleSuccessfulResponse(requestDto, reservation);
             } else {
                 handlePaymentError(String.valueOf(responseEntity));
                 throw new RuntimeException("Error requesting payment");
@@ -83,7 +92,8 @@ public class PaymentServiceImplV1 implements PaymentService {
         return headers;
     }
 
-    private JSONObject createTossApiRequestBody(PaymentRequestDto.RequestPaymentDto requestDto) {
+    private JSONObject createTossApiRequestBody(
+            PaymentRequestDto.CreatePaymentRequestDto requestDto) {
         JSONObject requestData = new JSONObject();
         requestData.put("orderId", requestDto.getOrderId());
         requestData.put("amount", requestDto.getAmount());
@@ -91,29 +101,18 @@ public class PaymentServiceImplV1 implements PaymentService {
         return requestData;
     }
 
-    private PaymentResponseDto handleSuccessfulResponse(
-            PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
+    private PaymentResponseDto.CreatePaymentResponseDto handleSuccessfulResponse(
+            PaymentRequestDto.CreatePaymentRequestDto requestDto
+            , Reservation reservation) {
         // 성공 시 결제 정보 저장
-        savePaymentInfo((String) responseBody.get("paymentKey"), requestDto, responseBody);
-
-        return PaymentResponseDto.builder()
-                .paymentKey((String) responseBody.get("paymentKey"))
+        Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
                 .amount(requestDto.getAmount())
-                .payType((String) responseBody.get("payType"))
-                .createdAt((String) responseBody.get("createdAt"))
+                .paymentKey(requestDto.getPaymentKey())
+                .reservation(reservation)
                 .build();
-    }
-
-    private void savePaymentInfo(String paymentKey, RequestPaymentDto requestDto,
-            JSONObject responseBody) {
-        Payments payments = Payments.builder()
-                .orderId(requestDto.getOrderId())
-                .amount(requestDto.getAmount())
-                .paymentKey(paymentKey)
-                .reservation(requestDto.getReservationId())
-                .build();
-        paymentsRepository.save(payments);
+        paymentRepository.save(payment);
+        return PaymentResponseDto.CreatePaymentResponseDto.from(payment);
     }
 
     private void handlePaymentError(String errorResponse) {
@@ -133,5 +132,4 @@ public class PaymentServiceImplV1 implements PaymentService {
             log.error("Error parsing error response", e);
         }
     }
-
 }

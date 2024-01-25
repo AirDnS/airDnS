@@ -1,9 +1,11 @@
 package com.example.airdns.domain.payment.repository;
 
-import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.payment.entity.Payment;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PaymentRepository extends JpaRepository<Payments, Long> {
+public interface PaymentRepository extends JpaRepository<Payment, Long> {
+    Optional<Object> findByPaymentId(Long paymentId);
 
-    Payments findByPaymentKey(String paymentKey);
+    Optional<Payment> findByReservationId(Long reservationId);
 }

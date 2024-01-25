@@ -11,7 +11,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Payments extends CommonEntity {
+public class Payment extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,19 +30,7 @@ public class Payments extends CommonEntity {
     private String orderId;
 
     @Column
-    private Boolean isCanceled;
-
-    @Column
-    private Boolean isPaySuccess;
-
-    @Column
     private String paymentKey;
-
-    @Column
-    private String failReason;
-
-    @Column
-    private String cancelReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
