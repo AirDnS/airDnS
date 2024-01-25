@@ -1,7 +1,12 @@
 package com.example.airdns.global.scheduler;
 
-import com.example.airdns.domain.deleteinfo.entity.DeleteInfo;
-import com.example.airdns.domain.deleteinfo.repository.DeleteInfoRepository;
+import com.example.airdns.domain.deleteinfo.entity.DeletePaymentsInfo;
+import com.example.airdns.domain.deleteinfo.entity.DeleteReservationsInfo;
+import com.example.airdns.domain.deleteinfo.entity.DeleteRoomsInfo;
+import com.example.airdns.domain.deleteinfo.entity.DeleteUsersInfo;
+import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityCustomException;
+import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityExceptionCode;
+import com.example.airdns.domain.deleteinfo.repository.*;
 import com.example.airdns.domain.payment.entity.Payments;
 import com.example.airdns.domain.payment.entity.QPayments;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
@@ -20,10 +25,7 @@ import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.repository.UsersRepository;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -32,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Component
@@ -44,24 +45,23 @@ public class Scheduler {
     private final RoomsRepository roomsRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
-    private final DeleteInfoRepository deleteInfoRepository;
+    private final DeleteUsersInfoRepository deleteUsersInfoRepository;
+    private final DeleteRoomsInfoRepository deleteRoomsInfoRepository;
+    private final DeleteReservationInfoRepository deleteReservationInfoRepository;
+    private final DeletePaymentsInfoRepository deletePaymentsInfoRepository;
     private final JPAQueryFactory jpaQueryFactory;
 
     // 초 분 시 일 월 요일
     @Transactional
     @Scheduled(cron = "10 * * * * *")
     public void deleteEntities(){
-        // 1년 지난 데이터 삭제
-        // LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
-        // test 1일 지난 데이터 삭제
-        LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
 
-        System.out.println("======10초마다 스케줄러 확인!=====");
         // deleted_at으로부터 1년이 지난 entity의 인스턴스들을 삭제
         deleteUsers(deleteTime);
         deleteRooms(deleteTime);
-        // deleteReservation(deleteTime);
-        // deletePayment(deleteTime);
+        deleteReservation(deleteTime);
+        deletePayment(deleteTime);
     }
 
     private void deleteUsers(LocalDateTime deleteTime){
@@ -161,7 +161,7 @@ public class Scheduler {
         }
     }
 
-    private void deleteReservations(LocalDateTime deleteTime) {
+    private void deleteReservation(LocalDateTime deleteTime) {
         QReservation qReservation = QReservation.reservation;
         QPayments qPayments = QPayments.payments;
 
@@ -195,7 +195,7 @@ public class Scheduler {
         }
     }
 
-    private void deletePayments(LocalDateTime deleteTime) {
+    private void deletePayment(LocalDateTime deleteTime) {
         QPayments qPayments = QPayments.payments;
 
         // 삭제할 Payments의 ID 조회
@@ -222,13 +222,13 @@ public class Scheduler {
                 Users user = usersRepository.findById(entityId).orElseThrow(
                         ()-> new UsersCustomException(UsersExceptionCode.NOT_FOUND_USER)
                 );
-                deleteInfoRepository.save(
-                        DeleteInfo.builder()
-                                .entityName(entityName)
+                deleteUsersInfoRepository.save(
+                        DeleteUsersInfo.builder()
                                 .deletedAt(LocalDateTime.now())
                                 .email(user.getEmail())
                                 .address(user.getAddress())
                                 .contact(user.getContact())
+                                .nickname(user.getNickname())
                                 .build()
                 );
                 break;
@@ -236,14 +236,14 @@ public class Scheduler {
                 Rooms room = roomsRepository.findById(entityId).orElseThrow(
                         ()-> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID)
                 );
-                deleteInfoRepository.save(
-                        DeleteInfo.builder()
-                                .entityName(entityName)
+                deleteRoomsInfoRepository.save(
+                        DeleteRoomsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
-                                .roomName(room.getName())
-                                .roomPrice(room.getPrice())
+                                .name(room.getName())
+                                .price(room.getPrice())
                                 .address(room.getAddress())
-                                .roomSize(room.getSize())
+                                .size(room.getSize())
+                                .owner(room.getUsers().getNickname())
                                 .build()
                 );
                 break;
@@ -251,12 +251,13 @@ public class Scheduler {
                 Reservation reservation = reservationRepository.findById(entityId).orElseThrow(
                         ()-> new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION)
                 );
-                deleteInfoRepository.save(
-                        DeleteInfo.builder()
-                                .entityName(entityName)
+                deleteReservationInfoRepository.save(
+                        DeleteReservationsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
                                 .checkIn(reservation.getCheckIn())
                                 .checkOut(reservation.getCheckOut())
+                                .roomName(reservation.getRooms().getName())
+                                .reserverName(reservation.getUsers().getNickname())
                                 .build()
                 );
                 break;
@@ -264,15 +265,17 @@ public class Scheduler {
                 Payments payments = paymentRepository.findById(entityId).orElseThrow(
                         ()-> new IllegalArgumentException("해당 결제 내용은 없습니다.")
                 );
-                deleteInfoRepository.save(
-                        DeleteInfo.builder()
-                                .entityName(entityName)
+                deletePaymentsInfoRepository.save(
+                        DeletePaymentsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
+                                .orderId(payments.getOrderId())
+                                .cancelReason(payments.getCancelReason())
+                                .amount(payments.getAmount())
                                 .failReason(payments.getFailReason())
                                 .build()
                 );
                 break;
-            default: throw new IllegalArgumentException("잘못된 엔티티 입력입니다.");
+            default: throw new DeleteInfoEntityCustomException(DeleteInfoEntityExceptionCode.NOT_FOUND_ENTITY);
         }
     }
 }
