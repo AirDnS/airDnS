@@ -68,6 +68,8 @@ public class KakaoOAuth2UserInfo implements OAuth2UserInfo {
         return Users.builder()
                 .email(email)
                 .nickname(makeNickname())
+                .contact("010-1234-1234")
+                .address("서울특별시")
                 .provider(OAuth2Provider.KAKAO)
                 .role(UserRole.USER)
                 .build();
