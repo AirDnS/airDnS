@@ -95,13 +95,15 @@ public class ReservationServiceImplV1 implements ReservationService {
     @Override
     public void isValidatedRequestSchedule(Long roomId, LocalDateTime checkIn, LocalDateTime checkOut) {
         LocalDateTime now = LocalDateTime.now();
-        if (checkIn.isBefore(now)
-                || checkIn.isAfter(checkOut)) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+        if (checkIn.isBefore(now)) {
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_CHECK_IN_IS_BEFORE_NOW);
+        }
+        else if(checkIn.isAfter(checkOut)){
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_CHECK_IN_IS_AFTER_CHECK_OUT);
         }
 
         if (checkIn.isEqual(checkOut)) {
-            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_REQUEST);
+            throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_CHECK_IN_IS_SAME_CHECK_OUT);
         }
 
         if (isReserved(roomId, checkIn, checkOut)
