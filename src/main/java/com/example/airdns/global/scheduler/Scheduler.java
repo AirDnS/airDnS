@@ -8,7 +8,7 @@ import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityCustomExce
 import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityExceptionCode;
 import com.example.airdns.domain.deleteinfo.repository.*;
 import com.example.airdns.domain.payment.entity.Payment;
-import com.example.airdns.domain.payment.entity.QPayments;
+import com.example.airdns.domain.payment.entity.QPayment;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
 import com.example.airdns.domain.reservation.entity.QReservation;
 import com.example.airdns.domain.reservation.entity.Reservation;
@@ -49,11 +49,12 @@ public class Scheduler {
     private final DeleteRoomsInfoRepository deleteRoomsInfoRepository;
     private final DeleteReservationInfoRepository deleteReservationInfoRepository;
     private final DeletePaymentsInfoRepository deletePaymentsInfoRepository;
+
     private final JPAQueryFactory jpaQueryFactory;
 
     // 초 분 시 일 월 요일
     @Transactional
-    @Scheduled(cron = "10 * * * * *")
+    @Scheduled(cron = "* * 1 * * *")
     public void deleteEntities(){
         LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
 
@@ -68,7 +69,7 @@ public class Scheduler {
         QUsers qUsers = QUsers.users;
         QRooms qRooms = QRooms.rooms;
         QReservation qReservation = QReservation.reservation;
-        QPayments qPayments = QPayments.payments;
+        QPayment qPayment = QPayment.payment;
 
         // select id from users where isDeleted = true and deletedAt < deletedTime;
         List<Long> userIds = jpaQueryFactory.select(qUsers.id)
@@ -87,9 +88,9 @@ public class Scheduler {
                     .from(qReservation)
                     .where(qReservation.users.id.eq(userId))
                     .fetch();
-            List<Long> paymentIds = jpaQueryFactory.select(qPayments.id)
-                    .from(qPayments)
-                    .where(qPayments.reservation.users.id.eq(userId))
+            List<Long> paymentIds = jpaQueryFactory.select(qPayment.id)
+                    .from(qPayment)
+                    .where(qPayment.reservation.users.id.eq(userId))
                     .fetch();
 
             // DeleteInfo 저장
@@ -102,8 +103,8 @@ public class Scheduler {
             jpaQueryFactory.delete(qRooms)
                     .where(qRooms.users.id.eq(userId))
                     .execute();
-            jpaQueryFactory.delete(qPayments)
-                    .where(qPayments.reservation.users.id.eq(userId))
+            jpaQueryFactory.delete(qPayment)
+                    .where(qPayment.reservation.users.id.eq(userId))
                     .execute();
             jpaQueryFactory.delete(qReservation)
                     .where(qReservation.users.id.eq(userId))
@@ -119,7 +120,7 @@ public class Scheduler {
     private void deleteRooms(LocalDateTime deleteTime){
         QRooms qRooms = QRooms.rooms;
         QReservation qReservation = QReservation.reservation;
-        QPayments qPayments = QPayments.payments;
+        QPayment qPayments = QPayment.payment;
 
         // 삭제할 Rooms의 ID 조회
         List<Long> roomIds = jpaQueryFactory.select(qRooms.id)
@@ -163,7 +164,7 @@ public class Scheduler {
 
     private void deleteReservation(LocalDateTime deleteTime) {
         QReservation qReservation = QReservation.reservation;
-        QPayments qPayments = QPayments.payments;
+        QPayment qPayments = QPayment.payment;
 
         // 삭제할 Reservation의 ID 조회
         List<Long> reservationIds = jpaQueryFactory.select(qReservation.id)
@@ -196,7 +197,7 @@ public class Scheduler {
     }
 
     private void deletePayment(LocalDateTime deleteTime) {
-        QPayments qPayments = QPayments.payments;
+        QPayment qPayments = QPayment.payment;
 
         // 삭제할 Payments의 ID 조회
         List<Long> paymentIds = jpaQueryFactory.select(qPayments.id)
@@ -262,16 +263,16 @@ public class Scheduler {
                 );
                 break;
             case "Payment" :
-                Payment payment = paymentRepository.findById(entityId).orElseThrow(
+                Payment payments = paymentRepository.findById(entityId).orElseThrow(
                         ()-> new IllegalArgumentException("해당 결제 내용은 없습니다.")
                 );
                 deletePaymentsInfoRepository.save(
                         DeletePaymentsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
-                                .orderId(payment.getOrderId())
-                                .cancelReason(payment.getCancelReason())
-                                .amount(payment.getAmount())
-                                .failReason(payment.getFailReason())
+                                .orderId(payments.getOrderId())
+                                .cancelReason(payments.getCancelReason())
+                                .amount(payments.getAmount())
+                                .failReason(payments.getFailReason())
                                 .build()
                 );
                 break;
