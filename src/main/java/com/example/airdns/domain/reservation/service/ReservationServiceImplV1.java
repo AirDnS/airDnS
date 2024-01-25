@@ -57,7 +57,7 @@ public class ReservationServiceImplV1 implements ReservationService {
         }
         isValidatedRequestSchedule(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime());
         reservation.updateReservationTime(requestDto);
-        return ReservationResponseDto.UpdateReservationResponseDto.of(reservation);
+        return ReservationResponseDto.UpdateReservationResponseDto.from(reservation);
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.example.airdns.domain.deleteinfo.entity.DeleteUsersInfo;
 import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityCustomException;
 import com.example.airdns.domain.deleteinfo.exception.DeleteInfoEntityExceptionCode;
 import com.example.airdns.domain.deleteinfo.repository.*;
-import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.payment.entity.Payment;
 import com.example.airdns.domain.payment.entity.QPayments;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
 import com.example.airdns.domain.reservation.entity.QReservation;
@@ -262,16 +262,16 @@ public class Scheduler {
                 );
                 break;
             case "Payment" :
-                Payments payments = paymentRepository.findById(entityId).orElseThrow(
+                Payment payment = paymentRepository.findById(entityId).orElseThrow(
                         ()-> new IllegalArgumentException("해당 결제 내용은 없습니다.")
                 );
                 deletePaymentsInfoRepository.save(
                         DeletePaymentsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
-                                .orderId(payments.getOrderId())
-                                .cancelReason(payments.getCancelReason())
-                                .amount(payments.getAmount())
-                                .failReason(payments.getFailReason())
+                                .orderId(payment.getOrderId())
+                                .cancelReason(payment.getCancelReason())
+                                .amount(payment.getAmount())
+                                .failReason(payment.getFailReason())
                                 .build()
                 );
                 break;

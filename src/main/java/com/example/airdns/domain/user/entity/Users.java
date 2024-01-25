@@ -71,4 +71,5 @@ public class Users extends CommonEntity {
     public void updateRole(UserRole role) {
         this.role = role;
     }
+
 }

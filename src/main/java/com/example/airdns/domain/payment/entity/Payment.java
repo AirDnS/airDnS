@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SQLDelete(sql = "UPDATE payments SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP whwere id = ?")
-public class Payments extends CommonEntity {
+@SQLDelete(sql = "UPDATE payment SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP whwere id = ?")
+public class Payment extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

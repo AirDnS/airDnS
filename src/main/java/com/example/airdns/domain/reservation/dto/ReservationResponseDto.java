@@ -26,7 +26,7 @@ public class ReservationResponseDto {
 
         private Long usersId;
 
-        public static UpdateReservationResponseDto of(Reservation reservation) {
+        public static UpdateReservationResponseDto from(Reservation reservation) {
             return UpdateReservationResponseDto.builder()
                     .id(reservation.getId())
                     .checkIn(reservation.getCheckIn())
