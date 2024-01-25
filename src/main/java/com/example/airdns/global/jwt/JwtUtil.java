@@ -134,6 +134,8 @@ public class JwtUtil {
         }
     }
 
+
+
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -157,13 +159,13 @@ public class JwtUtil {
         throw new NullPointerException("Not Found Token");
     }
 
-    public String getAccessTokenFromRequestCookie(HttpServletRequest req) {
+    public String getTokenFromRequestCookie(HttpServletRequest req, String type) {
         Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                if (cookie.getName().equals(type)) {
                     try {
-                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
+                        return URLDecoder.decode(cookie.getValue(), "UTF-8");
                     } catch (UnsupportedEncodingException e) {
                         return null;
                     }
@@ -172,21 +174,4 @@ public class JwtUtil {
         }
         return null;
     }
-
-    public String getRefreshTokenFromRequestCookie(HttpServletRequest req) {
-        Cookie[] cookies = req.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(REFRESH_TOKEN_HEADER)) {
-                    try {
-                        return URLDecoder.decode(cookie.getValue(), "UTF-8"); // Encode 되어 넘어간 Value 다시 Decode
-                    } catch (UnsupportedEncodingException e) {
-                        return null;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
 }
