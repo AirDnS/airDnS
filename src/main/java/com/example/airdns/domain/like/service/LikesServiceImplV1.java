@@ -21,7 +21,7 @@ public class LikesServiceImplV1 implements LikesService {
 
     @Override
     @Transactional(readOnly = true)
-    public LikesResponseDto.ReadLikeResponseDto readRoomLike(Long roomsId, Long likeId){
+    public LikesResponseDto.ReadLikeResponseDto readRoomLike(Long roomsId){
         Rooms room = roomsService.findById(roomsId);
 
         Integer roomLikeCount = room.getLikesList().size();
@@ -59,11 +59,11 @@ public class LikesServiceImplV1 implements LikesService {
     public LikesResponseDto.DeleteLikeResponseDto deleteLike(Long roomsId, Long likeId, Users user) {
         Rooms room = roomsService.findById(roomsId);
 
-        likesRepository.findByRoomsId(roomsId).orElseThrow(
+        Likes like = likesRepository.findByRoomsId(roomsId).orElseThrow(
                 ()-> new LikesCustomException(LikesExceptionCode.USER_NOT_LIKED)
         );
 
-        likesRepository.deleteById(likeId);
+        likesRepository.delete(like);
 
         return LikesResponseDto.DeleteLikeResponseDto.builder()
                 .roomName(room.getName())

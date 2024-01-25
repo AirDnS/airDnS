@@ -24,11 +24,10 @@ public class LikesController {
     @ApiResponses(value =  {
             @ApiResponse(responseCode = "200", description = "룸에 대한 좋아요 갯수 조회"),
     })
-    @GetMapping("/{roomsId}/likes/{likeId}")
+    @GetMapping("/{roomsId}/likes")
     public ResponseEntity<CommonResponse<LikesResponseDto.ReadLikeResponseDto>> readRoomLike(
-            @PathVariable Long roomsId,
-            @PathVariable Long likeId){
-        LikesResponseDto.ReadLikeResponseDto responseDto = likesService.readRoomLike(roomsId, likeId);
+            @PathVariable Long roomsId){
+        LikesResponseDto.ReadLikeResponseDto responseDto = likesService.readRoomLike(roomsId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 조회 성공", responseDto)
         );
