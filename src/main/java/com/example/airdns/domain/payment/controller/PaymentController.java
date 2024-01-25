@@ -34,7 +34,7 @@ public class PaymentController {
     @Operation(summary = "결제 요청", description = "예약 건에 대해 결제 요청을 한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "결제 성공"),
-            @ApiResponse(responseCode = "400", description = "해당 예약이 없습니다."),
+            @ApiResponse(responseCode = "400", description = "존재하지 않는 예약입니다."),
     })
     public ResponseEntity<CommonResponse<PaymentResponseDto.CreatePaymentResponseDto>> createPayment(
             @AuthenticationPrincipal UserDetailsImpl userDetails,

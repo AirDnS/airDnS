@@ -28,7 +28,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 @Slf4j(topic = "토스페이먼츠 API 요청")
 @RequiredArgsConstructor
-public abstract class PaymentServiceImplV1 implements PaymentService {
+public class PaymentServiceImplV1 implements PaymentService {
 
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
