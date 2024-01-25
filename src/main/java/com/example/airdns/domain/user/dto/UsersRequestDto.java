@@ -30,15 +30,4 @@ public class UsersRequestDto {
         @Pattern(regexp = "^[a-zA-Z0-9가-힣\\s-]+$")
         private String address;
     }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "유저 권한 수정 dto")
-    public static class UpdateUserRoleRequestDto {
-
-        @Schema(description = "권한", example = "ROLE_USER", defaultValue = "ROLE_USER")
-        private UserRole role;
-    }
 }

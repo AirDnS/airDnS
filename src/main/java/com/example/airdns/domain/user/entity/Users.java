@@ -8,7 +8,6 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 import lombok.*;
 
