@@ -44,6 +44,10 @@ public class ReservationResponseDto {
     public static class ReadReservationResponseDto implements Serializable {
         private Long id;
 
+        private String roomName;
+
+        private String address;
+
         private LocalDateTime checkIn;
 
         private LocalDateTime checkOut;
@@ -54,6 +58,8 @@ public class ReservationResponseDto {
         public static ReadReservationResponseDto from(Reservation reservation) {
             return ReadReservationResponseDto.builder()
                     .id(reservation.getId())
+                    .roomName(reservation.getRooms().getName())
+                    .address(reservation.getRooms().getAddress())
                     .checkIn(reservation.getCheckIn())
                     .checkOut(reservation.getCheckOut())
                     .roomsId(reservation.getRooms().getId())
