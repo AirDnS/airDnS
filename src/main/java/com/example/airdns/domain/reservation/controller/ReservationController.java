@@ -113,14 +113,13 @@ public class ReservationController {
         );
     }
 
-    @PatchMapping("/reservation/{reservationId}")
+    @DeleteMapping ("/reservation/{reservationId}")
     @Operation(summary = "해당 예약 삭제", description = "해당 예약을 삭제한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 성공"),
             @ApiResponse(responseCode = "403", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> deleteReservation(
-            HttpServletRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long reservationId
     ) {
