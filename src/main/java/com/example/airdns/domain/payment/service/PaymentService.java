@@ -2,6 +2,7 @@ package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
+import com.example.airdns.domain.payment.dto.PaymentResponseDto.ReadPaymentResponseDto;
 
 public interface PaymentService {
     /**
@@ -12,4 +13,5 @@ public interface PaymentService {
             Long userId,
             PaymentRequestDto.CreatePaymentRequestDto requestDto);
 
+    PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId, Long paymentId);
 }
