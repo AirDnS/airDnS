@@ -28,7 +28,7 @@ public class UsersServiceImplV1 implements UsersService {
 
     @Override
     @Transactional
-    public UsersResponseDto.UpdateRoleUsersResponseDto updateUserRole(Long userId) {
+    public UsersResponseDto.UpdateUsersResponseDto updateUserRole(Long userId) {
         Users user = findById(userId);
         if(user.getRole().equals(UserRole.USER)){
             user.updateRole(UserRole.HOST);
@@ -36,7 +36,7 @@ public class UsersServiceImplV1 implements UsersService {
             user.updateRole(UserRole.USER);
         }
 
-        return UsersResponseDto.UpdateRoleUsersResponseDto.from(user);
+        return UsersResponseDto.UpdateUsersResponseDto.from(user);
     }
 
     @Override
@@ -50,7 +50,5 @@ public class UsersServiceImplV1 implements UsersService {
         return usersRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() ->
                 new UsersCustomException(UsersExceptionCode.NOT_FOUND_USER));
     }
-
-
 
 }
