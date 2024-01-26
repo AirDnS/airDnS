@@ -55,6 +55,7 @@ public class JwtUtil {
     private String secret;
     private Key key;
 
+
     @PostConstruct
     public void init() {
         byte[] key = Decoders.BASE64URL.decode(secret);
@@ -125,7 +126,14 @@ public class JwtUtil {
 
             Cookie accessCookie = new Cookie(AUTHORIZATION_HEADER,accessToken);
             Cookie refreshCookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
+            accessCookie.setPath("/");
+            accessCookie.setHttpOnly(true);
+            accessCookie.setDomain(".air-dns.org");
             res.addCookie(accessCookie);
+
+            refreshCookie.setPath("/");
+            refreshCookie.setHttpOnly(true);
+            refreshCookie.setDomain(".air-dns.org");
             res.addCookie(refreshCookie);
         } catch (UnsupportedEncodingException e) {
             log.error("Not Encoding");

@@ -24,14 +24,11 @@ public class CookieUtil {
     }
 
     public static void addCookie(HttpServletResponse response, String name, String value, int maxAge) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
-                .path("/")
-                .httpOnly(true)
-                .maxAge(maxAge)
-                .secure(true)
-                .sameSite("None")
-                .build();
-        response.addHeader("Set-Cookie",cookie.toString());
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(maxAge);
+        response.addCookie(cookie);
     }
 
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response, String name) {
