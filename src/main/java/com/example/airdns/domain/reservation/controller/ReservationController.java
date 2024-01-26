@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -41,38 +40,16 @@ public class ReservationController {
     public ResponseEntity<CommonResponse> createReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long roomsId,
-            @Valid @RequestBody ReservationRequestDto.CreateReservationDto createReservation) {
-        reservationService.createReservation(userDetails.getUser().getId(), roomsId, createReservation);
+            @Valid @RequestBody ReservationRequestDto.CreateReservationRequestDto createReservation) {
+        reservationService.createReservation(
+                userDetails.getUser().getId(),
+                roomsId,
+                createReservation);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CommonResponse<>(
                         HttpStatus.CREATED,
                         "예약 성공"
                 )
-        );
-    }
-
-    @PatchMapping("/rooms/{roomsId}/reservation/{reservationId}")
-    @Operation(summary = "예약 수정", description = "해당 예약을 수정한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "스터디 룸 예약 수정 성공",
-                    content = {@Content(schema = @Schema(implementation = ReservationResponseDto.UpdateReservationResponseDto.class))}),
-            @ApiResponse(responseCode = "400", description = "수정 정보가 잘못 입력 되었습니다."),
-            @ApiResponse(responseCode = "404", description = "해당 유저가 예약한 것이 아닙니다.")
-    })
-    public ResponseEntity<CommonResponse> updateReservation(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
-            @PathVariable Long roomsId,
-            @PathVariable Long reservationId,
-            @Valid @RequestBody ReservationRequestDto.UpdateReservationDto requestDto) {
-        ReservationResponseDto.UpdateReservationResponseDto reservationResponse = reservationService.updateReservation(
-                userDetails.getUser().getId(),
-                roomsId,
-                reservationId,
-                requestDto);
-        return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse(HttpStatus.OK,
-                        "예약 수정 성공",
-                        reservationResponse)
         );
     }
 
@@ -102,7 +79,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "200", description = "예약 목록 조회에 성공")
     public ResponseEntity<CommonResponse> readReservationList(
             @AuthenticationPrincipal UserDetailsImpl userDetails
-    ) {
+            ) {
         List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationService.readReservationList(
                 userDetails.getUser().getId()
         );
@@ -113,14 +90,14 @@ public class ReservationController {
         );
     }
 
-    @PatchMapping("/reservation/{reservationId}")
-    @Operation(summary = "해당 예약 삭제", description = "해당 예약을 삭제한다.")
+
+    @DeleteMapping ("/reservation/{reservationId}")
+    @Operation(summary = "해당 예약 취소", description = "해당 예약을 취소.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 성공"),
             @ApiResponse(responseCode = "403", description = "해당 유저가 예약한 것이 아닙니다.")
     })
     public ResponseEntity<CommonResponse> deleteReservation(
-            HttpServletRequest request,
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long reservationId
     ) {
@@ -128,9 +105,8 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
                         HttpStatus.OK,
-                        "예약 삭제 성공"
+                        "예약 취소 성공"
                 )
         );
     }
-
 }

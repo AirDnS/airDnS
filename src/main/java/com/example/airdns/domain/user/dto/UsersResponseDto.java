@@ -41,23 +41,6 @@ public class UsersResponseDto {
     }
 
     @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "유저 정보 수정 응당 dto")
-    public static class UpdateRoleUsersResponseDto {
-
-        @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
-        private UserRole role;
-
-        public static UpdateRoleUsersResponseDto from(Users user) {
-            return UpdateRoleUsersResponseDto.builder()
-                    .role(user.getRole())
-                    .build();
-        }
-    }
-
-    @Getter
     @Setter
     @Builder
     @NoArgsConstructor

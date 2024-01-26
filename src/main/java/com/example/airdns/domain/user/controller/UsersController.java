@@ -54,14 +54,14 @@ public class UsersController {
     @Operation(summary = "유저 권한 수정", description = "사용중 유저의 권한을 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저 권한 변경 성공",
-                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.UpdateRoleUsersResponseDto.class))}),
+                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.UpdateUsersResponseDto.class))}),
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
-    public ResponseEntity<CommonResponse<UsersResponseDto.UpdateRoleUsersResponseDto>> updateRole(
+    public ResponseEntity<CommonResponse<UsersResponseDto.UpdateUsersResponseDto>> updateRole(
             @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
-        UsersResponseDto.UpdateRoleUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "권한 변경 성공", responseDto)
         );

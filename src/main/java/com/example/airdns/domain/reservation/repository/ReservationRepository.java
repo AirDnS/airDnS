@@ -17,9 +17,9 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 
     Optional<Reservation> findFirstByRoomsIdAndIsDeletedFalseAndCheckInBeforeAndCheckOutAfter(Long roomsId, LocalDateTime checkOut, LocalDateTime checkIn);
 
-    List<Reservation> findAllByUsersIdAndIsDeletedFalse(Long userId);
-
     List<Reservation> findByIsDeletedTrueAndDeletedAtBefore(LocalDateTime deleteTime);
 
     List<Reservation> findByUsers(Users user);
+
+    Optional<Reservation> findByIdAndIsCancelledFalse(Long reservationId);
 }
