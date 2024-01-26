@@ -7,6 +7,8 @@ import com.example.airdns.domain.payment.exception.PaymentCustomException;
 import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
 import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.reservation.exception.ReservationCustomException;
+import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
@@ -126,7 +128,6 @@ public class PaymentServiceImplV1 implements PaymentService {
             String errorMessage = (String) errorObject.get("message");
 
             if ("NOT_FOUND_PAYMENT_SESSION".equals(errorCode)) {
-                log.error("NOT_FOUND_PAYMENT_SESSION Error: {}", errorMessage);
             } else {
                 log.error("Unhandled Toss Payment Error: {} - {}", errorCode, errorMessage);
             }
@@ -136,15 +137,16 @@ public class PaymentServiceImplV1 implements PaymentService {
     }
 
     @Override
-    public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId, Long paymentId){
+    public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId,
+            Long paymentId) {
         Reservation reservation = reservationService.findById(reservationId);
         if (Objects.isNull(reservation)) {
-            throw new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_RESERVATION);
+            throw new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION);
         }
 
-        Optional<Payment> paymentOptional = paymentRepository.findByReservationIdAndId(reservationId, paymentId);
-        Payment payment = paymentOptional.orElseThrow(() ->
-                new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
+        Payment payment = paymentRepository.findByReservationIdAndId(reservationId, paymentId)
+                .orElseThrow(() -> new PaymentCustomException(
+                        PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
 
         return PaymentResponseDto.ReadPaymentResponseDto.from(payment);
     }
