@@ -169,6 +169,7 @@ public class Scheduler {
     // 둘 다 필드에 값이 존재하면? 우선 순위는 cancelledAt임
     // #2 Feedback : Reservation은 보다 스케줄러를 늦게 작동하게 하기(하루에 한 번 점검 할 필요가 없음으로 1주일에 한 번씩 동작하기)
     // 따로 스케줄러를 돌게 만듦
+    // 스케줄러 일부 수정
     @Transactional
     @Scheduled(cron = "10 * * * * *")
     //@Scheduled(cron = "* * 1 * * SUN")
