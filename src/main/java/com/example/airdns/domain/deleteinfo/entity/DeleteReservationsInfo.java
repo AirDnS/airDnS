@@ -18,7 +18,7 @@ public class DeleteReservationsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDateTime deletedAt;
+    private LocalDateTime cancelledAt;
 
     // Reservation DeleteInfo column
     private LocalDateTime checkIn;

@@ -9,7 +9,7 @@ import org.hibernate.annotations.SQLDelete;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "payments")
 @Builder
 @Getter
 @AllArgsConstructor

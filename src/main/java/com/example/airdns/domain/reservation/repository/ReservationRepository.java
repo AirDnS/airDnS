@@ -13,8 +13,6 @@ import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
-    Optional<Reservation> findByIdAndIsDeletedFalse(Long reservationId);
-
     Optional<Reservation> findFirstByRoomsIdAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(Long roomId, LocalDateTime checkOut, LocalDateTime checkIn);
 
     List<Reservation> findAllByUsersId(Long userId);

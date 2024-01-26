@@ -54,14 +54,15 @@ public class Scheduler {
 
     // 초 분 시 일 월 요일
     @Transactional
-    @Scheduled(cron = "* * 1 * * *")
+    //@Scheduled(cron = "* * 1 * * *")
+    @Scheduled(cron = "10 * * * * *")
     public void deleteEntities(){
-        LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
+        LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
+        //LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
 
         // deleted_at으로부터 1년이 지난 entity의 인스턴스들을 삭제
         deleteUsers(deleteTime);
         deleteRooms(deleteTime);
-        deleteReservation(deleteTime);
         deletePayment(deleteTime);
     }
 
@@ -162,15 +163,27 @@ public class Scheduler {
         }
     }
 
-    private void deleteReservation(LocalDateTime deleteTime) {
+    // #1 Feedback : checkout || cancelledAt 시간보다 1년 지나면 deleteReservationInfo에 넣기
+    // checkout은 무조건 1년이 지나면 deleteTime이 흘러가야함
+    // cancelledAt은 값이 존재하면 무조건 deleteTime이 흘러가야함
+    // 둘 다 필드에 값이 존재하면? 우선 순위는 cancelledAt임
+    // #2 Feedback : Reservation은 보다 스케줄러를 늦게 작동하게 하기(하루에 한 번 점검 할 필요가 없음으로 1주일에 한 번씩 동작하기)
+    // 따로 스케줄러를 돌게 만듦
+    @Transactional
+    @Scheduled(cron = "10 * * * * *")
+    //@Scheduled(cron = "* * 1 * * SUN")
+    public void deleteReservation() {
+        LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
+        //LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
         QReservation qReservation = QReservation.reservation;
         QPayment qPayments = QPayment.payment;
 
         // 삭제할 Reservation의 ID 조회
         List<Long> reservationIds = jpaQueryFactory.select(qReservation.id)
                 .from(qReservation)
-                .where(qReservation.isDeleted.eq(true)
-                        .and(qReservation.deletedAt.before(deleteTime)))
+                .where(qReservation.isCancelled.isTrue()
+                        .and(qReservation.canceledAt.before(deleteTime))
+                        .or(qReservation.checkOut.before(deleteTime).and(qReservation.canceledAt.isNull())))
                 .fetch();
 
         for (Long reservationId : reservationIds) {
@@ -254,7 +267,7 @@ public class Scheduler {
                 );
                 deleteReservationInfoRepository.save(
                         DeleteReservationsInfo.builder()
-                                .deletedAt(LocalDateTime.now())
+                                .cancelledAt(LocalDateTime.now())
                                 .checkIn(reservation.getCheckIn())
                                 .checkOut(reservation.getCheckOut())
                                 .roomName(reservation.getRooms().getName())
