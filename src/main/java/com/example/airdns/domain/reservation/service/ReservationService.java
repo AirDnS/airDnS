@@ -19,7 +19,7 @@ public interface ReservationService {
     void createReservation(
             Long userId,
             Long roomId,
-            ReservationRequestDto.CreateReservationDto createReservationDto
+            ReservationRequestDto.CreateReservationRequestDto createReservationDto
     );
 
     /**
@@ -55,20 +55,6 @@ public interface ReservationService {
             LocalDateTime checkOut
     );
 
-    /**
-     * 예약 정보중 체크인 시간과 체크 아웃 시간을 수정한다
-     * @Param 유저 Id
-     * @Param 방 Id
-     * @Param 해당 예약 Id
-     * @Param 수정 시간
-     * @return true/false
-     */
-    ReservationResponseDto.UpdateReservationResponseDto updateReservation(
-            Long userId,
-            Long roomsId,
-            Long reservationId,
-            ReservationRequestDto.UpdateReservationDto requestDto
-    );
 
     /**
      * 해당 예약 정보를 조회한다.
@@ -86,10 +72,12 @@ public interface ReservationService {
      * @Param 유저 Id
      * @return 예약 정보 목록
      */
-    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long id);
+    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
+            Long id
+    );
 
     /**
-     * 해당 예약을 삭제한다.
+     * 해당 예약을 취소한다.
      * @Param 유저 Id
      * @Param 예약 Id
      * @return void
