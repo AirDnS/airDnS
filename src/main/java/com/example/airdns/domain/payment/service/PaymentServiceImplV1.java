@@ -7,11 +7,15 @@ import com.example.airdns.domain.payment.exception.PaymentCustomException;
 import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
 import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.reservation.exception.ReservationCustomException;
+import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
+import com.example.airdns.domain.reservation.repository.ReservationRepository;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -32,6 +36,7 @@ public class PaymentServiceImplV1 implements PaymentService {
 
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
     private final RestTemplate restTemplate;
 
     @Value("${payment.toss.url}")
@@ -103,7 +108,7 @@ public class PaymentServiceImplV1 implements PaymentService {
     private PaymentResponseDto.CreatePaymentResponseDto handleSuccessfulResponse(
             PaymentRequestDto.CreatePaymentRequestDto requestDto
             , Reservation reservation) {
-        // 성공 시 결제 정보 저장
+        // 성공 시 결제 정보 및 예약정보 저장
         Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
                 .amount(requestDto.getAmount())
@@ -123,7 +128,6 @@ public class PaymentServiceImplV1 implements PaymentService {
             String errorMessage = (String) errorObject.get("message");
 
             if ("NOT_FOUND_PAYMENT_SESSION".equals(errorCode)) {
-                log.error("NOT_FOUND_PAYMENT_SESSION Error: {}", errorMessage);
             } else {
                 log.error("Unhandled Toss Payment Error: {} - {}", errorCode, errorMessage);
             }
@@ -131,4 +135,20 @@ public class PaymentServiceImplV1 implements PaymentService {
             log.error("Error parsing error response", e);
         }
     }
+
+    @Override
+    public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId,
+            Long paymentId) {
+        Reservation reservation = reservationService.findById(reservationId);
+        if (Objects.isNull(reservation)) {
+            throw new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION);
+        }
+
+        Payment payment = paymentRepository.findByReservationIdAndId(reservationId, paymentId)
+                .orElseThrow(() -> new PaymentCustomException(
+                        PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
+
+        return PaymentResponseDto.ReadPaymentResponseDto.from(payment);
+    }
+
 }
