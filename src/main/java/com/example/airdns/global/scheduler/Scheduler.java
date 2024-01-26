@@ -54,11 +54,11 @@ public class Scheduler {
 
     // 초 분 시 일 월 요일
     @Transactional
-    //@Scheduled(cron = "* * 1 * * *")
-    @Scheduled(cron = "10 * * * * *")
+    @Scheduled(cron = "0 0 1 * * *")
+    //@Scheduled(cron = "10 * * * * *")
     public void deleteEntities(){
-        LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
-        //LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
+        //LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
+        LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
 
         // deleted_at으로부터 1년이 지난 entity의 인스턴스들을 삭제
         deleteUsers(deleteTime);
@@ -171,11 +171,9 @@ public class Scheduler {
     // 따로 스케줄러를 돌게 만듦
     // 스케줄러 일부 수정
     @Transactional
-    @Scheduled(cron = "10 * * * * *")
-    //@Scheduled(cron = "* * 1 * * SUN")
+    @Scheduled(cron = "0 2 1 * * SUN")
     public void deleteReservation() {
-        LocalDateTime deleteTime = LocalDateTime.now().minusDays(1);
-        //LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
+        LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
         QReservation qReservation = QReservation.reservation;
         QPayment qPayments = QPayment.payment;
 
