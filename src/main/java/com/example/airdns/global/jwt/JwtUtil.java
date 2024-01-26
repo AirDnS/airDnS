@@ -125,8 +125,6 @@ public class JwtUtil {
 
             Cookie accessCookie = new Cookie(AUTHORIZATION_HEADER,accessToken);
             Cookie refreshCookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
-            accessCookie.setPath("/");
-            refreshCookie.setPath("/");
             res.addCookie(accessCookie);
             res.addCookie(refreshCookie);
         } catch (UnsupportedEncodingException e) {
