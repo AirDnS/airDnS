@@ -24,7 +24,7 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.STARTTIME_IS_AFTER_ENDTIME);
         }
 
-        if (restScheduleRepository.findFirstByEndTimeGreaterThanAndStartTimeLessThan(startDate, endDate).isPresent()) {
+        if (hasRestScheduleInRoomBetweenTimes(rooms.getId(), startDate, endDate)) {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.DUPLICATE_DATETIME);
         }
 
@@ -48,5 +48,11 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
         restScheduleRepository.delete(restSchedule);
         rooms.deleteRestSchedule(restSchedule);
     }
+
+    @Override
+    public boolean hasRestScheduleInRoomBetweenTimes(Long roomsId, LocalDateTime startDate, LocalDateTime endDate) {
+        return restScheduleRepository.findFirstByRoomsIdAndStartTimeBeforeAndEndTimeAfter(roomsId, startDate, endDate).isPresent();
+    }
+
 
 }

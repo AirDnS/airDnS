@@ -1,7 +1,5 @@
 package com.example.airdns.domain.reservation.service;
 
-import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
-import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 
 import java.time.LocalDateTime;
@@ -10,17 +8,17 @@ import java.util.List;
 public interface ReservationService {
 
     /**
-     * 해당 방에 대해 예약한다.
-     * @Param user 예약 유저
-     * @Param roomId 예약 할 방
-     * @Param request 예약할 날짜에 관한 정보
-     * @return void
+     * 예약을 생성한다
+     * @param reservation 예약 객체
+     * @return 생성된 예약 객체
      */
-    void createReservation(
-            Long userId,
-            Long roomId,
-            ReservationRequestDto.CreateReservationRequestDto createReservationDto
-    );
+    Reservation save(Reservation reservation);
+
+    /**
+     * 예약을 삭제한다
+     * @param reservation 예약 객체
+     */
+    void delete(Reservation reservation);
 
     /**
      * 해당 번호에 대한 예약을 찾는다.
@@ -42,61 +40,5 @@ public interface ReservationService {
             LocalDateTime checkOut
     );
 
-    /**
-     * 해당 시간에 해당 방이 영업하는지 안하는지 확인
-     * @Param 방 번호
-     * @Param 체크인 시간
-     * @Param 체크아웃 시간
-     * @return true/false
-     */
-    boolean isRested(
-            Long roomsId,
-            LocalDateTime checkIn,
-            LocalDateTime checkOut
-    );
-
-
-    /**
-     * 해당 예약 정보를 조회한다.
-     * @Param 유저 Id
-     * @Param 해당 예약 Id
-     * @return 예약 정보
-     */
-    ReservationResponseDto.ReadReservationResponseDto readReservation(
-            Long userId,
-            Long reservationId
-    );
-
-    /**
-     * 유저의 예약 목록을 조회한다.
-     * @Param 유저 Id
-     * @return 예약 정보 목록
-     */
-    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
-            Long id
-    );
-
-    /**
-     * 해당 예약을 취소한다.
-     * @Param 유저 Id
-     * @Param 예약 Id
-     * @return void
-     */
-    void deleteReservation(
-            Long userId,
-            Long reservationId
-    );
-
-    /**
-     * 해당 예약 시간이 가능한지 체크한다.
-     * @Param 해당 방 Id
-     * @Param 체크인 시간
-     * @Param 체크아웃 시간
-     * @return void
-     */
-    void isValidatedRequestSchedule(
-            Long roomsId,
-            LocalDateTime checkIn,
-            LocalDateTime checkOut
-    );
+    List<Reservation> findAllByUsersId(Long userId);
 }

@@ -13,4 +13,5 @@ public interface RestScheduleService {
 
     void deleteRestSchedule(Long imagesId, Rooms rooms);
 
+    boolean hasRestScheduleInRoomBetweenTimes(Long roomsId, LocalDateTime startDate, LocalDateTime endDate);
 }
