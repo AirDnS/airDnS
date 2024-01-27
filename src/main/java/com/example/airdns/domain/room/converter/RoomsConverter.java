@@ -36,6 +36,7 @@ public class RoomsConverter {
                 .price(rooms.getPrice())
                 .address(rooms.getAddress())
                 .size(rooms.getSize())
+                .isClosed(rooms.getIsClosed())
                 .createdAt(rooms.getCreatedAt())
                 .desc(rooms.getDescription())
                 .equipment(equipments)

@@ -22,6 +22,7 @@ public class RoomsResponseDto {
         private String address;
         private Integer size;
         private String desc;
+        private Boolean isClosed;
         private LocalDateTime createdAt;
         private List<Map<String, Object>> equipment;
         private List<ImagesResponseDto.ReadImagesResponseDto> image;
