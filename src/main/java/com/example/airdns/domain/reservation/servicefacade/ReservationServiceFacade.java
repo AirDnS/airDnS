@@ -3,6 +3,7 @@ package com.example.airdns.domain.reservation.servicefacade;
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.room.entity.Rooms;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,7 +54,4 @@ public interface ReservationServiceFacade {
             Long reservationId
     );
 
-    void isValidatedRequestSchedule(Long roomId,
-                                    LocalDateTime checkIn,
-                                    LocalDateTime checkOut);
 }

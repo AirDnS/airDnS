@@ -4,6 +4,7 @@ import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
+import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,11 +34,11 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
     @Override
-    public boolean isReserved(Long roomId,
+    public boolean isReserved(Rooms rooms,
                               LocalDateTime checkIn,
                               LocalDateTime checkOut) {
         return reservationRepository.
-                findFirstByRoomsIdAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(roomId, checkOut, checkIn).
+                findFirstByRoomsAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(rooms, checkOut, checkIn).
                 isPresent();
     }
 

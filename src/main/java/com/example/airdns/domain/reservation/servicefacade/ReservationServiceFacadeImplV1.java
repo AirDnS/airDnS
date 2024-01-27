@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,7 +37,10 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         Users users = usersService.findById(userId);
         Rooms rooms = roomsService.findById(roomId);
 
-        isValidatedRequestSchedule(roomId, requestDto.getCheckInTime(), requestDto.getCheckOutTime());
+        LocalDateTime checkInTime = requestDto.getCheckInTime().truncatedTo(ChronoUnit.HOURS);
+        LocalDateTime checkOutTime = requestDto.getCheckOutTime().truncatedTo(ChronoUnit.HOURS);
+
+        isValidatedRequestSchedule(rooms, checkInTime, checkOutTime);
 
         Reservation reservation = requestDto.toEntity(users, rooms);
         ReservationService.save(reservation);
@@ -77,8 +81,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         reservation.cancelled();
     }
 
-    @Override
-    public void isValidatedRequestSchedule(Long roomId,
+    private void isValidatedRequestSchedule(Rooms rooms,
                                            LocalDateTime checkIn,
                                            LocalDateTime checkOut) {
         LocalDateTime now = LocalDateTime.now();
@@ -93,16 +96,16 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_CHECK_IN_IS_SAME_CHECK_OUT);
         }
 
-        if (ReservationService.isReserved(roomId, checkIn, checkOut)
-                || isRested(roomId, checkIn, checkOut)) {
+        if (ReservationService.isReserved(rooms, checkIn, checkOut)
+                || isRested(rooms, checkIn, checkOut)) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
         }
     }
 
-    private boolean isRested(Long roomId,
+    private boolean isRested(Rooms rooms,
                             LocalDateTime checkIn,
                             LocalDateTime checkOut) {
-        return restScheduleService.hasRestScheduleInRoomBetweenTimes(roomId, checkOut, checkIn);
+        return restScheduleService.hasRestScheduleInRoomBetweenTimes(rooms, checkOut, checkIn);
     }
 
 }

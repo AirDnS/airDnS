@@ -121,6 +121,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
         roomsService.delete(rooms);
     }
 
+    @Transactional
     @Override
     public void CreateRoomsRestSchedule(
             CreateRoomsRestScheduleRequestDto requestDto,
@@ -129,6 +130,10 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
         Rooms rooms = roomsService.findById(roomsId);
 
         validateUserIsRoomsHost(rooms, users);
+
+        if (reservationService.isReserved(rooms, requestDto.getStartDate(), requestDto.getEndDate())) {
+            throw new RoomsCustomException(RoomsExceptionCode.EXIST_RESERVATION);
+        }
 
         rooms.addRestSchedule(
                 restScheduleService.createRestSchedule(

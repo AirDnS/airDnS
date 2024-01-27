@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @AllArgsConstructor
@@ -19,12 +20,14 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
 
     @Override
     public RestSchedule createRestSchedule(Rooms rooms, LocalDateTime startDate, LocalDateTime endDate) {
+        startDate = startDate.truncatedTo(ChronoUnit.HOURS);
+        endDate = endDate.truncatedTo(ChronoUnit.HOURS);
 
         if (!startDate.isBefore(endDate)) {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.STARTTIME_IS_AFTER_ENDTIME);
         }
 
-        if (hasRestScheduleInRoomBetweenTimes(rooms.getId(), startDate, endDate)) {
+        if (hasRestScheduleInRoomBetweenTimes(rooms, startDate, endDate)) {
             throw new RestScheduleCustomException(RestScheduleExceptionCode.DUPLICATE_DATETIME);
         }
 
@@ -50,8 +53,8 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
     }
 
     @Override
-    public boolean hasRestScheduleInRoomBetweenTimes(Long roomsId, LocalDateTime startDate, LocalDateTime endDate) {
-        return restScheduleRepository.findFirstByRoomsIdAndStartTimeBeforeAndEndTimeAfter(roomsId, startDate, endDate).isPresent();
+    public boolean hasRestScheduleInRoomBetweenTimes(Rooms rooms, LocalDateTime startDate, LocalDateTime endDate) {
+        return restScheduleRepository.findFirstByRoomsAndStartTimeBeforeAndEndTimeAfter(rooms, endDate, startDate).isPresent();
     }
 
 

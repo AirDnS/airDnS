@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.service;
 
 import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.room.entity.Rooms;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +36,7 @@ public interface ReservationService {
      * @return true/false
      */
     boolean isReserved(
-            Long roomsId,
+            Rooms rooms,
             LocalDateTime checkIn,
             LocalDateTime checkOut
     );
