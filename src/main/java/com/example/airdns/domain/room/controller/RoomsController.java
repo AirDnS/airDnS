@@ -1,7 +1,7 @@
 package com.example.airdns.domain.room.controller;
 
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
-import com.example.airdns.domain.room.servicefacade.service.RoomsServiceFacade;
+import com.example.airdns.domain.room.servicefacade.RoomsServiceFacade;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;

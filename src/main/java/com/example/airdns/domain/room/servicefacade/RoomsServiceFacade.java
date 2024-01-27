@@ -1,4 +1,4 @@
-package com.example.airdns.domain.room.servicefacade.service;
+package com.example.airdns.domain.room.servicefacade;
 
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;

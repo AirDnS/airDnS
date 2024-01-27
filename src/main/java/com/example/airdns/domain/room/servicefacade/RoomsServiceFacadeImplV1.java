@@ -1,4 +1,4 @@
-package com.example.airdns.domain.room.servicefacade.service;
+package com.example.airdns.domain.room.servicefacade;
 
 import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.entity.Images;
@@ -12,7 +12,6 @@ import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResp
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
-import com.example.airdns.domain.room.repository.RoomsRepository;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
 import com.example.airdns.domain.user.entity.Users;
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
