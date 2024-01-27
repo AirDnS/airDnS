@@ -1,7 +1,7 @@
 package com.example.airdns.domain.room.controller;
 
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
-import com.example.airdns.domain.room.service.RoomsService;
+import com.example.airdns.domain.room.servicefacade.service.RoomsServiceFacade;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +28,7 @@ import java.util.List;
 @RestController
 public class RoomsController {
 
-    private final RoomsService roomsService;
+    private final RoomsServiceFacade roomsServiceFacade;
 
     @PostMapping(
             value = "/rooms"
@@ -46,7 +46,7 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
                 HttpStatus.CREATED,
                 "스터디 룸 등록에 성공했습니다",
-                roomsService.createRooms(requestDto, files, userDetails.getUser())
+                roomsServiceFacade.createRooms(requestDto, files, userDetails.getUser())
         ));
     }
 
@@ -61,7 +61,7 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
-                roomsService.readRooms(roomsId)
+                roomsServiceFacade.readRooms(roomsId)
         ));
     }
 
@@ -77,7 +77,7 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
-                roomsService.readRoomsList(pageable, requestDto)
+                roomsServiceFacade.readRoomsList(pageable, requestDto)
         ));
     }
 
@@ -95,7 +95,7 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 수정에 성공했습니다",
-                roomsService.updateRooms(requestDto, roomsId, userDetails.getUser())
+                roomsServiceFacade.updateRooms(requestDto, roomsId, userDetails.getUser())
         ));
     }
 
@@ -117,7 +117,7 @@ public class RoomsController {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "이미지 변경에 성공했습니다",
-                roomsService.updateRoomsImages(requestDto, roomsId, files, userDetails.getUser())
+                roomsServiceFacade.updateRoomsImages(requestDto, roomsId, files, userDetails.getUser())
         ));
     }
 
@@ -133,7 +133,7 @@ public class RoomsController {
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
 
-        roomsService.deleteRooms(roomsId, userDetails.getUser());
+        roomsServiceFacade.deleteRooms(roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 삭제에 성공했습니다"
@@ -151,7 +151,7 @@ public class RoomsController {
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        roomsService.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        roomsServiceFacade.CreateRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "휴식 일정 등록에 성공했습니다"
@@ -169,7 +169,7 @@ public class RoomsController {
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        roomsService.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        roomsServiceFacade.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "휴식 일정 삭제에 성공했습니다"
