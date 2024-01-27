@@ -101,13 +101,15 @@ public class Rooms extends CommonEntity {
             BigDecimal price,
             String address,
             Integer size,
-            String description,
-            Boolean isClosed) {
+            String description) {
         this.name = name;
         this.price = price;
         this.address = address;
         this.size = size;
         this.description = description;
+    }
+
+    public void updateIsClosed(Boolean isClosed) {
         this.isClosed = isClosed;
     }
       

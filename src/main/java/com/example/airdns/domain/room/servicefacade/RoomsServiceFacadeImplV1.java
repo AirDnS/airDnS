@@ -74,6 +74,8 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
+        validateUserIsRoomsHost(rooms, users);
+
         rooms.resetEquipments();
         updateEquipments(rooms, requestDto.getEquipment());
 
@@ -82,11 +84,23 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
                 requestDto.getPrice(),
                 requestDto.getAddress(),
                 requestDto.getSize(),
-                requestDto.getDesc(),
-                requestDto.getIsClosed()
+                requestDto.getDesc()
         );
 
         return RoomsConverter.toDto(rooms);
+    }
+
+    @Transactional
+    @Override
+    public void updateRoomsIsClosed(
+            UpdateRoomsIsClosedRequestDto requestDto,
+            Long roomsId,
+            Users users) {
+        Rooms rooms = roomsService.findById(roomsId);
+
+        validateUserIsRoomsHost(rooms, users);
+
+        rooms.updateIsClosed(requestDto.getIsClosed());
     }
 
     @Transactional
@@ -173,7 +187,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     }
 
     private void uploadImages(Rooms rooms, List<MultipartFile> files) {
-        for(MultipartFile file : files) {
+        for (MultipartFile file : files) {
             if (file == null) continue;
 
             //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
