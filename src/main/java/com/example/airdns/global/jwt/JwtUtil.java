@@ -14,6 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -54,6 +55,7 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
     private Key key;
+
 
     @PostConstruct
     public void init() {
@@ -123,12 +125,20 @@ public class JwtUtil {
             String accessToken = URLEncoder.encode(token.getAccessToken(), "utf-8").replaceAll("\\+", "%20");
             String refreshToken = URLEncoder.encode(token.getRefreshToken(), "utf-8").replaceAll("\\+", "%20");
 
-            Cookie accessCookie = new Cookie(AUTHORIZATION_HEADER,accessToken);
-            Cookie refreshCookie = new Cookie(REFRESH_TOKEN_HEADER, refreshToken);
-            accessCookie.setPath("/");
-            refreshCookie.setPath("/");
-            res.addCookie(accessCookie);
-            res.addCookie(refreshCookie);
+            ResponseCookie accessCookie = ResponseCookie.from(AUTHORIZATION_HEADER,accessToken)
+                    .domain(".air-dns.org")
+                    .path("/")
+                    .httpOnly(true)
+                    .build();
+
+            ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_HEADER,refreshToken)
+                    .domain(".air-dns.org")
+                    .path("/")
+                    .httpOnly(true)
+                    .build();
+
+            res.addHeader("Set-Cookie", accessCookie.toString());
+            res.addHeader("Set-Cookie", refreshCookie.toString());
         } catch (UnsupportedEncodingException e) {
             log.error("Not Encoding");
         }

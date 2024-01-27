@@ -3,6 +3,7 @@ package com.example.airdns.domain.reservation.controller;
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.service.ReservationService;
+import com.example.airdns.domain.reservation.servicefacade.ReservationServiceFacade;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 public class ReservationController {
 
-    private final ReservationService reservationService;
+    private final ReservationServiceFacade reservationServiceFacade;
 
     @PostMapping("/rooms/{roomsId}/reservation")
     @Operation(summary = "예약 생성", description = "해당 방에 대해 예약을 한다.")
@@ -41,7 +42,7 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long roomsId,
             @Valid @RequestBody ReservationRequestDto.CreateReservationRequestDto createReservation) {
-        reservationService.createReservation(
+        reservationServiceFacade.createReservation(
                 userDetails.getUser().getId(),
                 roomsId,
                 createReservation);
@@ -64,7 +65,7 @@ public class ReservationController {
     public ResponseEntity<CommonResponse> readReservation(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long reservationId) {
-        ReservationResponseDto.ReadReservationResponseDto reservationResponseDto = reservationService.readReservation(
+        ReservationResponseDto.ReadReservationResponseDto reservationResponseDto = reservationServiceFacade.readReservation(
                 userDetails.getUser().getId(),
                 reservationId);
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -80,7 +81,7 @@ public class ReservationController {
     public ResponseEntity<CommonResponse> readReservationList(
             @AuthenticationPrincipal UserDetailsImpl userDetails
             ) {
-        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationService.readReservationList(
+        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readReservationList(
                 userDetails.getUser().getId()
         );
         return ResponseEntity.status(HttpStatus.OK).body(
@@ -101,7 +102,7 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long reservationId
     ) {
-        reservationService.deleteReservation(userDetails.getUser().getId(), reservationId);
+        reservationServiceFacade.deleteReservation(userDetails.getUser().getId(), reservationId);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
                         HttpStatus.OK,
