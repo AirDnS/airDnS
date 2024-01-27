@@ -10,6 +10,7 @@ import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SQLDelete(sql = "UPDATE users SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP WHERE id = ?")
 public class Users extends CommonEntity {
 
     @Id
@@ -47,28 +49,12 @@ public class Users extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private UserRole role;
 
-    @Column
     @Builder.Default
-    private Boolean isDeleted = false;
+    @Column
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column
     private LocalDateTime deletedAt;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Reviews> reviewsList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Rooms> roomsList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Likes> likesList = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "users", cascade = CascadeType.PERSIST)
-    private List<Reservation> reservationList = new ArrayList<>();
 
     public Users update(String email, OAuth2Provider provider) {
         this.email = email;

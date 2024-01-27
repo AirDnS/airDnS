@@ -1,6 +1,5 @@
 package com.example.airdns.domain.reservation.entity;
 
-
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.global.common.entity.CommonEntity;
@@ -33,7 +32,6 @@ public class Reservation extends CommonEntity {
 
     @Column
     private LocalDateTime canceledAt;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rooms_id")

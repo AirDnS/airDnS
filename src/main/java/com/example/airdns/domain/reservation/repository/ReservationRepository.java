@@ -2,6 +2,7 @@ package com.example.airdns.domain.reservation.repository;
 
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
+import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

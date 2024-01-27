@@ -7,8 +7,6 @@ import com.example.airdns.domain.oauth2.service.CustomOAuth2UserService;
 import com.example.airdns.global.jwt.JwtAuthorizationFilter;
 import com.example.airdns.global.jwt.JwtCustomExceptionFilter;
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpHeaders;
-import org.apache.http.client.methods.HttpHead;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
