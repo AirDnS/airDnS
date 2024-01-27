@@ -18,8 +18,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.example.airdns.domain.image.entity.QImages.images;
 import static com.example.airdns.domain.room.entity.QRooms.rooms;
 import static com.example.airdns.domain.roomequipment.entity.QRoomEquipments.roomEquipments;
 
@@ -46,12 +46,12 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                         inEquipment(condition.getEqupmentList())
                 )
                 ;
-
-        List<RoomsResponseDto.ReadRoomsResponseDto> content = Objects.requireNonNull(this.getQuerydsl())
+        List<RoomsResponseDto.ReadRoomsResponseDto> content = null;
+        try (Stream<Rooms> stream = Objects.requireNonNull(this.getQuerydsl())
                 .applyPagination(pageable, query)
-                .stream()
-                .map(RoomsConverter::toDto)
-                .collect(Collectors.toList());
+                .stream()) {
+            content = stream.map(RoomsConverter::toDto).collect(Collectors.toList());
+        };
 
         return new PageImpl<>(content, pageable, query.fetchCount());
     }
