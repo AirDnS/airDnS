@@ -52,6 +52,13 @@ public class RoomsConverter {
                                 ))
                                 .toList()
                 )
+                .restScheduleList(
+                        rooms.getRestScheduleList().stream()
+                                .map(restSchedule -> Arrays.asList(
+                                        restSchedule.getStartTime(), restSchedule.getEndTime()
+                                ))
+                                .toList()
+                )
                 .build();
     }
 

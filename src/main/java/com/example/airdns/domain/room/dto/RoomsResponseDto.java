@@ -27,6 +27,7 @@ public class RoomsResponseDto {
         private List<Map<String, Object>> equipment;
         private List<ImagesResponseDto.ReadImagesResponseDto> image;
         private List<List<LocalDateTime>> reservatedTimeList;
+        private List<List<LocalDateTime>> restScheduleList;
     }
 
     @Getter
