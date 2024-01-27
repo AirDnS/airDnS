@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
     List<Reservation> findAllByUsersId(Long userId);
 
-    Optional<Reservation> findFirstByRoomsIdAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(Long roomId, LocalDateTime checkOut, LocalDateTime checkIn);
+    Optional<Reservation> findFirstByRoomsAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(Rooms rooms, LocalDateTime checkOut, LocalDateTime checkIn);
 
     Optional<Reservation> findByIdAndIsCancelledFalse(Long reservationId);
 }
