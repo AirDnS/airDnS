@@ -14,6 +14,10 @@ import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,9 +35,10 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     private final ReservationService ReservationService;
     private final RestScheduleService restScheduleService;
     @Override
-    public void createReservation(Long userId,
-                                  Long roomId,
-                                  ReservationRequestDto.CreateReservationRequestDto requestDto) {
+    public void createReservation(
+            Long userId,
+            Long roomId,
+            ReservationRequestDto.CreateReservationRequestDto requestDto) {
         Users users = usersService.findById(userId);
         Rooms rooms = roomsService.findById(roomId);
 
@@ -48,8 +53,9 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
 
 
     @Override
-    public ReservationResponseDto.ReadReservationResponseDto readReservation(Long userId,
-                                                                             Long reservationId) {
+    public ReservationResponseDto.ReadReservationResponseDto readReservation(
+            Long userId,
+            Long reservationId) {
         Reservation reservation = ReservationService.findById(reservationId);
 
         if (!Objects.equals(reservation.getUsers().getId(), userId)) {
@@ -60,18 +66,26 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     }
 
     @Override
-    public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long userId) {
+    public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
+            Long usersId,
+            int page,
+            int size,
+            String sortBy,
+            boolean isAsc) {
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page,size,sort);
         return ReservationService.
-                findAllByUsersId(userId).
-                stream().
+                findAllByUsersId(usersId, pageable).
                 map(ReservationResponseDto.ReadReservationResponseDto::from).
-                toList();
+                getContent();
     }
 
     @Override
     @Transactional
-    public void deleteReservation(Long userId,
-                                  Long reservationId) {
+    public void deleteReservation(
+            Long userId,
+            Long reservationId) {
         Reservation reservation = ReservationService.findById(reservationId);
 
         if (!Objects.equals(reservation.getUsers().getId(), userId)) {
@@ -81,9 +95,10 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         reservation.cancelled();
     }
 
-    private void isValidatedRequestSchedule(Rooms rooms,
-                                           LocalDateTime checkIn,
-                                           LocalDateTime checkOut) {
+    private void isValidatedRequestSchedule(
+            Rooms rooms,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut) {
         LocalDateTime now = LocalDateTime.now();
         if (checkIn.isBefore(now)) {
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_CHECK_IN_IS_BEFORE_NOW);
@@ -102,9 +117,10 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         }
     }
 
-    private boolean isRested(Rooms rooms,
-                            LocalDateTime checkIn,
-                            LocalDateTime checkOut) {
+    private boolean isRested(
+            Rooms rooms,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut) {
         return restScheduleService.hasRestScheduleInRoomBetweenTimes(rooms, checkOut, checkIn);
     }
 
