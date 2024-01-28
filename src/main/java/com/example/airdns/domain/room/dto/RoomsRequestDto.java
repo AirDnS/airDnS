@@ -1,5 +1,6 @@
 package com.example.airdns.domain.room.dto;
 
+import com.example.airdns.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -77,6 +78,15 @@ public class RoomsRequestDto {
 
         @Schema(description = "장비 종류", example = "[1,2,4,5,10]")
         private List<Long> equipment;
+    }
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadRoomsListByHostRequestDto {
+        @Schema(description = "검색어", example = "엘리스")
+        private String keyword;
     }
 
     @Getter

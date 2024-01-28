@@ -66,18 +66,37 @@ public class RoomsController {
     }
 
     @GetMapping("/rooms")
-    @Operation(summary = "방 정보 전체 조회", description = "방 정보를 조회한다")
+    @Operation(summary = "방 전체 조건 조회", description = "방 전체를 조건으로 조회한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스터디 룸 조회 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity readRoomsList(@PageableDefault(size = 8, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                        @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
+    public ResponseEntity readRoomsList(
+            @PageableDefault(size = 8, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
                 roomsServiceFacade.readRoomsList(pageable, requestDto)
+        ));
+    }
+
+    @GetMapping("/rooms/host")
+    @Operation(summary = "등록한 방 전체 조건 조회", description = "등록한 방 전체를 조건으로 조회한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "스터디 룸 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity readRoomsListByHost(
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Valid RoomsRequestDto.ReadRoomsListByHostRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "스터디 룸 정보 조회에 성공했습니다",
+                roomsServiceFacade.readRoomsListByHost(pageable, requestDto, userDetails.getUser())
         ));
     }
 

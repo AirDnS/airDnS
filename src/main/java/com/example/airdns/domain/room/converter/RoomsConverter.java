@@ -83,6 +83,15 @@ public class RoomsConverter {
                 .build();
     }
 
+    public static RoomsSearchConditionDto toRoomsSearchCondition(
+            RoomsRequestDto.ReadRoomsListByHostRequestDto requestDto,
+            Users users) {
+        return RoomsSearchConditionDto.builder()
+                .keyword(requestDto.getKeyword())
+                .users(users)
+                .build();
+    }
+
     private static List<Map<String, Object>> getEquipmentListByRooms(Rooms rooms) {
         List<Map<String, Object>> equipmentList = new ArrayList<>();
 

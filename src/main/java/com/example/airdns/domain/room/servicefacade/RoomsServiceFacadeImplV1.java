@@ -39,7 +39,8 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     @Override
     public ReadRoomsResponseDto createRooms(
             CreateRoomsRequestDto requestDto,
-            List<MultipartFile> files, Users users) {
+            List<MultipartFile> files,
+            Users users) {
         if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
             throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
         }
@@ -64,6 +65,18 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             ReadRoomsListRequestDto requestDto) {
         return roomsService.findAllSearchFilter(
                 pageable, RoomsConverter.toRoomsSearchCondition(requestDto));
+    }
+
+    @Override
+    public Object readRoomsListByHost(
+            Pageable pageable,
+            ReadRoomsListByHostRequestDto requestDto,
+            Users users) {
+        if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
+            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
+        }
+
+        return roomsService.findAllByHost(pageable, RoomsConverter.toRoomsSearchCondition(requestDto, users));
     }
 
     @Transactional

@@ -37,6 +37,13 @@ public interface RoomsServiceFacade {
     Page<ReadRoomsResponseDto> readRoomsList(Pageable pageable, ReadRoomsListRequestDto requestDto);
 
     /**
+     * 직접 등록한 스터디 룸 전체 조회
+     * @param requestDto 검색 조건
+     * @return 방 리스트 데이터
+     */
+    Object readRoomsListByHost(Pageable pageable, ReadRoomsListByHostRequestDto requestDto, Users users);
+
+    /**
      * 스터디 룸 변경
      * @param requestDto 변경할 데이터
      * @param roomsId 방 번호
@@ -82,5 +89,4 @@ public interface RoomsServiceFacade {
      * @param roomsId 방 번호
      */
     void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
-
 }

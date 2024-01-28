@@ -1,5 +1,6 @@
 package com.example.airdns.domain.room.dto;
 
+import com.example.airdns.domain.user.entity.Users;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,4 +18,6 @@ public class RoomsSearchConditionDto {
     Integer startSize;
     Integer endSize;
     List<Long> equpmentList;
+    Users users;
+    Boolean isClosed;
 }

@@ -45,11 +45,13 @@ public class Rooms extends CommonEntity {
     @Column
     private String description;
 
-    @Column
-    private Boolean isClosed;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isClosed = Boolean.FALSE;
 
-    @Column
-    private Boolean isDeleted;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column
     private LocalDateTime deletedAt;

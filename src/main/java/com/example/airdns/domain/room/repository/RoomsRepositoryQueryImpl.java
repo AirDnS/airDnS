@@ -43,29 +43,52 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                 .or(eqAddress(condition.getKeyword())),
                         betweenPrice(condition.getStartPrice(), condition.getEndPrice()),
                         betweenSize(condition.getStartSize(), condition.getEndSize()),
-                        inEquipment(condition.getEqupmentList())
-                )
-                ;
-        List<RoomsResponseDto.ReadRoomsResponseDto> content = null;
+                        inEquipment(condition.getEqupmentList()),
+                        rooms.isDeleted.isFalse(),
+                        rooms.isClosed.isFalse()
+                );
+
+        return getRoomsResponseDto(pageable, query);
+    }
+
+    @Override
+    public Page<RoomsResponseDto.ReadRoomsResponseDto> findAllByHost(
+            Pageable pageable, RoomsSearchConditionDto condition) {
+        JPQLQuery<Rooms> query = queryFactory
+                .select(rooms)
+                .from(rooms)
+                .where(
+                        eqName(condition.getKeyword()),
+                        rooms.users.eq(condition.getUsers()),
+                        rooms.isDeleted.isFalse()
+                );
+
+        return getRoomsResponseDto(pageable, query);
+    }
+
+    private Page<RoomsResponseDto.ReadRoomsResponseDto> getRoomsResponseDto(Pageable pageable, JPQLQuery<Rooms> query) {
+        List<RoomsResponseDto.ReadRoomsResponseDto> content;
         try (Stream<Rooms> stream = Objects.requireNonNull(this.getQuerydsl())
                 .applyPagination(pageable, query)
                 .stream()) {
             content = stream.map(RoomsConverter::toDto).collect(Collectors.toList());
-        };
+        }
 
         return new PageImpl<>(content, pageable, query.fetchCount());
     }
 
     private BooleanBuilder eqName(String keyword) {
-        return new BooleanBuilder(keyword == null || keyword.isEmpty()
+        return new BooleanBuilder(
+                keyword == null || keyword.isEmpty()
                         ? null
-                        : rooms.name.like("%"+keyword+"%"));
+                        : rooms.name.like("%" + keyword + "%"));
     }
 
     private BooleanBuilder eqAddress(String keyword) {
-        return new  BooleanBuilder(keyword == null || keyword.isEmpty()
+        return new BooleanBuilder(
+                keyword == null || keyword.isEmpty()
                         ? null
-                        : rooms.address.like("%"+keyword+"%"));
+                        : rooms.address.like("%" + keyword + "%"));
     }
 
     private BooleanExpression betweenPrice(BigDecimal startPrice, BigDecimal endPrice) {
@@ -100,12 +123,12 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         return equpmentList == null || equpmentList.isEmpty()
                 ? null
                 : rooms.id.in(
-                        JPAExpressions
-                                .select(roomEquipments.rooms.id)
-                                .from(roomEquipments)
-                                .where(roomEquipments.equipments.id.in(
-                                        equpmentList
-                                ))
+                JPAExpressions
+                        .select(roomEquipments.rooms.id)
+                        .from(roomEquipments)
+                        .where(roomEquipments.equipments.id.in(
+                                equpmentList
+                        ))
         );
     }
 }
