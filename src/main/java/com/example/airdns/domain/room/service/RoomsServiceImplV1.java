@@ -1,6 +1,5 @@
 package com.example.airdns.domain.room.service;
 
-import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
@@ -40,12 +39,17 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     @Override
     public Rooms findById(Long roomsId) {
-        return roomsRepository.findById(roomsId)
+        return roomsRepository.findByIdAndIsDeletedFalse(roomsId)
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
     }
 
     @Override
-    public Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition) {
-        return roomsRepository.findAllSearchFilter(pageable, roomsSearchCondition);
+    public Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto condition) {
+        return roomsRepository.findAllSearchFilter(pageable, condition);
+    }
+
+    @Override
+    public Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto condition) {
+        return roomsRepository.findAllByHost(pageable, condition);
     }
 }
