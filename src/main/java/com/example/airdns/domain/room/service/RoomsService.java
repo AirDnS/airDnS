@@ -43,8 +43,15 @@ public interface RoomsService {
      * 방 검색
      * @param pageable 페이징 객체
      * @param roomsSearchCondition 방 조회 조건
-     * @return
+     * @return 방 조회 데이터
      */
     Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
 
+    /**
+     * 등록한 방 검색
+     * @param pageable 페이징 객체
+     * @param roomsSearchCondition 방 조회 조건
+     * @return 방 조회 데이터
+     */
+    Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
 }

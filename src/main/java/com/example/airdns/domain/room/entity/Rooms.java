@@ -45,11 +45,13 @@ public class Rooms extends CommonEntity {
     @Column
     private String description;
 
-    @Column
-    private Boolean isClosed;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isClosed = Boolean.FALSE;
 
-    @Column
-    private Boolean isDeleted;
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column
     private LocalDateTime deletedAt;
@@ -101,13 +103,15 @@ public class Rooms extends CommonEntity {
             BigDecimal price,
             String address,
             Integer size,
-            String description,
-            Boolean isClosed) {
+            String description) {
         this.name = name;
         this.price = price;
         this.address = address;
         this.size = size;
         this.description = description;
+    }
+
+    public void updateIsClosed(Boolean isClosed) {
         this.isClosed = isClosed;
     }
       

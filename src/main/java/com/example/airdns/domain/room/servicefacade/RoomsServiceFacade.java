@@ -7,6 +7,7 @@ import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -36,6 +37,13 @@ public interface RoomsServiceFacade {
     Page<ReadRoomsResponseDto> readRoomsList(Pageable pageable, ReadRoomsListRequestDto requestDto);
 
     /**
+     * 직접 등록한 스터디 룸 전체 조회
+     * @param requestDto 검색 조건
+     * @return 방 리스트 데이터
+     */
+    Object readRoomsListByHost(Pageable pageable, ReadRoomsListByHostRequestDto requestDto, Users users);
+
+    /**
      * 스터디 룸 변경
      * @param requestDto 변경할 데이터
      * @param roomsId 방 번호
@@ -43,6 +51,14 @@ public interface RoomsServiceFacade {
      * @return 변경된 방 데이터
      */
     ReadRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long roomsId, Users users);
+
+    /**
+     * 스터디 룸 운영 여부 변경
+     * @param requestDto 변경할 데이터
+     * @param roomsId 방 번호
+     * @param users 로그인 유저
+     */
+    void updateRoomsIsClosed(UpdateRoomsIsClosedRequestDto requestDto, Long roomsId, Users users);
 
     /**
      * 스터디룸 이미지 수정
@@ -73,5 +89,4 @@ public interface RoomsServiceFacade {
      * @param roomsId 방 번호
      */
     void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
-
 }

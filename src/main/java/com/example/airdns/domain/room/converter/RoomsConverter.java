@@ -3,6 +3,7 @@ package com.example.airdns.domain.room.converter;
 import com.example.airdns.domain.equipment.dto.EquipmentsResponseDto;
 import com.example.airdns.domain.equipment.entity.Equipments;
 import com.example.airdns.domain.equipmentcategory.entity.EquipmentCategories;
+import com.example.airdns.domain.image.converter.ImagesConverter;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
@@ -35,17 +36,26 @@ public class RoomsConverter {
                 .price(rooms.getPrice())
                 .address(rooms.getAddress())
                 .size(rooms.getSize())
+                .isClosed(rooms.getIsClosed())
+                .createdAt(rooms.getCreatedAt())
                 .desc(rooms.getDescription())
                 .equipment(equipments)
-                .imageUrl(
+                .image(
                         rooms.getImagesList().stream()
-                            .map((Images::getImageUrl))
+                            .map((ImagesConverter::toDto))
                             .toList()
                 )
                 .reservatedTimeList(
                         rooms.getReservationList().stream()
                                 .map(reservation -> Arrays.asList(
                                         reservation.getCheckIn(), reservation.getCheckOut()
+                                ))
+                                .toList()
+                )
+                .restScheduleList(
+                        rooms.getRestScheduleList().stream()
+                                .map(restSchedule -> Arrays.asList(
+                                        restSchedule.getStartTime(), restSchedule.getEndTime()
                                 ))
                                 .toList()
                 )
@@ -70,6 +80,15 @@ public class RoomsConverter {
                 .startSize(requestDto.getSize() != null ? requestDto.getSize().get(0) : null)
                 .endSize(requestDto.getSize() != null ? requestDto.getSize().get(1) : null)
                 .equpmentList(requestDto.getEquipment())
+                .build();
+    }
+
+    public static RoomsSearchConditionDto toRoomsSearchCondition(
+            RoomsRequestDto.ReadRoomsListByHostRequestDto requestDto,
+            Users users) {
+        return RoomsSearchConditionDto.builder()
+                .keyword(requestDto.getKeyword())
+                .users(users)
                 .build();
     }
 
