@@ -6,6 +6,8 @@ import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -43,8 +45,8 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
     @Override
-    public List<Reservation> findAllByUsersId(Long userId) {
-        return reservationRepository.findAllByUsersId(userId);
+    public Page<Reservation> findAllByUsersId(Long userId, Pageable pageable) {
+        return reservationRepository.findAllByUsersId(userId, pageable);
     }
 
 }
