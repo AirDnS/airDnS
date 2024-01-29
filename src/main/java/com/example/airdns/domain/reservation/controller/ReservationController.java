@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -85,7 +86,7 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readReservationList(
+        Page<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readReservationList(
                 userDetails.getUser().getId(),
                 pageable
         );
@@ -100,9 +101,12 @@ public class ReservationController {
     @Operation(summary = "해당 방에 대한 예약 목록을 조회한다", description = "해당 방에 대한 예약 목록을 조회한다.")
     @ApiResponse(responseCode = "200", description = "해당 방에 대한 예약 목록 조회에 성공")
     public ResponseEntity<CommonResponse> readRoomReservationList(
-            @PathVariable Long roomsId
+            @PathVariable Long roomsId,
+            @PageableDefault(sort = "checkIn", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readRoomReservationList(roomsId);
+        Page<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readRoomReservationList(
+                roomsId,
+                pageable);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse(HttpStatus.OK,
                         "방 예약 목록 조회 성공",

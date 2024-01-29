@@ -14,6 +14,7 @@ import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,13 +68,12 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     }
 
     @Override
-    public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
+    public Page<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
             Long usersId,
             Pageable pageable) {
         return ReservationService.
                 findAllByUsersId(usersId, pageable).
-                map(ReservationResponseDto.ReadReservationResponseDto::from).
-                getContent();
+                map(ReservationResponseDto.ReadReservationResponseDto::from);
     }
 
 
@@ -92,12 +92,12 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     }
 
     @Override
-    public List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId) {
+    public Page<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(
+            Long roomsId,
+            Pageable pageable) {
         return ReservationService.
-                findAllByRoomsIdAndIsCancelledFalse(roomsId).
-                stream().
-                map(ReservationResponseDto.ReadReservationResponseDto::from).
-                toList();
+                findAllByRoomsIdAndIsCancelledFalse(roomsId, pageable).
+                map(ReservationResponseDto.ReadReservationResponseDto::from);
     }
 
     @Override

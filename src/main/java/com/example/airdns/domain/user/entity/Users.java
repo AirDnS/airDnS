@@ -39,11 +39,17 @@ public class Users extends CommonEntity {
     @Column
     private String nickname;
 
+    @Builder.Default
     @Column
-    private String contact;
+    private String name = "아무개";
 
+    @Builder.Default
     @Column
-    private String address;
+    private String contact = "010-1234-1234";
+
+    @Builder.Default
+    @Column
+    private String address = "서울특별시 강남구 테헤란로44길 8";
 
     @Column
     @Enumerated(EnumType.STRING)

@@ -62,7 +62,8 @@ public interface ReservationService {
      *
      * @return 예약 목록 리스트 타입
      * @Param 방 번호
+     * @Param 페이지 옵션
      */
-    List<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId);
+    Page<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId, Pageable pageable);
 
 }
