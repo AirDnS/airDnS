@@ -89,7 +89,9 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
 
         validateUserIsRoomsHost(rooms, users);
 
+        roomEquipmentsService.deleteAll(rooms.getRoomEquipmentsList());
         rooms.resetEquipments();
+
         updateEquipments(rooms, requestDto.getEquipment());
 
         rooms.updateRooms(
