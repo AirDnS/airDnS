@@ -84,7 +84,8 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
             Long reservationId) {
         Reservation reservation = ReservationService.findById(reservationId);
 
-        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
+        if (!Objects.equals(reservation.getUsers().getId(), userId)
+                && !Objects.equals(reservation.getRooms().getUsers().getId(), userId)) {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
@@ -109,7 +110,6 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     @Override
     public String createReservationName(String roomsName, LocalDateTime checkIn, LocalDateTime checkOut) {
         return roomsName + "," +checkIn + "," + checkOut;
-
     }
 
     private void isValidatedRequestSchedule(
