@@ -9,8 +9,8 @@ public interface PaymentService {
      * @param reservationId 예약 ID
      * @param requestDto 결제 요청 DTO
      */
-    PaymentResponseDto.CreatePaymentResponseDto createPayment(Long reservationId,
-            Long userId,
+    PaymentResponseDto.CreatePaymentResponseDto createPayment(Long userId,
+            Long reservationId,
             PaymentRequestDto.CreatePaymentRequestDto requestDto);
 
     PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId, Long paymentId);
