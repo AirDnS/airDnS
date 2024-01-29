@@ -18,6 +18,9 @@ public class UsersResponseDto {
     @Schema(description = "유저 정보 수정 응답 dto")
     public static class UpdateUsersResponseDto {
 
+        @Schema(description = "이름", example = "홍길동", defaultValue = "홍길동")
+        private String name;
+
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
         private String nickname;
 
@@ -32,6 +35,7 @@ public class UsersResponseDto {
 
         public static UpdateUsersResponseDto from(Users user) {
             return UpdateUsersResponseDto.builder()
+                    .name(user.getName())
                     .nickname(user.getNickname())
                     .address(user.getAddress())
                     .contact(user.getContact())
