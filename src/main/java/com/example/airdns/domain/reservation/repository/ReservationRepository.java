@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ReservationRepository extends JpaRepository<Reservation,Long> {
+public interface ReservationRepository extends JpaRepository<Reservation,Long>, ReservationRepositoryQuery {
     List<Reservation> findAllByUsersId(Long userId);
 
     Optional<Reservation> findFirstByRoomsAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(Rooms rooms, LocalDateTime checkOut, LocalDateTime checkIn);

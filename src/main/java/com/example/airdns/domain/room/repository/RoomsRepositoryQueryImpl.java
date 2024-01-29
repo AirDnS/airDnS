@@ -3,6 +3,7 @@ package com.example.airdns.domain.room.repository;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
+import com.example.airdns.domain.room.entity.QRooms;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -130,5 +131,20 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                 equpmentList
                         ))
         );
+    }
+
+    @Override
+    public List<Long> findDeletedRoomIds(QRooms qRooms, Long userId){
+        return queryFactory.select(qRooms.id)
+                .from(qRooms)
+                .where(qRooms.users.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    public void deleteByUserId(QRooms qRooms, Long userId) {
+        queryFactory.delete(qRooms)
+                .where(qRooms.users.id.eq(userId))
+                .execute();
     }
 }

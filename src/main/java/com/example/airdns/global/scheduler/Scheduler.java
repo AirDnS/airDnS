@@ -25,6 +25,7 @@ import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.repository.UsersRepository;
+import com.example.airdns.domain.user.service.UsersServiceImplV1;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -52,6 +53,7 @@ public class Scheduler {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    private final UsersServiceImplV1 usersService;
     // 초 분 시 일 월 요일
     @Transactional
     @Scheduled(cron = "0 0 1 * * *")
@@ -61,7 +63,7 @@ public class Scheduler {
         LocalDateTime deleteTime = LocalDateTime.now().minusYears(1);
 
         // deleted_at으로부터 1년이 지난 entity의 인스턴스들을 삭제
-        deleteUsers(deleteTime);
+        usersService.deleteUsers(deleteTime);
         deleteRooms(deleteTime);
         deletePayment(deleteTime);
     }

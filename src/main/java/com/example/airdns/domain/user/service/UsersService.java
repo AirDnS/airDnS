@@ -4,6 +4,8 @@ import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.dto.UsersResponseDto;
 import com.example.airdns.domain.user.entity.Users;
 
+import java.time.LocalDateTime;
+
 public interface UsersService {
 
     UsersResponseDto.UpdateUsersResponseDto updateUser(Long userId, UsersRequestDto.UpdateUserInfoRequestDto userRequestDto);
@@ -12,4 +14,6 @@ public interface UsersService {
     UsersResponseDto.UpdateUsersResponseDto updateUserRole(Long userId);
 
     UsersResponseDto.ReadUserResponseDto getUserInfo(Long userId);
+
+    void deleteUsers(LocalDateTime deleteTime);
 }

@@ -2,7 +2,9 @@ package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
-import com.example.airdns.domain.payment.dto.PaymentResponseDto.ReadPaymentResponseDto;
+import com.example.airdns.domain.payment.entity.QPayment;
+
+import java.util.List;
 
 public interface PaymentService {
     /**
@@ -14,4 +16,10 @@ public interface PaymentService {
             PaymentRequestDto.CreatePaymentRequestDto requestDto);
 
     PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId, Long paymentId);
+
+    List<Long> findDeletedPaymentIds(QPayment qPayment, Long userId);
+
+    void saveDeletedPaymentInfo(Long paymentId);
+
+    void deleteByUserId(QPayment qPayment, Long userId);
 }

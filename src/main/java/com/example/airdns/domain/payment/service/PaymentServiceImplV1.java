@@ -1,11 +1,15 @@
 package com.example.airdns.domain.payment.service;
 
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
 import com.example.airdns.domain.payment.entity.Payment;
+import com.example.airdns.domain.payment.entity.QPayment;
 import com.example.airdns.domain.payment.exception.PaymentCustomException;
 import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
+import com.example.airdns.domain.payment.repository.PaymentRepositoryQuery;
+import com.example.airdns.domain.payment.repository.PaymentRepositoryQueryImpl;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
@@ -14,8 +18,8 @@ import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -38,6 +42,7 @@ public class PaymentServiceImplV1 implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
     private final RestTemplate restTemplate;
+    private final PaymentRepositoryQueryImpl paymentRepositoryQuery;
 
     @Value("${payment.toss.url}")
     private String tossPaymentApiUrl;
@@ -151,4 +156,18 @@ public class PaymentServiceImplV1 implements PaymentService {
         return PaymentResponseDto.ReadPaymentResponseDto.from(payment);
     }
 
+    @Override
+    public List<Long> findDeletedPaymentIds(QPayment qPayment, Long userId){
+        return paymentRepositoryQuery.findDeletedPaymentIds(qPayment, userId);
+    }
+
+    @Override
+    public void deleteByUserId(QPayment qPayment, Long userId){
+        paymentRepositoryQuery.deleteByUserId(qPayment, userId);
+    }
+
+    @Override
+    public void saveDeletedPaymentInfo(Long paymentId) {
+
+    }
 }

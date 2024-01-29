@@ -1,5 +1,6 @@
 package com.example.airdns.domain.reservation.service;
 
+import com.example.airdns.domain.reservation.entity.QReservation;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
 
@@ -42,4 +43,10 @@ public interface ReservationService {
     );
 
     List<Reservation> findAllByUsersId(Long userId);
+
+    List<Long> findDeletedReservationIds(QReservation qReservation, Long userId);
+
+    void saveDeletedReservationInfo(Long reservationId);
+
+    void deleteByUserId(QReservation qReservation, Long userId);
 }

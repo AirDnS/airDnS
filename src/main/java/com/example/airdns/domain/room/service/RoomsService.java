@@ -2,9 +2,12 @@ package com.example.airdns.domain.room.service;
 
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
+import com.example.airdns.domain.room.entity.QRooms;
 import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface RoomsService {
 
@@ -54,4 +57,7 @@ public interface RoomsService {
      * @return 방 조회 데이터
      */
     Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
+    List<Long> findDeletedRoomIds(QRooms qRooms, Long userId);
+    void saveDeletedRoomInfo(Long roomsId);
+    void deleteByUserId(QRooms qRooms, Long userId);
 }

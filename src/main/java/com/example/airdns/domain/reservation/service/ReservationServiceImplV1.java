@@ -1,9 +1,12 @@
 package com.example.airdns.domain.reservation.service;
 
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
+import com.example.airdns.domain.reservation.entity.QReservation;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
+import com.example.airdns.domain.reservation.repository.ReservationRepositoryQueryImpl;
 import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,8 @@ import java.util.List;
 public class ReservationServiceImplV1 implements ReservationService {
 
     private final ReservationRepository reservationRepository;
+    private final DeleteInfoService deleteInfoService;
+    private final ReservationRepositoryQueryImpl reservationRepositoryQuery;
 
     @Override
     public Reservation save(Reservation reservation) {
@@ -47,4 +52,19 @@ public class ReservationServiceImplV1 implements ReservationService {
         return reservationRepository.findAllByUsersId(userId);
     }
 
+    @Override
+    public List<Long> findDeletedReservationIds(QReservation qReservation, Long userId){
+        return reservationRepositoryQuery.findDeletedReservationIds(qReservation, userId);
+    }
+
+    @Override
+    public void saveDeletedReservationInfo(Long reservationId){
+        Reservation reservation = findById(reservationId);
+        deleteInfoService.saveDeletedReservationInfo(reservation);
+    }
+
+    @Override
+    public void deleteByUserId(QReservation qReservation, Long userId){
+        reservationRepositoryQuery.deleteByUserId(qReservation, userId);
+    }
 }
