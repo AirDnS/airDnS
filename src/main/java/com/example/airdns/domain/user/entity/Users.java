@@ -69,6 +69,7 @@ public class Users extends CommonEntity {
     }
 
     public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
+        this.name = userRequestDto.getName();
         this.address = userRequestDto.getAddress();
         this.contact = userRequestDto.getContact();
         this.nickname = userRequestDto.getNickname();

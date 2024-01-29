@@ -18,6 +18,11 @@ public class UsersRequestDto {
     @Schema(description = "유저 정보 수정 dto")
     public static class UpdateUserInfoRequestDto {
 
+        @Schema(description = "유저 이름", example = "홍길동", defaultValue = "아무개")
+        @Pattern(regexp = "^[가-힣]{2,4}$", message = "한글 이름 2 ~ 4자 이내")
+        private String name;
+
+
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
         @Size(min= 2, max=10)
         private String nickname;
