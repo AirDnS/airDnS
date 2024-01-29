@@ -4,6 +4,8 @@ import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationServiceFacade {
@@ -15,7 +17,7 @@ public interface ReservationServiceFacade {
      * @Param request 예약할 날짜에 관한 정보
      * @return void
      */
-    void createReservation(
+    ReservationResponseDto.CreateReservationResponseDto createReservation(
             Long userId,
             Long roomId,
             ReservationRequestDto.CreateReservationRequestDto createReservationDto
@@ -63,4 +65,31 @@ public interface ReservationServiceFacade {
      * @return 예약 정보 목록
      */
     List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId);
+
+    /**
+     * 해당 예약방에 대한 금액을 계산한다.
+     * @Param room Price
+     * @Param 체크인
+     * @Param 체크아웃
+     * @return 예약 총 금액
+     */
+    BigDecimal calculateReservationPrice(
+            BigDecimal roomsPrice,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut
+    );
+
+    /**
+     * 해당 예약방에 대한 금액을 계산한다.
+     * @Param room 네임
+     * @Param 체크인
+     * @Param 체크아웃
+     * @return 예약 이름
+     */
+    String createReservationName(
+            String roomsName,
+            LocalDateTime checkIn,
+            LocalDateTime checkOut
+    );
+
 }
