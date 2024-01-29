@@ -44,14 +44,15 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long roomsId,
             @Valid @RequestBody ReservationRequestDto.CreateReservationRequestDto createReservation) {
-        reservationServiceFacade.createReservation(
+        ReservationResponseDto.CreateReservationResponseDto responseDto = reservationServiceFacade.createReservation(
                 userDetails.getUser().getId(),
                 roomsId,
                 createReservation);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CommonResponse<>(
                         HttpStatus.CREATED,
-                        "예약 성공"
+                        "예약에 성공했습니다.",
+                        responseDto
                 )
         );
     }

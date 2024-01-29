@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -32,7 +33,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     private final ReservationService ReservationService;
     private final RestScheduleService restScheduleService;
     @Override
-    public void createReservation(
+    public ReservationResponseDto.CreateReservationResponseDto createReservation(
             Long userId,
             Long roomId,
             ReservationRequestDto.CreateReservationRequestDto requestDto) {
@@ -44,8 +45,11 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
 
         isValidatedRequestSchedule(rooms, checkInTime, checkOutTime);
 
-        Reservation reservation = requestDto.toEntity(users, rooms);
-        ReservationService.save(reservation);
+        BigDecimal price = calculateReservationPrice(rooms.getPrice(), checkInTime, checkOutTime);
+        String name = createReservationName(rooms.getName(), checkInTime, checkOutTime);
+
+        Reservation reservation = requestDto.toEntity(users, rooms, price, name);
+        return ReservationResponseDto.CreateReservationResponseDto.from(ReservationService.save(reservation));
     }
 
 
@@ -73,8 +77,6 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     }
 
 
-
-
     @Override
     @Transactional
     public void deleteReservation(
@@ -96,6 +98,18 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
                 stream().
                 map(ReservationResponseDto.ReadReservationResponseDto::from).
                 toList();
+    }
+
+    @Override
+    public BigDecimal calculateReservationPrice(BigDecimal roomsPrice, LocalDateTime checkIn, LocalDateTime checkOut) {
+        long betweenTime = ChronoUnit.HOURS.between(checkIn, checkOut);
+        return BigDecimal.valueOf(roomsPrice.longValue() * betweenTime);
+    }
+
+    @Override
+    public String createReservationName(String roomsName, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return roomsName + "," +checkIn + "," + checkOut;
+
     }
 
     private void isValidatedRequestSchedule(
