@@ -41,7 +41,7 @@ public interface RoomsServiceFacade {
      * @param requestDto 검색 조건
      * @return 방 리스트 데이터
      */
-    Object readRoomsListByHost(Pageable pageable, ReadRoomsListByHostRequestDto requestDto, Users users);
+    Page<ReadRoomsResponseDto> readRoomsListByHost(Pageable pageable, ReadRoomsListByHostRequestDto requestDto, Users users);
 
     /**
      * 스터디 룸 변경

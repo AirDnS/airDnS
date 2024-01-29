@@ -3,6 +3,8 @@ package com.example.airdns.domain.room.dto;
 import com.example.airdns.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -20,12 +22,14 @@ public class RoomsRequestDto {
         private String name;
 
         @Schema(description = "방 가격", example = "500000")
+        @PositiveOrZero(message = "가격은 0보다 큰 값을 입력해야 합니다.")
         private BigDecimal price;
 
         @Schema(description = "주소", example = "서울특별시 강남구 테헤란로44길 8")
         private String address;
 
         @Schema(description = "방 평수", example = "10")
+        @PositiveOrZero(message = "평수는 0보다 큰 값을 입력해야 합니다.")
         private Integer size;
 
         @Schema(description = "방 설명", example = "크기가 아담한 방입니다")

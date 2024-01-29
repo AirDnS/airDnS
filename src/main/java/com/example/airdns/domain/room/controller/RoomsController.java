@@ -40,7 +40,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "입력된 장비 없음")
     })
     public ResponseEntity createRooms(
-            @RequestPart(value = "data") RoomsRequestDto.CreateRoomsRequestDto requestDto,
+            @RequestPart(value = "data") @Valid RoomsRequestDto.CreateRoomsRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(

@@ -68,7 +68,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     }
 
     @Override
-    public Object readRoomsListByHost(
+    public Page<ReadRoomsResponseDto> readRoomsListByHost(
             Pageable pageable,
             ReadRoomsListByHostRequestDto requestDto,
             Users users) {
