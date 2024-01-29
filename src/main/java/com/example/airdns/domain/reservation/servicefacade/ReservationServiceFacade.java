@@ -5,6 +5,7 @@ import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
@@ -47,10 +48,7 @@ public interface ReservationServiceFacade {
      */
     List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
             Long usersId,
-            int page,
-            int size,
-            String sortBy,
-            boolean isAsc
+            Pageable pageable
     );
 
     /**

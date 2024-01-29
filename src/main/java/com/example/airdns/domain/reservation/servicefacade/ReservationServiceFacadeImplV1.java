@@ -68,13 +68,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     @Override
     public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
             Long usersId,
-            int page,
-            int size,
-            String sortBy,
-            boolean isAsc) {
-        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
-        Sort sort = Sort.by(direction, sortBy);
-        Pageable pageable = PageRequest.of(page,size,sort);
+            Pageable pageable) {
         return ReservationService.
                 findAllByUsersId(usersId, pageable).
                 map(ReservationResponseDto.ReadReservationResponseDto::from).
