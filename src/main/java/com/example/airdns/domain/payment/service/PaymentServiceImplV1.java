@@ -15,7 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -47,8 +46,8 @@ public class PaymentServiceImplV1 implements PaymentService {
 
     @Override
     public PaymentResponseDto.CreatePaymentResponseDto createPayment(
-            Long reservationId,
             Long userId,
+            Long reservationId,
             PaymentRequestDto.CreatePaymentRequestDto requestDto) {
 
         Reservation reservation = reservationService.findById(reservationId);
@@ -102,6 +101,7 @@ public class PaymentServiceImplV1 implements PaymentService {
         requestData.put("orderId", requestDto.getOrderId());
         requestData.put("amount", requestDto.getAmount());
         requestData.put("paymentKey", requestDto.getPaymentKey());
+//        requestData.put("orderName", requestDto.getOrderName());
         return requestData;
     }
 
@@ -111,6 +111,7 @@ public class PaymentServiceImplV1 implements PaymentService {
         // 성공 시 결제 정보 및 예약정보 저장
         Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
+//                .orderName(requestDto.getOrderName())
                 .amount(requestDto.getAmount())
                 .paymentKey(requestDto.getPaymentKey())
                 .reservation(reservation)
