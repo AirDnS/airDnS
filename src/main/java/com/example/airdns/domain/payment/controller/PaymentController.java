@@ -33,7 +33,7 @@ public class PaymentController {
 
     private final PaymentServiceImplV1 paymentService;
 
-    @PostMapping("/{reservationId}/payment")
+    @PostMapping("reservation/{reservationId}/payment")
     @Operation(summary = "결제 요청", description = "예약 건에 대해 결제 요청을 한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "결제 성공"),
