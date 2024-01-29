@@ -2,10 +2,8 @@ package com.example.airdns.domain.reservation.servicefacade;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
-import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.room.entity.Rooms;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationServiceFacade {
@@ -37,10 +35,15 @@ public interface ReservationServiceFacade {
     /**
      * 유저의 예약 목록을 조회한다.
      * @Param 유저 Id
+     * @Param 페이지
+     * @Param 페이지에 개수
+     * @Param 정렬 기준
+     * @Param 정렬 방법
      * @return 예약 정보 목록
      */
     List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
-            Long id
+            Long usersId,
+            Pageable pageable
     );
 
     /**
@@ -54,4 +57,10 @@ public interface ReservationServiceFacade {
             Long reservationId
     );
 
+    /**
+     * 해당 예약을 취소한다.
+     * @Param 방 Id
+     * @return 예약 정보 목록
+     */
+    List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId);
 }
