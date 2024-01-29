@@ -128,6 +128,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .queryParam("nickname", URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8))
                 .queryParam("address", URLEncoder.encode(user.getAddress(), StandardCharsets.UTF_8))
                 .queryParam("contact", URLEncoder.encode(user.getContact(), StandardCharsets.UTF_8))
+                .queryParam("name", URLEncoder.encode(user.getName(), StandardCharsets.UTF_8))
                 .queryParam("role", user.getRole())
                 .build().toUriString();
     }

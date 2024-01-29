@@ -21,12 +21,22 @@ public class ReservationResponseDto {
 
         private BigDecimal price;
 
-        private String orderName;
+        private String reservationName;
+
+        private String userEmail;
+
+        private String userName;
+
+        private String userContact;
+
         public static CreateReservationResponseDto from(Reservation reservation) {
             return CreateReservationResponseDto.builder()
                     .id(reservation.getId())
                     .price(reservation.getPrice())
-                    .orderName(reservation.getName())
+                    .reservationName(reservation.getName())
+                    .userEmail(reservation.getUsers().getEmail())
+                    .userName(reservation.getUsers().getName())
+                    .userContact(reservation.getUsers().getContact())
                     .build();
         }
     }
