@@ -49,4 +49,9 @@ public class ReservationServiceImplV1 implements ReservationService {
         return reservationRepository.findAllByUsersId(userId, pageable);
     }
 
+    @Override
+    public List<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId) {
+        return reservationRepository.findAllByRoomsIdAndIsCancelledFalse(roomsId);
+    }
+
 }

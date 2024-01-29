@@ -2,7 +2,6 @@ package com.example.airdns.domain.reservation.controller;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
-import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.reservation.servicefacade.ReservationServiceFacade;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
@@ -15,7 +14,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -80,25 +78,39 @@ public class ReservationController {
     }
 
     @GetMapping("/reservation")
-    @Operation(summary = "예약 전체 조회", description = "유저의 예약 목록을 조회한다.")
+    @Operation(summary = "유저 예약 전체 조회", description = "유저의 예약 목록을 조회한다.")
     @ApiResponse(responseCode = "200", description = "예약 목록 조회에 성공")
     public ResponseEntity<CommonResponse> readReservationList(
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
-            ) {
+    ) {
         List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readReservationList(
                 userDetails.getUser().getId(),
                 pageable
         );
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse(HttpStatus.OK,
-                        "예약 목록 조회 성공",
+                        "유저 예약 목록 조회 성공",
+                        reservationResponseDtoList)
+        );
+    }
+
+    @GetMapping("/reservation/rooms/{roomsId}")
+    @Operation(summary = "해당 방에 대한 예약 목록을 조회한다", description = "해당 방에 대한 예약 목록을 조회한다.")
+    @ApiResponse(responseCode = "200", description = "해당 방에 대한 예약 목록 조회에 성공")
+    public ResponseEntity<CommonResponse> readRoomReservationList(
+            @PathVariable Long roomsId
+    ) {
+        List<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readRoomReservationList(roomsId);
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse(HttpStatus.OK,
+                        "방 예약 목록 조회 성공",
                         reservationResponseDtoList)
         );
     }
 
 
-    @DeleteMapping ("/reservation/{reservationId}")
+    @DeleteMapping("/reservation/{reservationId}")
     @Operation(summary = "해당 예약 취소", description = "해당 예약을 취소.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "해당 예약 성공"),
@@ -108,7 +120,10 @@ public class ReservationController {
             @AuthenticationPrincipal UserDetailsImpl userDetails,
             @PathVariable Long reservationId
     ) {
-        reservationServiceFacade.deleteReservation(userDetails.getUser().getId(), reservationId);
+        reservationServiceFacade.deleteReservation(
+                userDetails.getUser().getId(),
+                reservationId
+        );
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(
                         HttpStatus.OK,

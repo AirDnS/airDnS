@@ -2,13 +2,8 @@ package com.example.airdns.domain.reservation.servicefacade;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
-import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.room.entity.Rooms;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationServiceFacade {
@@ -62,4 +57,10 @@ public interface ReservationServiceFacade {
             Long reservationId
     );
 
+    /**
+     * 해당 예약을 취소한다.
+     * @Param 방 Id
+     * @return 예약 정보 목록
+     */
+    List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId);
 }
