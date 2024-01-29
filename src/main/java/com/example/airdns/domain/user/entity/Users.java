@@ -1,10 +1,6 @@
 package com.example.airdns.domain.user.entity;
 
-import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.oauth2.common.OAuth2Provider;
-import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.review.entity.Reviews;
-import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
@@ -13,8 +9,6 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -41,15 +35,15 @@ public class Users extends CommonEntity {
 
     @Builder.Default
     @Column
-    private String name = "아무개";
+    private String name = "Default";
 
     @Builder.Default
     @Column
-    private String contact = "010-1234-1234";
+    private String contact = "Default";
 
     @Builder.Default
     @Column
-    private String address = "서울특별시 강남구 테헤란로44길 8";
+    private String address = "Default";
 
     @Column
     @Enumerated(EnumType.STRING)
