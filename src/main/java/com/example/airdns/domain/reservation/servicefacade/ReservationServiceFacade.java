@@ -2,6 +2,7 @@ package com.example.airdns.domain.reservation.servicefacade;
 
 import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
@@ -43,7 +44,7 @@ public interface ReservationServiceFacade {
      * @Param 정렬 방법
      * @return 예약 정보 목록
      */
-    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
+    Page<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
             Long usersId,
             Pageable pageable
     );
@@ -62,9 +63,13 @@ public interface ReservationServiceFacade {
     /**
      * 해당 예약을 취소한다.
      * @Param 방 Id
+     * @Param 페이지 옵션
      * @return 예약 정보 목록
      */
-    List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId);
+    Page<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(
+            Long roomsId,
+            Pageable pageable
+    );
 
     /**
      * 해당 예약방에 대한 금액을 계산한다.
