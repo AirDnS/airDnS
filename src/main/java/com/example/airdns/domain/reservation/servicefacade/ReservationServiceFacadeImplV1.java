@@ -14,10 +14,7 @@ import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,6 +72,9 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
                 getContent();
     }
 
+
+
+
     @Override
     @Transactional
     public void deleteReservation(
@@ -87,6 +87,15 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         }
 
         reservation.cancelled();
+    }
+
+    @Override
+    public List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId) {
+        return ReservationService.
+                findAllByRoomsIdAndIsCancelledFalse(roomsId).
+                stream().
+                map(ReservationResponseDto.ReadReservationResponseDto::from).
+                toList();
     }
 
     private void isValidatedRequestSchedule(
@@ -117,5 +126,4 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
             LocalDateTime checkOut) {
         return restScheduleService.hasRestScheduleInRoomBetweenTimes(rooms, checkOut, checkIn);
     }
-
 }
