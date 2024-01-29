@@ -139,6 +139,26 @@ public class RoomsController {
                 roomsServiceFacade.updateRoomsImages(requestDto, roomsId, files, userDetails.getUser())
         ));
     }
+    @PatchMapping(
+            value = "/rooms/{roomsId}/updateIsClosed",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    @Operation(summary = "방 운영 여부 변경", description = "방 운영 여부를 변경한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "운영 여부 변경 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity updateRoomsIsClosed(
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
+            @RequestBody RoomsRequestDto.UpdateRoomsIsClosedRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        roomsServiceFacade.updateRoomsIsClosed(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "스터디 룸 운영 여부 변경에 성공했습니다"
+        ));
+    }
 
     @DeleteMapping("/rooms/{roomsId}")
     @Operation(summary = "방 삭제", description = "방을 삭제한다")
