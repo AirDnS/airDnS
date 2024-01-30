@@ -126,13 +126,13 @@ public class JwtUtil {
             String refreshToken = URLEncoder.encode(token.getRefreshToken(), "utf-8").replaceAll("\\+", "%20");
 
             ResponseCookie accessCookie = ResponseCookie.from(AUTHORIZATION_HEADER,accessToken)
-//                    .domain(".air-dns.org")
+                    .domain(".air-dns.org")
                     .path("/")
                     .httpOnly(true)
                     .build();
 
             ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_HEADER,refreshToken)
-//                    .domain(".air-dns.org")
+                    .domain(".air-dns.org")
                     .path("/")
                     .httpOnly(true)
                     .build();

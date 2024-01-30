@@ -73,7 +73,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity readRoomsList(
-            @PageableDefault(size = 8, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
@@ -179,7 +179,25 @@ public class RoomsController {
         ));
     }
 
-    @PostMapping("/rooms/{roomsId}/addRestTime")
+    @GetMapping("/rooms/{roomsId}/restschedule")
+    @Operation(summary = "휴식 일정 조회", description = "휴식 일정을 조회 한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "휴식 일정 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity ReadRoomsRestSchedule(
+            @PageableDefault(sort = "startTime") Pageable pageable,
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "휴식 일정 조회에 성공했습니다",
+                roomsServiceFacade.ReadRoomsRestSchedule(pageable, roomsId, userDetails.getUser())
+        ));
+    }
+
+    @PostMapping("/rooms/{roomsId}/restschedule")
     @Operation(summary = "휴식 일정 등록", description = "휴식 일정을 등록한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "휴식 일정 등록 성공"),
@@ -197,7 +215,7 @@ public class RoomsController {
         ));
     }
 
-    @DeleteMapping("/rooms/{roomsId}/removeRestTime")
+    @DeleteMapping("/rooms/{roomsId}/restschedule/{restscheduleId}")
     @Operation(summary = "휴식 일정 삭제", description = "휴식 일정을 삭제한다")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "휴식 일정 삭제 성공"),
@@ -206,9 +224,9 @@ public class RoomsController {
     })
     public ResponseEntity DeleteRoomsRestSchedule(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
-            @RequestBody @Valid RoomsRequestDto.DeleteRoomsRestScheduleRequestDto requestDto,
+            @Parameter(name = "restscheduleId", description = "휴무 ID") @PathVariable("restscheduleId") Long restscheduleId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        roomsServiceFacade.DeleteRoomsRestSchedule(requestDto, roomsId, userDetails.getUser());
+        roomsServiceFacade.DeleteRoomsRestSchedule(roomsId, restscheduleId, userDetails.getUser());
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "휴식 일정 삭제에 성공했습니다"
