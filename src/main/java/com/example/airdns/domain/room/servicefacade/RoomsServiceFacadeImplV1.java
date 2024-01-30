@@ -37,6 +37,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     private final EquipmentsService equipmentsService;
     private final ReservationService reservationService;
 
+    @Transactional
     @Override
     public ReadRoomsResponseDto createRooms(
             CreateRoomsRequestDto requestDto,
