@@ -4,6 +4,7 @@ import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
 import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ReservationServiceFacade {
@@ -63,4 +64,6 @@ public interface ReservationServiceFacade {
      * @return 예약 정보 목록
      */
     List<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(Long roomsId);
+
+    void deleteReservation(LocalDateTime deleteTime);
 }

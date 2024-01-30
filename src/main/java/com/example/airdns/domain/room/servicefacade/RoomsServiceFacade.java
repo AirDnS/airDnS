@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomsServiceFacade {
@@ -89,4 +90,6 @@ public interface RoomsServiceFacade {
      * @param roomsId 방 번호
      */
     void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
+
+    void deleteRooms(LocalDateTime deleteTime);
 }

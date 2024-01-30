@@ -66,9 +66,19 @@ public interface ReservationService {
     List<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId);
     // List<Reservation> findAllByUsersId(Long userId);
 
-    List<Long> findDeletedReservationIds(QReservation qReservation, Long userId);
+    // List<Long> findReservationIdsByUserId(Long userId);
 
     void saveDeletedReservationInfo(Long reservationId);
 
-    void deleteByUserId(QReservation qReservation, Long userId);
+    void deleteByUserId(Long userId);
+
+    void deleteByRoomId(Long roomId);
+
+    List<Long> findReservationIdsByRoomId(Long roomId);
+
+    List<Long> findReservationIds(LocalDateTime deleteTime);
+
+    List<Long> findReservationIdsByUserId(Long userId);
+
+    void deleteReservation(Long reservationId);
 }

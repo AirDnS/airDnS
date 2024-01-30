@@ -18,15 +18,20 @@ public class DeleteReservationsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private LocalDateTime cancelledAt;
 
     // Reservation DeleteInfo column
+    @Column
     private LocalDateTime checkIn;
 
+    @Column
     private LocalDateTime checkOut;
 
+    // @Column
     private String roomName;
 
     // 예약자 성함
+    // @Column
     private String reserverName;
 }

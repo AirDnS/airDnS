@@ -1,13 +1,15 @@
 package com.example.airdns.domain.reservation.service;
 
 import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
-import com.example.airdns.domain.reservation.entity.QReservation;
+import com.example.airdns.domain.payment.service.PaymentService;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
-import com.example.airdns.domain.reservation.repository.ReservationRepositoryQueryImpl;
+import com.example.airdns.domain.reservation.repository.ReservationRepositoryQuery;
 import com.example.airdns.domain.room.entity.Rooms;
+import com.example.airdns.domain.room.exception.RoomsCustomException;
+import com.example.airdns.domain.room.exception.RoomsExceptionCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +24,6 @@ public class ReservationServiceImplV1 implements ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final DeleteInfoService deleteInfoService;
-    private final ReservationRepositoryQueryImpl reservationRepositoryQuery;
 
     @Override
     public Reservation save(Reservation reservation) {
@@ -60,18 +61,41 @@ public class ReservationServiceImplV1 implements ReservationService {
     }
 
     @Override
-    public List<Long> findDeletedReservationIds(QReservation qReservation, Long userId){
-        return reservationRepositoryQuery.findDeletedReservationIds(qReservation, userId);
+    public List<Long> findReservationIdsByUserId(Long userId){
+        return reservationRepository.findReservationIdsByUserId(userId);
     }
 
     @Override
     public void saveDeletedReservationInfo(Long reservationId){
-        Reservation reservation = findById(reservationId);
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(
+                // 삭제된 Room
+                ()-> new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION)
+        );
         deleteInfoService.saveDeletedReservationInfo(reservation);
     }
 
     @Override
-    public void deleteByUserId(QReservation qReservation, Long userId){
-        reservationRepositoryQuery.deleteByUserId(qReservation, userId);
+    public void deleteByUserId(Long userId){
+        reservationRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public List<Long> findReservationIdsByRoomId(Long roomId){
+        return reservationRepository.findReservationIdsByRoomId(roomId);
+    }
+
+    @Override
+    public void deleteByRoomId(Long roomId){
+        reservationRepository.deleteByRoomId(roomId);
+    }
+
+    @Override
+    public List<Long> findReservationIds(LocalDateTime deleteTime){
+        return reservationRepository.findReservationIds(deleteTime);
+    }
+
+    @Override
+    public void deleteReservation(Long reservationId){
+        reservationRepository.deleteReservationInfo(reservationId);
     }
 }

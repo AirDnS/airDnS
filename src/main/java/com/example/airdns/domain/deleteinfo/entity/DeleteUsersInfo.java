@@ -19,19 +19,23 @@ public class DeleteUsersInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private LocalDateTime deletedAt;
 
+    @Column
     // User DeleteInfo column
     private String address;
 
+    @Column
     private String contact;
 
+    @Column
     private String email;
 
+    @Column
     private String nickname;
 
     @Column
     @Enumerated(EnumType.STRING)
     private UserRole role;
-
 }

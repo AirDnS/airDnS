@@ -13,5 +13,4 @@ public interface UsersRepository extends JpaRepository<Users, Long>, UsersReposi
 
     Optional<Users> findByIdAndIsDeletedFalse(Long userId);
 
-    List<Users> findByIsDeletedTrueAndDeletedAtBefore(LocalDateTime deleteTime);
 }

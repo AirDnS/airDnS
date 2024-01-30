@@ -1,14 +1,8 @@
 package com.example.airdns.domain.user.service;
 
 import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
-import com.example.airdns.domain.payment.entity.QPayment;
-import com.example.airdns.domain.payment.service.PaymentService;
 import com.example.airdns.domain.payment.service.PaymentServiceImplV1;
-import com.example.airdns.domain.reservation.entity.QReservation;
-import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.reservation.service.ReservationServiceImplV1;
-import com.example.airdns.domain.room.entity.QRooms;
-import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.room.service.RoomsServiceImplV1;
 import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.dto.UsersResponseDto;
@@ -18,7 +12,6 @@ import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.repository.UsersRepository;
-import com.example.airdns.domain.user.repository.UsersRepositoryQueryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +24,6 @@ import java.util.List;
 public class UsersServiceImplV1 implements UsersService {
 
     private final UsersRepository usersRepository;
-    private final UsersRepositoryQueryImpl usersRepositoryQuery;
     private final DeleteInfoServiceImpl deleteInfoService;
     private final RoomsServiceImplV1 roomsService;
     private final ReservationServiceImplV1 reservationService;
@@ -71,19 +63,15 @@ public class UsersServiceImplV1 implements UsersService {
     }
 
     @Override
+    @Transactional
     public void deleteUsers(LocalDateTime deleteTime){
-        QUsers qUsers = QUsers.users;
-        QRooms qRooms = QRooms.rooms;
-        QReservation qReservation = QReservation.reservation;
-        QPayment qPayment = QPayment.payment;
         // select id from users where isDeleted = true and deletedAt < deletedTime;
-        List<Long> userIds = usersRepositoryQuery.findDeletedUserIds(deleteTime);
-
+        List<Long> userIds = usersRepository.findUserIds(deleteTime);
         for (Long userId : userIds) {
             // 연관된 Rooms, Payments, Reservations의 ID 조회
-            List<Long> roomIds = roomsService.findDeletedRoomIds(qRooms, userId);
-            List<Long> reservationIds = reservationService.findDeletedReservationIds(qReservation, userId);
-            List<Long> paymentIds = paymentService.findDeletedPaymentIds(qPayment, userId);
+            List<Long> roomIds = roomsService.findRoomIdsByUserId(userId);
+            List<Long> reservationIds = reservationService.findReservationIdsByUserId(userId);
+            List<Long> paymentIds = paymentService.findPaymentIdsByUserId(userId);
 
             // DeleteInfo 저장
             saveDeleteUserInfo(userId);
@@ -92,12 +80,14 @@ public class UsersServiceImplV1 implements UsersService {
             paymentIds.forEach(paymentId -> paymentService.saveDeletedPaymentInfo(paymentId));
 
             // 연관된 엔터티 삭제
-            roomsService.deleteByUserId(qRooms, userId);
-            paymentService.deleteByUserId(qPayment, userId);
-            reservationService.deleteByUserId(qReservation, userId);
+            paymentService.deleteByUserId(userId);
+            reservationIds.forEach(reservationId -> paymentService.deleteByRoomId(reservationId));
+            reservationService.deleteByUserId(userId);
+            roomIds.forEach(roomId -> reservationService.deleteByRoomId(roomId));
+            roomsService.deleteByUserId(userId);
 
             // 마지막으로 Users 삭제
-            usersRepositoryQuery.deleteById(qUsers, userId);
+            usersRepository.deleteUserInfo(userId);
         }
     }
     private void saveDeleteUserInfo(Long userId){

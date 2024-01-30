@@ -1,6 +1,7 @@
 package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
 import com.example.airdns.domain.payment.entity.Payment;
@@ -17,9 +18,13 @@ import com.example.airdns.domain.reservation.repository.ReservationRepository;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -40,9 +45,8 @@ public class PaymentServiceImplV1 implements PaymentService {
 
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
-    private final ReservationRepository reservationRepository;
     private final RestTemplate restTemplate;
-    private final PaymentRepositoryQueryImpl paymentRepositoryQuery;
+    private final DeleteInfoService deleteInfoService;
 
     @Value("${payment.toss.url}")
     private String tossPaymentApiUrl;
@@ -157,17 +161,60 @@ public class PaymentServiceImplV1 implements PaymentService {
     }
 
     @Override
-    public List<Long> findDeletedPaymentIds(QPayment qPayment, Long userId){
-        return paymentRepositoryQuery.findDeletedPaymentIds(qPayment, userId);
+    public List<Long> findPaymentIdsByUserId(Long userId){
+        return paymentRepository.findPaymentIdsByUserId(userId);
     }
 
     @Override
-    public void deleteByUserId(QPayment qPayment, Long userId){
-        paymentRepositoryQuery.deleteByUserId(qPayment, userId);
+    public void deleteByUserId(Long userId){
+        paymentRepository.deleteByUserId(userId);
     }
 
     @Override
     public void saveDeletedPaymentInfo(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
+                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+        );
+        deleteInfoService.saveDeletedPaymentInfo(payment);
+    }
 
+    @Override
+    public List<Long> findPaymentIdsByReservationIds(List<Long> reservationIds){
+        return paymentRepository.findPaymentIdsByReservationIds(reservationIds);
+    }
+
+    @Override
+    public void deleteByRoomId(Long roomId){
+        paymentRepository.deleteByRoomId(roomId);
+    }
+
+    @Override
+    public void deleteByReservationId(Long reservationId){
+        paymentRepository.deleteByReservationId(reservationId);
+    }
+
+    @Override
+    public List<Long> findPaymentIdsByReservationId(Long reservationId){
+        return paymentRepository.findPaymentIdsByReservationId(reservationId);
+    }
+
+    @Override
+    public void deletePayment(LocalDateTime deleteTime){
+        List<Long> paymentIds = paymentRepository.findPaymentIdsByDeleteTime(deleteTime);
+
+        for (Long paymentId : paymentIds) {
+            // DeleteInfo 저장
+            saveDeletePaymentInfo(paymentId);
+
+            // Payments 삭제
+            paymentRepository.deletePaymentId(paymentId);
+        }
+    }
+
+    private void saveDeletePaymentInfo(Long paymentId){
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
+                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+        );
+        deleteInfoService.saveDeletedPaymentInfo(payment);
     }
 }

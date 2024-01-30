@@ -19,20 +19,27 @@ public class DeleteRoomsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private LocalDateTime deletedAt;
 
     // Room DeleteInfo column
     // + address
+    @Column
     private String name;
 
+    // @Column
     private String address;
 
+    @Column
     private BigDecimal price;
 
+    @Column
     private String description;
 
+    @Column
     private Integer size;
 
     // 룸 소유자
+    // @Column
     private String owner;
 }

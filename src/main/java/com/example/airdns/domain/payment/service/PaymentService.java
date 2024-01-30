@@ -4,6 +4,7 @@ import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
 import com.example.airdns.domain.payment.entity.QPayment;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PaymentService {
@@ -17,9 +18,19 @@ public interface PaymentService {
 
     PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId, Long paymentId);
 
-    List<Long> findDeletedPaymentIds(QPayment qPayment, Long userId);
+    List<Long> findPaymentIdsByUserId(Long userId);
 
     void saveDeletedPaymentInfo(Long paymentId);
 
-    void deleteByUserId(QPayment qPayment, Long userId);
+    void deleteByUserId(Long userId);
+
+    List<Long> findPaymentIdsByReservationIds(List<Long> reservationIds);
+
+    void deleteByRoomId(Long roomId);
+
+    void deleteByReservationId(Long reservationId);
+
+    List<Long> findPaymentIdsByReservationId(Long reservationId);
+
+    void deletePayment(LocalDateTime deleteTime);
 }

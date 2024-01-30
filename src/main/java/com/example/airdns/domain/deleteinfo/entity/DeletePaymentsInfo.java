@@ -18,10 +18,8 @@ public class DeletePaymentsInfo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column
     private LocalDateTime deletedAt;
-
-    // Payment DeleteInfo column
-    private String failReason;
 
     @Column
     private String paymentType;
@@ -37,7 +35,4 @@ public class DeletePaymentsInfo {
 
     @Column
     private String paymentKey;
-
-    @Column
-    private String cancelReason;
 }

@@ -7,6 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UsersRepositoryQuery {
-    List<Long> findDeletedUserIds(LocalDateTime deleteTime);
-    void deleteById(QUsers qUsers, Long userId);
+    List<Long> findUserIds(LocalDateTime deleteTime);
+    void deleteUserInfo(Long userId);
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface RoomsRepository extends JpaRepository<Rooms, Long>, RoomsRepositoryQuery {
     Optional<Rooms> findByIdAndIsDeletedFalse(Long roomsId);
+    Optional<Rooms> findByIdAndIsDeletedTrue(Long roomsId);
 }
