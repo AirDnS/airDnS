@@ -33,6 +33,5 @@ public class Scheduler {
         roomsServiceFacade.deleteRooms(deleteTime);
         reservationServiceFacade.deleteReservation(deleteTime);
         paymentService.deletePayment(deleteTime);
-
     }
 }
