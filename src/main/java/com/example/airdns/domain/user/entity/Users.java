@@ -63,10 +63,18 @@ public class Users extends CommonEntity {
     }
 
     public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
-        this.name = userRequestDto.getName();
-        this.address = userRequestDto.getAddress();
-        this.contact = userRequestDto.getContact();
-        this.nickname = userRequestDto.getNickname();
+        if (!userRequestDto.getName().isBlank()) {
+            this.name = userRequestDto.getName();
+        }
+        if (!userRequestDto.getAddress().isBlank()) {
+            this.address = userRequestDto.getAddress();
+        }
+        if (!userRequestDto.getContact().isBlank()) {
+            this.contact = userRequestDto.getContact();
+        }
+        if (!userRequestDto.getNickname().isBlank()) {
+            this.nickname = userRequestDto.getNickname();
+        }
     }
 
     public void updateRole(UserRole role) {
