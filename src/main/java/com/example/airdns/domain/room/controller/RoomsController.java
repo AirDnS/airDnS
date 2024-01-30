@@ -41,7 +41,7 @@ public class RoomsController {
     })
     public ResponseEntity createRooms(
             @RequestPart(value = "data") @Valid RoomsRequestDto.CreateRoomsRequestDto requestDto,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            @RequestPart(value = "files") List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
                 HttpStatus.CREATED,
