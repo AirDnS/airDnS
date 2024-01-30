@@ -102,7 +102,7 @@ public class ReservationController {
     @ApiResponse(responseCode = "200", description = "해당 방에 대한 예약 목록 조회에 성공")
     public ResponseEntity<CommonResponse> readRoomReservationList(
             @PathVariable Long roomsId,
-            @PageableDefault(sort = "checkIn", direction = Sort.Direction.DESC) Pageable pageable
+            @PageableDefault(sort = "checkIn") Pageable pageable
     ) {
         Page<ReservationResponseDto.ReadReservationResponseDto> reservationResponseDtoList = reservationServiceFacade.readRoomReservationList(
                 roomsId,
