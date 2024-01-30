@@ -80,6 +80,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             ResponseCookie accessCookie = ResponseCookie.from(AUTHORIZATION_HEADER, accessToken)
                     .domain(".air-dns.org")
                     .path("/")
+                    .httpOnly(true)
                     .build();
             response.addHeader("Set-Cookie", accessCookie.toString());
         }
