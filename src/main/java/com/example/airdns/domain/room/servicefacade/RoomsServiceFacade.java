@@ -100,10 +100,7 @@ public interface RoomsServiceFacade {
      * @param restscheduleId 휴식 일정 정보
      * @param users 로그인 회원
      */
-    void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
-
-    void deleteRooms(LocalDateTime deleteTime);
-  
     void DeleteRoomsRestSchedule(Long roomsId, Long restscheduleId, Users users);
 
+    void deleteRooms(LocalDateTime deleteTime);
 }
