@@ -5,6 +5,7 @@ import com.example.airdns.domain.equipment.entity.Equipments;
 import com.example.airdns.domain.equipmentcategory.entity.EquipmentCategories;
 import com.example.airdns.domain.image.converter.ImagesConverter;
 import com.example.airdns.domain.image.entity.Images;
+import com.example.airdns.domain.restschedule.entity.RestSchedule;
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
@@ -59,6 +60,15 @@ public class RoomsConverter {
                                 ))
                                 .toList()
                 )
+                .build();
+    }
+
+
+    public static RoomsResponseDto.ReadRoomsRestScheduleResponseDto toDto(RestSchedule restSchedule) {
+        return RoomsResponseDto.ReadRoomsRestScheduleResponseDto.builder()
+                .id(restSchedule.getId())
+                .startTime(restSchedule.getStartTime())
+                .endTime(restSchedule.getEndTime())
                 .build();
     }
 

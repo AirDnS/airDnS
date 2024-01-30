@@ -7,6 +7,7 @@ import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
+import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
 import com.example.airdns.domain.room.entity.Rooms;
@@ -87,7 +88,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
         roomEquipmentsService.deleteAll(rooms.getRoomEquipmentsList());
         rooms.resetEquipments();
@@ -113,7 +114,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
         rooms.updateIsClosed(requestDto.getIsClosed());
     }
@@ -127,7 +128,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
         if (requestDto != null) {
             deleteImage(rooms, requestDto.getRemoveImages());
@@ -145,9 +146,21 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     public void deleteRooms(Long roomsId, Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
         roomsService.delete(rooms);
+    }
+
+
+    @Override
+    public Page<RoomsResponseDto.ReadRoomsRestScheduleResponseDto> ReadRoomsRestSchedule(
+            Pageable pageable, Long roomsId, Users users) {
+        Rooms rooms = roomsService.findById(roomsId);
+
+        verifyUserHasThisRooms(rooms, users);
+
+        return restScheduleService.readRestSchedule(pageable, rooms)
+                .map(RoomsConverter::toDto);
     }
 
     @Transactional
@@ -158,7 +171,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             Users users) {
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
         if (reservationService.isReserved(rooms, requestDto.getStartDate(), requestDto.getEndDate())) {
             throw new RoomsCustomException(RoomsExceptionCode.EXIST_RESERVATION);
@@ -174,18 +187,18 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     @Transactional
     @Override
     public void DeleteRoomsRestSchedule(
-            DeleteRoomsRestScheduleRequestDto requestDto,
             Long roomsId,
+            Long restscheduleId,
             Users users) {
 
         Rooms rooms = roomsService.findById(roomsId);
 
-        validateUserIsRoomsHost(rooms, users);
+        verifyUserHasThisRooms(rooms, users);
 
-        restScheduleService.deleteRestSchedule(requestDto.getRestScheduleId(), rooms);
+        restScheduleService.deleteRestSchedule(restscheduleId, rooms);
     }
 
-    private void validateUserIsRoomsHost(Rooms rooms, Users users) {
+    private void verifyUserHasThisRooms(Rooms rooms, Users users) {
         if (!rooms.getUsers().getId().equals(users.getId())) {
             throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
         }

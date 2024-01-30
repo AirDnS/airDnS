@@ -6,6 +6,8 @@ import com.example.airdns.domain.restschedule.exception.RestScheduleExceptionCod
 import com.example.airdns.domain.restschedule.repository.RestScheduleRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,12 @@ import java.time.temporal.ChronoUnit;
 public class RestScheduleServiceImplV1 implements RestScheduleService {
 
     private final RestScheduleRepository restScheduleRepository;
+
+    @Override
+    public Page<RestSchedule> readRestSchedule(Pageable pageable, Rooms rooms) {
+        return restScheduleRepository.findAllByRoomsAndStartTimeAfter(pageable, rooms, LocalDateTime.now());
+    }
+
 
     @Override
     public RestSchedule createRestSchedule(Rooms rooms, LocalDateTime startDate, LocalDateTime endDate) {

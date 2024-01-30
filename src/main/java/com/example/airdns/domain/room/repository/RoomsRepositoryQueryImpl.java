@@ -71,7 +71,7 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         try (Stream<Rooms> stream = Objects.requireNonNull(this.getQuerydsl())
                 .applyPagination(pageable, query)
                 .stream()) {
-            content = stream.map(RoomsConverter::toDto).collect(Collectors.toList());
+            content = stream.map(RoomsConverter::toDto).toList();
         }
 
         return new PageImpl<>(content, pageable, query.fetchCount());
