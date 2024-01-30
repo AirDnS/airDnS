@@ -12,4 +12,6 @@ public interface UsersService {
     UsersResponseDto.UpdateUsersResponseDto updateUserRole(Long userId);
 
     UsersResponseDto.ReadUserResponseDto readUserInfo(Long userId);
+
+    void readUserSilence(Long userId);
 }

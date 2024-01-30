@@ -128,7 +128,6 @@ public class JwtUtil {
             ResponseCookie accessCookie = ResponseCookie.from(AUTHORIZATION_HEADER,accessToken)
                     .domain(".air-dns.org")
                     .path("/")
-                    .httpOnly(true)
                     .build();
 
             ResponseCookie refreshCookie = ResponseCookie.from(REFRESH_TOKEN_HEADER,refreshToken)
