@@ -8,6 +8,9 @@ import com.example.airdns.domain.equipment.exception.EquipmentsExceptionCode;
 import com.example.airdns.domain.roomequipment.repository.RoomEquipmentsRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -23,6 +26,11 @@ public class RoomEquipmentsServiceImplV1 implements RoomEquipmentsService {
                 .build());
     }
 
+    @Transactional
+    @Override
+    public void deleteAll(List<RoomEquipments> roomEquipmentsList) {
+        roomEquipmentsRepository.deleteAll(roomEquipmentsList);
+    }
 
 
 }

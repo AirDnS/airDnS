@@ -40,7 +40,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "입력된 장비 없음")
     })
     public ResponseEntity createRooms(
-            @RequestPart(value = "data") RoomsRequestDto.CreateRoomsRequestDto requestDto,
+            @RequestPart(value = "data") @Valid RoomsRequestDto.CreateRoomsRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return ResponseEntity.status(HttpStatus.CREATED).body(new CommonResponse<>(
@@ -137,6 +137,26 @@ public class RoomsController {
                 HttpStatus.OK,
                 "이미지 변경에 성공했습니다",
                 roomsServiceFacade.updateRoomsImages(requestDto, roomsId, files, userDetails.getUser())
+        ));
+    }
+    @PatchMapping(
+            value = "/rooms/{roomsId}/updateIsClosed",
+            consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
+    )
+    @Operation(summary = "방 운영 여부 변경", description = "방 운영 여부를 변경한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "운영 여부 변경 성공"),
+            @ApiResponse(responseCode = "403", description = "권한 없음"),
+            @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
+    })
+    public ResponseEntity updateRoomsIsClosed(
+            @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
+            @RequestBody RoomsRequestDto.UpdateRoomsIsClosedRequestDto requestDto,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        roomsServiceFacade.updateRoomsIsClosed(requestDto, roomsId, userDetails.getUser());
+        return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
+                HttpStatus.OK,
+                "스터디 룸 운영 여부 변경에 성공했습니다"
         ));
     }
 

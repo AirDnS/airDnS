@@ -16,10 +16,12 @@ import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -36,7 +38,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     private final PaymentService paymentService;
     private final DeleteInfoService deleteInfoService;
     @Override
-    public void createReservation(
+    public ReservationResponseDto.CreateReservationResponseDto createReservation(
             Long userId,
             Long roomId,
             ReservationRequestDto.CreateReservationRequestDto requestDto) {
@@ -50,6 +52,12 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
 
         Reservation reservation = requestDto.toEntity(users, rooms);
         reservationService.save(reservation);
+      
+        BigDecimal price = calculateReservationPrice(rooms.getPrice(), checkInTime, checkOutTime);
+        String name = createReservationName(rooms.getName(), checkInTime, checkOutTime);
+
+        Reservation reservation = requestDto.toEntity(users, rooms, price, name);
+        return ReservationResponseDto.CreateReservationResponseDto.from(ReservationService.save(reservation));
     }
 
 
@@ -67,13 +75,12 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     }
 
     @Override
-    public List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
+    public Page<ReservationResponseDto.ReadReservationResponseDto> readReservationList(
             Long usersId,
             Pageable pageable) {
         return reservationService.
                 findAllByUsersId(usersId, pageable).
-                map(ReservationResponseDto.ReadReservationResponseDto::from).
-                getContent();
+                map(ReservationResponseDto.ReadReservationResponseDto::from);
     }
 
     @Override
@@ -83,7 +90,8 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
             Long reservationId) {
         Reservation reservation = reservationService.findById(reservationId);
 
-        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
+        if (!Objects.equals(reservation.getUsers().getId(), userId)
+                && !Objects.equals(reservation.getRooms().getUsers().getId(), userId)) {
             throw new UsersCustomException(UsersExceptionCode.FORBIDDEN_YOUR_NOT_COME_IN);
         }
 
@@ -97,6 +105,23 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
                 stream().
                 map(ReservationResponseDto.ReadReservationResponseDto::from).
                 toList();
+    public Page<ReservationResponseDto.ReadReservationResponseDto> readRoomReservationList(
+            Long roomsId,
+            Pageable pageable) {
+        return ReservationService.
+                findAllByRoomsIdAndIsCancelledFalse(roomsId, pageable).
+                map(ReservationResponseDto.ReadReservationResponseDto::from);
+    }
+
+    @Override
+    public BigDecimal calculateReservationPrice(BigDecimal roomsPrice, LocalDateTime checkIn, LocalDateTime checkOut) {
+        long betweenTime = ChronoUnit.HOURS.between(checkIn, checkOut);
+        return BigDecimal.valueOf(roomsPrice.longValue() * betweenTime);
+    }
+
+    @Override
+    public String createReservationName(String roomsName, LocalDateTime checkIn, LocalDateTime checkOut) {
+        return roomsName + "," +checkIn + "," + checkOut;
     }
     private void isValidatedRequestSchedule(
             Rooms rooms,

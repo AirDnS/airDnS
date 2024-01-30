@@ -7,10 +7,39 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ReservationResponseDto {
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CreateReservationResponseDto implements Serializable {
+        private Long id;
+
+        private BigDecimal price;
+
+        private String reservationName;
+
+        private String userEmail;
+
+        private String userName;
+
+        private String userContact;
+
+        public static CreateReservationResponseDto from(Reservation reservation) {
+            return CreateReservationResponseDto.builder()
+                    .id(reservation.getId())
+                    .price(reservation.getPrice())
+                    .reservationName(reservation.getName())
+                    .userEmail(reservation.getUsers().getEmail())
+                    .userName(reservation.getUsers().getName())
+                    .userContact(reservation.getUsers().getContact())
+                    .build();
+        }
+    }
 
     @Getter
     @Builder
@@ -44,5 +73,4 @@ public class ReservationResponseDto {
                     .build();
         }
     }
-
 }

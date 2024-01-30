@@ -14,6 +14,6 @@ public interface UsersService {
     UsersResponseDto.UpdateUsersResponseDto updateUserRole(Long userId);
 
     UsersResponseDto.ReadUserResponseDto getUserInfo(Long userId);
-
     void deleteUsers(LocalDateTime deleteTime);
+    UsersResponseDto.ReadUserResponseDto readUserInfo(Long userId);
 }

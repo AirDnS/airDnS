@@ -6,6 +6,7 @@ import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,6 +20,12 @@ public class Reservation extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column
+    private BigDecimal price;
+
+    @Column
+    private String name;
 
     @Column
     private LocalDateTime checkIn;

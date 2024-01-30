@@ -56,8 +56,8 @@ public class PaymentServiceImplV1 implements PaymentService {
 
     @Override
     public PaymentResponseDto.CreatePaymentResponseDto createPayment(
-            Long reservationId,
             Long userId,
+            Long reservationId,
             PaymentRequestDto.CreatePaymentRequestDto requestDto) {
 
         Reservation reservation = reservationService.findById(reservationId);
@@ -111,6 +111,8 @@ public class PaymentServiceImplV1 implements PaymentService {
         requestData.put("orderId", requestDto.getOrderId());
         requestData.put("amount", requestDto.getAmount());
         requestData.put("paymentKey", requestDto.getPaymentKey());
+        requestData.put("orderName", requestDto.getOrderName());
+        requestData.put("paymentType", requestDto.getPaymentType());
         return requestData;
     }
 
@@ -120,8 +122,10 @@ public class PaymentServiceImplV1 implements PaymentService {
         // 성공 시 결제 정보 및 예약정보 저장
         Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
+                .orderName(requestDto.getOrderName())
                 .amount(requestDto.getAmount())
                 .paymentKey(requestDto.getPaymentKey())
+                .paymentType(requestDto.getPaymentType())
                 .reservation(reservation)
                 .build();
         paymentRepository.save(payment);
@@ -148,12 +152,7 @@ public class PaymentServiceImplV1 implements PaymentService {
     @Override
     public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId,
             Long paymentId) {
-        Reservation reservation = reservationService.findById(reservationId);
-        if (Objects.isNull(reservation)) {
-            throw new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION);
-        }
-
-        Payment payment = paymentRepository.findByReservationIdAndId(reservationId, paymentId)
+        Payment payment = paymentRepository.findByReservationIdAndIdAndIsDeletedFalse(reservationId, paymentId)
                 .orElseThrow(() -> new PaymentCustomException(
                         PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
 

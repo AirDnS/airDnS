@@ -20,5 +20,5 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long>, 
 
     Page<Reservation> findAllByUsersId(Long usersId, Pageable pageable);
 
-    List<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId);
+    Page<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId, Pageable pageable);
 }
