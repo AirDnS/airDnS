@@ -281,9 +281,7 @@ public class Scheduler {
                         DeletePaymentsInfo.builder()
                                 .deletedAt(LocalDateTime.now())
                                 .orderId(payments.getOrderId())
-                                .cancelReason(payments.getCancelReason())
                                 .amount(payments.getAmount())
-                                .failReason(payments.getFailReason())
                                 .build()
                 );
                 break;

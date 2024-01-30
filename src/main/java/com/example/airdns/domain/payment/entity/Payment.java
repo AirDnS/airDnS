@@ -34,21 +34,10 @@ public class Payment extends CommonEntity {
     private String orderId;
 
     @Column
-    private Boolean isCanceled;
-
-    @Column
-    private Boolean isPaySuccess;
-
-    @Column
     private String paymentKey;
 
     @Column
-    private String failReason;
-
-    @Column
-    private String cancelReason;
-
-    @Column
+    @Builder.Default
     private Boolean isDeleted = Boolean.FALSE;
 
     @Column

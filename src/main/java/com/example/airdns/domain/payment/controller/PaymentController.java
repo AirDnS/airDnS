@@ -58,7 +58,7 @@ public class PaymentController {
 
     }
 
-    @GetMapping("/payment/{reservationId}/{paymentId}")
+    @GetMapping("/reservation/{reservationId}/payment/{paymentId}")
     @Operation(summary = "결제 단건 조회", description = "해당 결제를 조회한다.")
     @ApiResponses(value = {@ApiResponse(responseCode = "200", description = "결제내역 조회에 성공!",
             content = {
