@@ -22,7 +22,7 @@ public class RestScheduleServiceImplV1 implements RestScheduleService {
 
     @Override
     public Page<RestSchedule> readRestSchedule(Pageable pageable, Rooms rooms) {
-        return restScheduleRepository.findAllByRoomsAndStartTimeAfter(pageable, rooms, LocalDateTime.now());
+        return restScheduleRepository.findAllByRoomsAndEndTimeAfter(pageable, rooms, LocalDateTime.now());
     }
 
 

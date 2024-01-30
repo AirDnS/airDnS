@@ -16,5 +16,5 @@ public interface RestScheduleRepository extends JpaRepository<RestSchedule, Long
      */
     Optional<RestSchedule> findFirstByRoomsAndStartTimeBeforeAndEndTimeAfter(Rooms rooms, LocalDateTime endDate, LocalDateTime startDate);
 
-    Page<RestSchedule> findAllByRoomsAndStartTimeAfter(Pageable pageable, Rooms rooms, LocalDateTime date);
+    Page<RestSchedule> findAllByRoomsAndEndTimeAfter(Pageable pageable, Rooms rooms, LocalDateTime date);
 }
