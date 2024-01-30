@@ -85,5 +85,19 @@ public class UsersController {
         );
     }
 
-
+    @GetMapping("/users/silence")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "유저 조회", description = "유저 정보를 조회한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "의미없는 요청 성공",
+                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.ReadUserResponseDto.class))}),
+            @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
+    })
+    public ResponseEntity readUserSilence(
+            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
+        usersService.readUserSilence(UserDetailsImpl.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "Silence Login")
+        );
+    }
 }

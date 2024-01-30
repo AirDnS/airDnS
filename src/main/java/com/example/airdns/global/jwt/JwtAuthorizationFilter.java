@@ -8,6 +8,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+
+import static com.example.airdns.global.jwt.JwtUtil.REFRESH_TOKEN_HEADER;
 
 @Component
 @RequiredArgsConstructor
@@ -74,9 +77,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (refreshTokenRepository.existsByUsername(authentication.getName())) {
             String newAccessToken = jwtUtil.createAccessToken(authentication);
             String accessToken = URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
-            Cookie accessCookie = new Cookie(AUTHORIZATION_HEADER, accessToken);
-            accessCookie.setPath("/");
-            response.addCookie(accessCookie);
+            ResponseCookie accessCookie = ResponseCookie.from(AUTHORIZATION_HEADER, accessToken)
+                    .domain(".air-dns.org")
+                    .path("/")
+                    .build();
+            response.addHeader("Set-Cookie", accessCookie.toString());
         }
     }
 }
