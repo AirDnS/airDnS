@@ -76,10 +76,10 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
-    public ResponseEntity getUserInfo(
+    public ResponseEntity readUserInfo(
             @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
-        UsersResponseDto.ReadUserResponseDto responseDto = usersService.getUserInfo(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.ReadUserResponseDto responseDto = usersService.readUserInfo(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "유저 정보 조회 성공", responseDto)
         );

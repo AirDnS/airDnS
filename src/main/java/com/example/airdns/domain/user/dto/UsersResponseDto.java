@@ -75,6 +75,7 @@ public class UsersResponseDto {
         public static ReadUserResponseDto from(Users user) {
             return ReadUserResponseDto.builder()
                     .id(user.getId())
+                    .name(user.getName())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
                     .address(user.getAddress())
