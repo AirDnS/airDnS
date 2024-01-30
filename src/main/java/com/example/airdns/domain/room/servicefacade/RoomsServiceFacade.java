@@ -1,13 +1,12 @@
 package com.example.airdns.domain.room.servicefacade;
 
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
+import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
-import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -77,16 +76,29 @@ public interface RoomsServiceFacade {
     void deleteRooms(Long roomsId, Users users);
 
     /**
+     * 스터디룸 휴식 일정 조회
+     *
+     * @param pageable
+     * @param roomsId 방 번호
+     * @param users 로그인 회원
+     * @return
+     */
+    Page<RoomsResponseDto.ReadRoomsRestScheduleResponseDto> ReadRoomsRestSchedule(Pageable pageable, Long roomsId, Users users);
+
+    /**
      * 스터디룸 휴식 일정 등록
      * @param requestDto 휴식 일정 정보
      * @param roomsId 방 번호
+     * @param users 로그인 회원
      */
     void CreateRoomsRestSchedule(CreateRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
 
     /**
      * 스터디룸 휴식 일정 삭제
-     * @param requestDto 휴식 일정 정보
      * @param roomsId 방 번호
+     * @param restscheduleId 휴식 일정 정보
+     * @param users 로그인 회원
      */
-    void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
+    void DeleteRoomsRestSchedule(Long roomsId, Long restscheduleId, Users users);
+
 }
