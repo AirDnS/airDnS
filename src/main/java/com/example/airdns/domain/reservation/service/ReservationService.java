@@ -6,6 +6,7 @@ import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -62,11 +63,9 @@ public interface ReservationService {
      *
      * @return 예약 목록 리스트 타입
      * @Param 방 번호
+     * @Param 페이지 옵션
      */
-    List<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId);
-    // List<Reservation> findAllByUsersId(Long userId);
-
-    // List<Long> findReservationIdsByUserId(Long userId);
+    Page<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId, Pageable pageable);
 
     void saveDeletedReservationInfo(Long reservationId);
 

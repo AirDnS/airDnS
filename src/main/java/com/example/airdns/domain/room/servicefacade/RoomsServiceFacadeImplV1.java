@@ -73,7 +73,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     }
 
     @Override
-    public Object readRoomsListByHost(
+    public Page<ReadRoomsResponseDto> readRoomsListByHost(
             Pageable pageable,
             ReadRoomsListByHostRequestDto requestDto,
             Users users) {
@@ -94,7 +94,9 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
 
         validateUserIsRoomsHost(rooms, users);
 
+        roomEquipmentsService.deleteAll(rooms.getRoomEquipmentsList());
         rooms.resetEquipments();
+
         updateEquipments(rooms, requestDto.getEquipment());
 
         rooms.updateRooms(

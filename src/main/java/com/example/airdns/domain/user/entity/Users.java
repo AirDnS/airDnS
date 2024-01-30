@@ -1,10 +1,6 @@
 package com.example.airdns.domain.user.entity;
 
-import com.example.airdns.domain.like.entity.Likes;
 import com.example.airdns.domain.oauth2.common.OAuth2Provider;
-import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.review.entity.Reviews;
-import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.dto.UsersRequestDto;
 import com.example.airdns.domain.user.enums.UserRole;
 import com.example.airdns.global.common.entity.CommonEntity;
@@ -13,8 +9,6 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -39,11 +33,17 @@ public class Users extends CommonEntity {
     @Column
     private String nickname;
 
+    @Builder.Default
     @Column
-    private String contact;
+    private String name = "Default";
 
+    @Builder.Default
     @Column
-    private String address;
+    private String contact = "Default";
+
+    @Builder.Default
+    @Column
+    private String address = "Default";
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -63,9 +63,18 @@ public class Users extends CommonEntity {
     }
 
     public void updateInfo(UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
-        this.address = userRequestDto.getAddress();
-        this.contact = userRequestDto.getContact();
-        this.nickname = userRequestDto.getNickname();
+        if (!userRequestDto.getName().isBlank()) {
+            this.name = userRequestDto.getName();
+        }
+        if (!userRequestDto.getAddress().isBlank()) {
+            this.address = userRequestDto.getAddress();
+        }
+        if (!userRequestDto.getContact().isBlank()) {
+            this.contact = userRequestDto.getContact();
+        }
+        if (!userRequestDto.getNickname().isBlank()) {
+            this.nickname = userRequestDto.getNickname();
+        }
     }
 
     public void updateRole(UserRole role) {
