@@ -80,9 +80,6 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
                 map(ReservationResponseDto.ReadReservationResponseDto::from);
     }
 
-
-
-
     @Override
     @Transactional
     public void deleteReservation(
@@ -139,7 +136,6 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
             throw new ReservationCustomException(ReservationExceptionCode.BAD_REQUEST_RESERVATION_NOT_RESERVE);
         }
     }
-
     private boolean isRested(
             Rooms rooms,
             LocalDateTime checkIn,

@@ -1,12 +1,10 @@
 package com.example.airdns.domain.reservation.service;
 
-import com.example.airdns.domain.reservation.entity.QReservation;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
