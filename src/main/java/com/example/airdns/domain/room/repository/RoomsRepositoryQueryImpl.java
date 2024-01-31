@@ -3,7 +3,6 @@ package com.example.airdns.domain.room.repository;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
-import com.example.airdns.domain.room.entity.QRooms;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -153,20 +152,18 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
 
     @Override
     public List<Long> findRoomIds(LocalDateTime deleteTime){
-        QRooms qRooms = QRooms.rooms;
-        return queryFactory.select(qRooms.id)
-                .from(qRooms)
-                .where(qRooms.isDeleted.eq(true)
-                        .and(qRooms.deletedAt.before(deleteTime)))
+        return queryFactory.select(rooms.id)
+                .from(rooms)
+                .where(rooms.isDeleted.eq(true)
+                        .and(rooms.deletedAt.before(deleteTime)))
                 .fetch();
     }
 
     @Override
     @Transactional
     public void deleteRoomInfo(Long roomId){
-        QRooms qRooms = QRooms.rooms;
-        queryFactory.delete(qRooms)
-                .where(qRooms.id.eq(roomId))
+        queryFactory.delete(rooms)
+                .where(rooms.id.eq(roomId))
                 .execute();
     }
 }

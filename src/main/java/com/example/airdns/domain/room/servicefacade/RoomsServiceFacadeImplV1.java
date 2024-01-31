@@ -42,6 +42,7 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     private final PaymentService paymentService;
     private final DeleteInfoService deleteInfoService;
 
+    @Transactional
     @Override
     public ReadRoomsResponseDto createRooms(
             CreateRoomsRequestDto requestDto,
