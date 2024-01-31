@@ -32,7 +32,7 @@ public class LikesRepositoryTest {
     @Transactional
     @DisplayName("LikesRepository findByRoomsId Success")
     public void findByRoomsIdSuccess() {
-        // Likes 엔티티를 생성하고 저장
+        // given
         Users user = Users.builder().nickname("User Nickname").build();
         Rooms room = Rooms.builder().users(user).name("Room Name").build();
 
@@ -42,8 +42,10 @@ public class LikesRepositoryTest {
         Likes likes = Likes.builder().users(user).rooms(room).build();
         entityManager.persist(likes);
 
+        // when
         Optional<Likes> foundLikes = likesRepository.findByRoomsId(room.getId());
 
+        // then
         assertTrue(foundLikes.isPresent());
 
         assertEquals(room.getId(), foundLikes.get().getRooms().getId());
@@ -53,7 +55,7 @@ public class LikesRepositoryTest {
     @Transactional
     @DisplayName("LikesRepository ExistsByRoomsAndUsers Success")
     public void ExistsByRoomsAndUsers() {
-        // Likes 엔티티를 생성하고 저장
+        // given
         Users user = Users.builder().nickname("User Nickname").build();
         Rooms room = Rooms.builder().users(user).name("Room Name").build();
 
@@ -63,10 +65,10 @@ public class LikesRepositoryTest {
         Likes likes = Likes.builder().users(user).rooms(room).build();
         entityManager.persist(likes);
 
-        // LikesRepository를 사용하여 existsByRoomsAndUsers 메서드를 호출
+        // when
         boolean exists = likesRepository.existsByRoomsAndUsers(room, user);
 
-        // 해당 Rooms와 Users로 좋아요가 존재해야 합니다.
+        // then
         assertTrue(exists);
     }
 }

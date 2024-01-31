@@ -8,12 +8,19 @@ import com.example.airdns.domain.like.service.LikesServiceImplV1;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.global.security.UserDetailsImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,12 +69,20 @@ public class LikesServiceTest {
     void createLikeSuccess() {
         // given
         Long roomId = 1L;
-        Users user = Users.builder().nickname("User1").build();
+
+        UserDetailsImpl userDetails = new UserDetailsImpl(
+                Users.builder().name("testUser").role(UserRole.USER).build()
+        );
+
+        Users user = Users.builder().nickname(userDetails.getUsername()).build();
         Rooms room = Rooms.builder().id(roomId).name("Room Number1").address("Room1 Address").build();
         Likes savedLike = Likes.builder()
                 .rooms(room)
                 .users(user)
                 .build();
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(roomsService.findById(roomId)).thenReturn(room);
         when(likesRepository.save(org.mockito.ArgumentMatchers.any(Likes.class))).thenReturn(savedLike);
@@ -85,15 +100,20 @@ public class LikesServiceTest {
     void createLikeAlreadyExistLikes() {
         // given
         Long roomId = 1L;
-        Users user = Users.builder().nickname("User Nickname").build();
+        UserDetailsImpl userDetails = new UserDetailsImpl(
+                Users.builder().name("testUser").role(UserRole.USER).build()
+        );
         Rooms room = Rooms.builder().name("Room Name").build();
 
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
         when(roomsService.findById(roomId)).thenReturn(room);
-        when(likesRepository.existsByRoomsAndUsers(room, user)).thenReturn(true);
+        when(likesRepository.existsByRoomsAndUsers(room, userDetails.getUser())).thenReturn(true);
 
         // when, then
         LikesCustomException exception = assertThrows(LikesCustomException.class, () -> {
-            likesService.createLike(roomId, user);
+            likesService.createLike(roomId, userDetails.getUser());
         });
 
         assertEquals("LIKES-002", exception.getErrorCode());
