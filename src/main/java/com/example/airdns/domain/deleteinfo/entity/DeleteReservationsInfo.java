@@ -28,10 +28,10 @@ public class DeleteReservationsInfo {
     @Column
     private LocalDateTime checkOut;
 
-    // @Column
+    @Column
     private String roomName;
 
     // 예약자 성함
-    // @Column
+    @Column
     private String reserverName;
 }

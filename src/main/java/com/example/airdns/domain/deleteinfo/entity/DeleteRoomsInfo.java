@@ -27,7 +27,7 @@ public class DeleteRoomsInfo {
     @Column
     private String name;
 
-    // @Column
+    @Column
     private String address;
 
     @Column
@@ -40,6 +40,6 @@ public class DeleteRoomsInfo {
     private Integer size;
 
     // 룸 소유자
-    // @Column
+    @Column
     private String owner;
 }

@@ -12,6 +12,7 @@ import com.example.airdns.domain.payment.entity.Payment;
 import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     private final DeleteRoomsInfoRepository deleteRoomsInfoRepository;
     private final DeleteReservationInfoRepository deleteReservationInfoRepository;
     private final DeletePaymentsInfoRepository deletePaymentsInfoRepository;
+    private final EntityManager em;
 
     @Override
     @Transactional
@@ -46,6 +48,10 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     @Override
     @Transactional
     public void saveDeletedRoomsInfo(Rooms room){
+
+        // 1차 캐시에 있는 Rooms의 정보를 먼저 가져와서 넣기
+        Rooms saveRoom = em.find(Rooms.class, room.getId());
+
         deleteRoomsInfoRepository.save(
                 DeleteRoomsInfo.builder()
                         .deletedAt(LocalDateTime.now())
@@ -54,7 +60,7 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
                         .address(room.getAddress())
                         .size(room.getSize())
                         .description(room.getDescription())
-                        //.owner(room.getUsers().getNickname())
+                        .owner(saveRoom.getUsers().getNickname())
                         .build()
         );
     }
@@ -62,13 +68,16 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     @Override
     @Transactional
     public void saveDeletedReservationInfo(Reservation reservation){
+
+        Reservation saveReservation = em.find(Reservation.class, reservation.getId());
+
         deleteReservationInfoRepository.save(
                 DeleteReservationsInfo.builder()
                         .cancelledAt(LocalDateTime.now())
                         .checkIn(reservation.getCheckIn())
                         .checkOut(reservation.getCheckOut())
-                        //.roomName(reservation.getRooms().getName())
-                        //.reserverName(reservation.getUsers().getNickname())
+                        .roomName(saveReservation.getRooms().getName())
+                        .reserverName(saveReservation.getUsers().getNickname())
                         .build()
         );
     }
@@ -83,6 +92,7 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
                         .amount(payment.getAmount())
                         .orderName(payment.getOrderName())
                         .orderId(payment.getOrderId())
+                        .paymentKey(payment.getPaymentKey())
                         .paymentType(payment.getPaymentType())
                         .build()
         );
