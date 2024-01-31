@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ReservationResponseDto {
@@ -15,24 +16,27 @@ public class ReservationResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class UpdateReservationResponseDto implements Serializable {
+    public static class CreateReservationResponseDto implements Serializable {
         private Long id;
 
-        private LocalDateTime checkIn;
+        private BigDecimal price;
 
-        private LocalDateTime checkOut;
+        private String reservationName;
 
-        private Long roomsId;
+        private String userEmail;
 
-        private Long usersId;
+        private String userName;
 
-        public static UpdateReservationResponseDto of(Reservation reservation) {
-            return UpdateReservationResponseDto.builder()
+        private String userContact;
+
+        public static CreateReservationResponseDto from(Reservation reservation) {
+            return CreateReservationResponseDto.builder()
                     .id(reservation.getId())
-                    .checkIn(reservation.getCheckIn())
-                    .checkOut(reservation.getCheckOut())
-                    .roomsId(reservation.getRooms().getId())
-                    .usersId(reservation.getUsers().getId())
+                    .price(reservation.getPrice())
+                    .reservationName(reservation.getName())
+                    .userEmail(reservation.getUsers().getEmail())
+                    .userName(reservation.getUsers().getName())
+                    .userContact(reservation.getUsers().getContact())
                     .build();
         }
     }
@@ -44,7 +48,13 @@ public class ReservationResponseDto {
     public static class ReadReservationResponseDto implements Serializable {
         private Long id;
 
+        private String roomName;
+
+        private String address;
+
         private LocalDateTime checkIn;
+
+        private Boolean isCancelled;
 
         private LocalDateTime checkOut;
 
@@ -54,11 +64,13 @@ public class ReservationResponseDto {
         public static ReadReservationResponseDto from(Reservation reservation) {
             return ReadReservationResponseDto.builder()
                     .id(reservation.getId())
+                    .roomName(reservation.getRooms().getName())
+                    .address(reservation.getRooms().getAddress())
+                    .isCancelled(reservation.getIsCancelled())
                     .checkIn(reservation.getCheckIn())
                     .checkOut(reservation.getCheckOut())
                     .roomsId(reservation.getRooms().getId())
                     .build();
         }
     }
-
 }

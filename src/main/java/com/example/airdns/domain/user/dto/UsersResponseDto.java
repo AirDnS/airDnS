@@ -5,16 +5,20 @@ import com.example.airdns.domain.user.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.util.List;
-
 public class UsersResponseDto {
+
     @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "유저 정보 수정 응당 dto")
+    @Schema(description = "유저 정보 수정 응답 dto")
     public static class UpdateUsersResponseDto {
+
+        @Schema(description = "유저 ID", example = "DB에 저장 ID", defaultValue = "2")
+        private Long id;
+
+        @Schema(description = "이름", example = "홍길동", defaultValue = "홍길동")
+        private String name;
 
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
         private String nickname;
@@ -28,28 +32,13 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static UpdateUsersResponseDto of(Users user) {
+        public static UpdateUsersResponseDto from(Users user) {
             return UpdateUsersResponseDto.builder()
+                    .id(user.getId())
+                    .name(user.getName())
                     .nickname(user.getNickname())
                     .address(user.getAddress())
                     .contact(user.getContact())
-                    .role(user.getRole())
-                    .build();
-        }
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "유저 정보 수정 응당 dto")
-    public static class UpdateRoleUsersResponseDto {
-
-        @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
-        private UserRole role;
-
-        public static UpdateRoleUsersResponseDto of(Users user) {
-            return UpdateRoleUsersResponseDto.builder()
                     .role(user.getRole())
                     .build();
         }
@@ -63,7 +52,10 @@ public class UsersResponseDto {
     public static class ReadUserResponseDto {
 
         @Schema(description = "유저 ID", example = "DB에 저장 ID", defaultValue = "2")
-        private Long userId;
+        private Long id;
+
+        @Schema(description = "이름", example = "홍길동", defaultValue = "홍길동")
+        private String name;
 
         @Schema(description = "이메일", example = "qwer1234@gmail.com", defaultValue = "qwer1234@gmail.com")
         private String email;
@@ -80,9 +72,10 @@ public class UsersResponseDto {
         @Schema(description = "역할", example = "ROLE_USER", defaultValue = "ROLE_USER")
         private UserRole role;
 
-        public static ReadUserResponseDto of(Users user) {
+        public static ReadUserResponseDto from(Users user) {
             return ReadUserResponseDto.builder()
-                    .userId(user.getId())
+                    .id(user.getId())
+                    .name(user.getName())
                     .email(user.getEmail())
                     .nickname(user.getNickname())
                     .address(user.getAddress())

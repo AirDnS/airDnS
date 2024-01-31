@@ -13,13 +13,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.example.airdns.domain.image.entity.QImages.images;
 import static com.example.airdns.domain.room.entity.QRooms.rooms;
 import static com.example.airdns.domain.roomequipment.entity.QRoomEquipments.roomEquipments;
 
@@ -43,29 +45,52 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                 .or(eqAddress(condition.getKeyword())),
                         betweenPrice(condition.getStartPrice(), condition.getEndPrice()),
                         betweenSize(condition.getStartSize(), condition.getEndSize()),
-                        inEquipment(condition.getEqupmentList())
-                )
-                ;
+                        inEquipment(condition.getEqupmentList()),
+                        rooms.isDeleted.isFalse(),
+                        rooms.isClosed.isFalse()
+                );
 
-        List<RoomsResponseDto.ReadRoomsResponseDto> content = Objects.requireNonNull(this.getQuerydsl())
+        return getRoomsResponseDto(pageable, query);
+    }
+
+    @Override
+    public Page<RoomsResponseDto.ReadRoomsResponseDto> findAllByHost(
+            Pageable pageable, RoomsSearchConditionDto condition) {
+        JPQLQuery<Rooms> query = queryFactory
+                .select(rooms)
+                .from(rooms)
+                .where(
+                        eqName(condition.getKeyword()),
+                        rooms.users.eq(condition.getUsers()),
+                        rooms.isDeleted.isFalse()
+                );
+
+        return getRoomsResponseDto(pageable, query);
+    }
+
+    private Page<RoomsResponseDto.ReadRoomsResponseDto> getRoomsResponseDto(Pageable pageable, JPQLQuery<Rooms> query) {
+        List<RoomsResponseDto.ReadRoomsResponseDto> content;
+        try (Stream<Rooms> stream = Objects.requireNonNull(this.getQuerydsl())
                 .applyPagination(pageable, query)
-                .stream()
-                .map(RoomsConverter::toDto)
-                .collect(Collectors.toList());
+                .stream()) {
+            content = stream.map(RoomsConverter::toDto).toList();
+        }
 
         return new PageImpl<>(content, pageable, query.fetchCount());
     }
 
     private BooleanBuilder eqName(String keyword) {
-        return new BooleanBuilder(keyword == null || keyword.isEmpty()
+        return new BooleanBuilder(
+                keyword == null || keyword.isEmpty()
                         ? null
-                        : rooms.name.like("%"+keyword+"%"));
+                        : rooms.name.like("%" + keyword + "%"));
     }
 
     private BooleanBuilder eqAddress(String keyword) {
-        return new  BooleanBuilder(keyword == null || keyword.isEmpty()
+        return new BooleanBuilder(
+                keyword == null || keyword.isEmpty()
                         ? null
-                        : rooms.address.like("%"+keyword+"%"));
+                        : rooms.address.like("%" + keyword + "%"));
     }
 
     private BooleanExpression betweenPrice(BigDecimal startPrice, BigDecimal endPrice) {
@@ -100,12 +125,45 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         return equpmentList == null || equpmentList.isEmpty()
                 ? null
                 : rooms.id.in(
-                        JPAExpressions
-                                .select(roomEquipments.rooms.id)
-                                .from(roomEquipments)
-                                .where(roomEquipments.equipments.id.in(
-                                        equpmentList
-                                ))
+                JPAExpressions
+                        .select(roomEquipments.rooms.id)
+                        .from(roomEquipments)
+                        .where(roomEquipments.equipments.id.in(
+                                equpmentList
+                        ))
         );
+    }
+
+    @Override
+    public List<Long> findRoomIdsByUserId(Long userId){
+        return queryFactory.select(rooms.id)
+                .from(rooms)
+                .where(rooms.users.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserId(Long userId) {
+        queryFactory.delete(rooms)
+                .where(rooms.users.id.eq(userId))
+                .execute();
+    }
+
+    @Override
+    public List<Long> findRoomIds(LocalDateTime deleteTime){
+        return queryFactory.select(rooms.id)
+                .from(rooms)
+                .where(rooms.isDeleted.eq(true)
+                        .and(rooms.deletedAt.before(deleteTime)))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteRoomInfo(Long roomId){
+        queryFactory.delete(rooms)
+                .where(rooms.id.eq(roomId))
+                .execute();
     }
 }

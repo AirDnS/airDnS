@@ -4,6 +4,7 @@ import com.example.airdns.domain.oauth2.common.OAuth2Provider;
 import com.example.airdns.domain.oauth2.common.OAuth2UserInfo;
 import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.oauth2.common.OAuth2UserUnlinkManager;
+import com.example.airdns.domain.oauth2.dto.ResponseTokenDto;
 import com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.repository.UsersRepository;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import static com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository.MODE_PARAM_COOKIE_NAME;
@@ -36,8 +39,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final OAuth2UserUnlinkManager oAuth2UserUnlinkManager;
     private final RedisService redisService;
     private final UsersRepository usersRepository;
+
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+    public void onAuthenticationSuccess(HttpServletRequest request,
+                                        HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
         String targetUrl = determineTargetUrl(request, response, authentication);
@@ -51,7 +56,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }
 
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
+    protected String determineTargetUrl(HttpServletRequest request,
+                                        HttpServletResponse response,
                                         Authentication authentication) {
 
         Optional<String> redirectUri = CookieUtil.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
@@ -67,51 +73,35 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         if (principal == null) {
             return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("error", "Login failed")
+                    .queryParam("status", "Failed")
                     .build().toUriString();
         }
 
         if ("login".equalsIgnoreCase(mode)) {
-            // TODO: DB 저장
-            // TODO: 액세스 토큰, 리프레시 토큰 발급
-            // TODO: 리프레시 토큰 DB 저장
-            log.info("email={}, nickname={}, accessToken={}",
-                    principal.getUserInfo().getEmail(),
-                    principal.getUserInfo().getNickname(),
-                    principal.getUserInfo().getAccessToken()
-            );
 
-            log.info("test");
-            String accessToken = jwtUtil.createAccessToken(authentication);
-            String refreshToken = jwtUtil.createRefreshToken(authentication);
-            // User 정보 저장
+            ResponseTokenDto tokenDto = createTokenDto(authentication);
+            Users user = createOrUpdateUser(principal.getUserInfo());
+            jwtUtil.saveRefreshToken(principal.getName(), tokenDto.getRefreshToken());
 
-            saveOrUpdate(principal.getUserInfo());
+            jwtUtil.addJwtToCookie(tokenDto, response);
 
-            //redis에 저장
-            jwtUtil.saveRefreshToken(principal.getName(), refreshToken);
-
-            jwtUtil.addJwtToCookie(refreshToken, response);
-
-            return UriComponentsBuilder.fromUriString(targetUrl)
-                    .queryParam("token",accessToken)
-                    .build().toUriString();
+            return loginResponseTargetUrl(targetUrl, user);
 
         } else if ("unlink".equalsIgnoreCase(mode)) {
 
             String accessToken = principal.getUserInfo().getAccessToken();
             OAuth2Provider provider = principal.getUserInfo().getProvider();
 
-            // TODO: 리프레시 토큰 삭제
             oAuth2UserUnlinkManager.unlink(provider, accessToken);
             redisService.deleteValues(principal.getName());
 
             return UriComponentsBuilder.fromUriString(targetUrl)
+                    .queryParam("status", "logout")
                     .build().toUriString();
         }
 
         return UriComponentsBuilder.fromUriString(targetUrl)
-                .queryParam("error", "Login failed")
+                .queryParam("status", "Failed")
                 .build().toUriString();
     }
 
@@ -124,16 +114,39 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         return null;
     }
 
-    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+    protected void clearAuthenticationAttributes(HttpServletRequest request,
+                                                 HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
+
     }
 
-    private Users saveOrUpdate(OAuth2UserInfo oAuth2UserInfo) {
+    private String loginResponseTargetUrl(String targetUrl, Users user){
+        return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("status", "Success")
+                .queryParam("userId", user.getId())
+                .queryParam("nickname", URLEncoder.encode(user.getNickname(), StandardCharsets.UTF_8))
+                .queryParam("address", URLEncoder.encode(user.getAddress(), StandardCharsets.UTF_8))
+                .queryParam("contact", URLEncoder.encode(user.getContact(), StandardCharsets.UTF_8))
+                .queryParam("name", URLEncoder.encode(user.getName(), StandardCharsets.UTF_8))
+                .queryParam("role", user.getRole())
+                .build().toUriString();
+    }
+
+    private Users createOrUpdateUser(OAuth2UserInfo oAuth2UserInfo) {
         Users users = usersRepository.findByEmail(oAuth2UserInfo.getEmail())
                 .map(entity -> entity.update(oAuth2UserInfo.getEmail(), oAuth2UserInfo.getProvider()))
                 .orElse(oAuth2UserInfo.toEntity());
 
         return usersRepository.save(users);
+    }
+
+    private ResponseTokenDto createTokenDto(Authentication authentication) {
+        String accessToken = jwtUtil.createAccessToken(authentication);
+        String refreshToken = jwtUtil.createRefreshToken(authentication);
+        return ResponseTokenDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 }

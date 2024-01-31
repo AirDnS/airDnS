@@ -1,28 +1,25 @@
 package com.example.airdns.domain.room.service;
 
-import com.example.airdns.domain.equipment.service.EquipmentsService;
-import com.example.airdns.domain.image.entity.Images;
-import com.example.airdns.domain.image.service.ImagesService;
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
+import com.example.airdns.domain.payment.service.PaymentService;
+import com.example.airdns.domain.payment.service.PaymentServiceImplV1;
 import com.example.airdns.domain.reservation.service.ReservationService;
-import com.example.airdns.domain.restschedule.service.RestScheduleService;
-import com.example.airdns.domain.room.converter.RoomsConverter;
-import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
-import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
+import com.example.airdns.domain.reservation.service.ReservationServiceImplV1;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
 import com.example.airdns.domain.room.repository.RoomsRepository;
-import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
-import com.example.airdns.domain.user.entity.Users;
-import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.domain.room.repository.RoomsRepositoryQuery;
+import com.example.airdns.domain.room.repository.RoomsRepositoryQueryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,124 +27,16 @@ import java.util.List;
 public class RoomsServiceImplV1 implements RoomsService {
 
     private final RoomsRepository roomsRepository;
-    private final ImagesService imagesService;
-    private final RoomEquipmentsService roomEquipmentsService;
-    private final RestScheduleService restScheduleService;
-    private final EquipmentsService equipmentsService;
+    private final DeleteInfoServiceImpl deleteInfoService;
 
     @Override
-    public ReadRoomsResponseDto createRooms(
-            CreateRoomsRequestDto requestDto,
-            List<MultipartFile> files, Users users) {
-        if (users.getRole() != UserRole.HOST && users.getRole() != UserRole.ADMIN) {
-            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
-        }
-
-        Rooms rooms = RoomsConverter.toEntity(requestDto, users);
-        roomsRepository.save(rooms);
-
-        updateEquipments(rooms, requestDto.getEquipment());
-        uploadImages(rooms, files);
-
-        return RoomsConverter.toDto(rooms);
+    public Rooms save(Rooms rooms) {
+        return roomsRepository.save(rooms);
     }
 
     @Override
-    public ReadRoomsResponseDto readRooms(Long roomsId) {
-        return RoomsConverter.toDto(findById(roomsId));
-    }
-
-    @Override
-    public Page<ReadRoomsResponseDto> readRoomsList(
-            Pageable pageable,
-            ReadRoomsListRequestDto requestDto) {
-        return roomsRepository.findAllSearchFilter(
-                pageable, RoomsConverter.toRoomsSearchCondition(requestDto));
-    }
-
-    @Transactional
-    @Override
-    public ReadRoomsResponseDto updateRooms(
-            UpdateRoomsRequestDto requestDto,
-            Long roomsId,
-            Users users) {
-        Rooms rooms = findById(roomsId);
-
-        rooms.resetEquipments();
-        updateEquipments(rooms, requestDto.getEquipment());
-
-        rooms.updateRooms(
-                requestDto.getName(),
-                requestDto.getPrice(),
-                requestDto.getAddress(),
-                requestDto.getSize(),
-                requestDto.getDesc(),
-                requestDto.getIsClosed()
-        );
-
-        return RoomsConverter.toDto(rooms);
-    }
-
-    @Transactional
-    @Override
-    public UpdateRoomsImagesResponseDto updateRoomsImages(
-            UpdateRoomsImagesRequestDto requestDto,
-            Long roomsId,
-            List<MultipartFile> files,
-            Users users) {
-        Rooms rooms = findById(roomsId);
-
-        validateUserIsRoomsHost(rooms, users);
-
-        if (requestDto != null) {
-            deleteImage(rooms, requestDto.getRemoveImages());
-        }
-
-        if (files != null) {
-            uploadImages(rooms, files);
-        }
-
-        return RoomsConverter.toImagesDto(rooms);
-
-    }
-
-    @Override
-    public void deleteRooms(Long roomsId, Users users) {
-        Rooms rooms = findById(roomsId);
-
-        validateUserIsRoomsHost(rooms, users);
-
+    public void delete(Rooms rooms) {
         roomsRepository.delete(rooms);
-    }
-
-    @Override
-    public void CreateRoomsRestSchedule(
-            CreateRoomsRestScheduleRequestDto requestDto,
-            Long roomsId,
-            Users users) {
-        Rooms rooms = findById(roomsId);
-
-        validateUserIsRoomsHost(rooms, users);
-
-        rooms.addRestSchedule(
-                restScheduleService.createRestSchedule(
-                        rooms, requestDto.getStartDate(), requestDto.getEndDate()
-                )
-        );
-    }
-
-    @Transactional
-    @Override
-    public void DeleteRoomsRestSchedule(
-            DeleteRoomsRestScheduleRequestDto requestDto,
-            Long roomsId,
-            Users users) {
-
-        Rooms rooms = findById(roomsId);
-
-        validateUserIsRoomsHost(rooms, users);
-
-        restScheduleService.deleteRestSchedule(requestDto.getRestScheduleId(), rooms);
     }
 
     @Override
@@ -162,41 +51,50 @@ public class RoomsServiceImplV1 implements RoomsService {
 
     @Override
     public Rooms findById(Long roomsId) {
-        return roomsRepository.findById(roomsId)
+        return roomsRepository.findByIdAndIsDeletedFalse(roomsId)
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
     }
-
-    private void validateUserIsRoomsHost(Rooms rooms, Users users) {
-        if (!rooms.getUsers().getId().equals(users.getId())) {
-            throw new RoomsCustomException(RoomsExceptionCode.NO_PERMISSION_USER);
-        }
+    @Override
+    public Rooms findByIdAndIsDeletedTrue(Long roomId){
+        return roomsRepository.findByIdAndIsDeletedTrue(roomId)
+                .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
+    }
+    @Override
+    public Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto condition) {
+        return roomsRepository.findAllSearchFilter(pageable, condition);
     }
 
-    private void updateEquipments(Rooms rooms, List<Long> equipments) {
-        equipments.stream().distinct().forEach(
-                equipment -> rooms.addEquipments(
-                        roomEquipmentsService.createRoomEquipments(
-                                rooms, equipmentsService.findById(equipment)
-                        )
-                )
+    @Override
+    public Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto condition) {
+        return roomsRepository.findAllByHost(pageable, condition);
+    }
+
+    @Override
+    public List<Long> findRoomIdsByUserId(Long userId){
+        return roomsRepository.findRoomIdsByUserId(userId);
+    }
+
+    @Transactional
+    public void saveDeletedRoomInfo(Long roomId){
+        Rooms room = roomsRepository.findById(roomId).orElseThrow(
+                // 삭제된 Room
+                ()-> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID)
         );
+        deleteInfoService.saveDeletedRoomsInfo(room);
     }
 
-    private void uploadImages(Rooms rooms, List<MultipartFile> files) {
-        for(MultipartFile file : files) {
-            if (file == null) continue;
-
-            //TODO 롤백 시 이미지 제거 (선택1: 롤백 로직 추가, 선택2: 배치 시스템 구성)
-            rooms.addImage(imagesService.createImages(rooms, file));
-        }
+    @Override
+    public void deleteByUserId(Long userId){
+        roomsRepository.deleteByUserId(userId);
     }
 
-    private void deleteImage(Rooms rooms, List<Long> removeImages) {
-        if (!rooms.getImagesList().stream().map(Images::getId).toList()
-                .containsAll(removeImages)) {
-            throw new RoomsCustomException(RoomsExceptionCode.IMAGES_NOT_EXIST);
-        }
+    @Override
+    public List<Long> findRoomIds(LocalDateTime deleteTime){
+        return roomsRepository.findRoomIds(deleteTime);
+    }
 
-        removeImages.forEach(images -> imagesService.deleteImages(images, rooms));
+    @Override
+    public void deleteRoomInfo(Long roomId){
+        roomsRepository.deleteRoomInfo(roomId);
     }
 }

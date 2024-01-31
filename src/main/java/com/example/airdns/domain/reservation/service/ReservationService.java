@@ -1,8 +1,9 @@
 package com.example.airdns.domain.reservation.service;
 
-import com.example.airdns.domain.reservation.dto.ReservationRequestDto;
-import com.example.airdns.domain.reservation.dto.ReservationResponseDto;
 import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.room.entity.Rooms;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,105 +11,106 @@ import java.util.List;
 public interface ReservationService {
 
     /**
-     * 해당 방에 대해 예약한다.
-     * @Param user 예약 유저
-     * @Param roomId 예약 할 방
-     * @Param request 예약할 날짜에 관한 정보
-     * @return void
+     * 예약을 생성한다
+     *
+     * @param reservation 예약 객체
+     * @return 생성된 예약 객체
      */
-    void createReservation(
-            Long userId,
-            Long roomId,
-            ReservationRequestDto.CreateReservationDto createReservationDto
-    );
+    Reservation save(Reservation reservation);
+
+    /**
+     * 예약을 삭제한다
+     *
+     * @param reservation 예약 객체
+     */
+    void delete(Reservation reservation);
 
     /**
      * 해당 번호에 대한 예약을 찾는다.
-     * @Param reservationId 예약번호
+     *
      * @return 예약정보
+     * @Param reservationId 예약번호
      */
     Reservation findById(Long reservationId);
 
     /**
      * 해당 시간에 해당 방에 예약이 있는지 없는지 확인
+     *
+     * @return true/false
      * @Param 방 번호
      * @Param 체크인 시간
      * @Param 체크아웃 시간
-     * @return true/false
      */
     boolean isReserved(
-            Long roomsId,
+            Rooms rooms,
             LocalDateTime checkIn,
             LocalDateTime checkOut
     );
 
     /**
-     * 해당 시간에 해당 방이 영업하는지 안하는지 확인
+     * 해당 유저에 대한 예약 목록 조회
+     *
+     * @return 예약 목록 페이지 타입
+     * @Param 유저 Id
+     * @Param 페이지 옵션
+     */
+    Page<Reservation> findAllByUsersId(Long usersId, Pageable pageable);
+
+    /**
+     * 해당 방에 대한 예약 목록 조회
+     *
+     * @return 예약 목록 리스트 타입
      * @Param 방 번호
-     * @Param 체크인 시간
-     * @Param 체크아웃 시간
-     * @return true/false
+     * @Param 페이지 옵션
      */
-    boolean isRested(
-            Long roomsId,
-            LocalDateTime checkIn,
-            LocalDateTime checkOut
-    );
+    Page<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId, Pageable pageable);
 
     /**
-     * 예약 정보중 체크인 시간과 체크 아웃 시간을 수정한다
-     * @Param 유저 Id
-     * @Param 방 Id
-     * @Param 해당 예약 Id
-     * @Param 수정 시간
-     * @return true/false
+     * 해당 예약에 대한 소프트 삭제 데이터 변경
+     *
+     * @Param 예약 아이디
      */
-    ReservationResponseDto.UpdateReservationResponseDto updateReservation(
-            Long userId,
-            Long roomsId,
-            Long reservationId,
-            ReservationRequestDto.UpdateReservationDto requestDto
-    );
+    void saveDeletedReservationInfo(Long reservationId);
 
     /**
-     * 해당 예약 정보를 조회한다.
-     * @Param 유저 Id
-     * @Param 해당 예약 Id
-     * @return 예약 정보
+     * 유저 아이디를 통한 예약 정보 삭제
+     *
+     * @Param 유저 아이디
      */
-    ReservationResponseDto.ReadReservationResponseDto readReservation(
-            Long userId,
-            Long reservationId
-    );
+    void deleteByUserId(Long userId);
 
     /**
-     * 유저의 예약 목록을 조회한다.
-     * @Param 유저 Id
-     * @return 예약 정보 목록
+     * 룸 아이디를 통한 예약 정보 삭제
+     *
+     * @Param 룸 아이디
      */
-    List<ReservationResponseDto.ReadReservationResponseDto> readReservationList(Long id);
+    void deleteByRoomId(Long roomId);
 
     /**
-     * 해당 예약을 삭제한다.
-     * @Param 유저 Id
-     * @Param 예약 Id
-     * @return void
+     * 룸 아이디를 통한 예약 아이디 리스트 조회
+     *
+     * @Param 룸 아이디
      */
-    void deleteReservation(
-            Long userId,
-            Long reservationId
-    );
+    List<Long> findReservationIdsByRoomId(Long roomId);
 
     /**
-     * 해당 예약 시간이 가능한지 체크한다.
-     * @Param 해당 방 Id
-     * @Param 체크인 시간
-     * @Param 체크아웃 시간
-     * @return void
+     * 삭제 시간을 통한 예약 아이디 리스트 조회
+     *
+     * @Param 삭제 시간
      */
-    void isValidatedRequestSchedule(
-            Long roomsId,
-            LocalDateTime checkIn,
-            LocalDateTime checkOut
-    );
+    List<Long> findReservationIds(LocalDateTime deleteTime);
+
+    /**
+     * 유저 아이디를 통한 예약 아이디 리스트 조회
+     *
+     * @Param 유저 아이디
+     */
+    List<Long> findReservationIdsByUserId(Long userId);
+
+    /**
+     * 예약 아이디를 통한 예약 정보를 하드 삭제
+     *
+     * @Param 예약 아이디
+     */
+    void deleteReservation(Long reservationId);
 }

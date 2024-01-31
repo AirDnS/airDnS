@@ -1,5 +1,7 @@
 package com.example.airdns.domain.room.dto;
 
+import com.example.airdns.domain.image.dto.ImagesResponseDto;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -21,9 +23,12 @@ public class RoomsResponseDto {
         private String address;
         private Integer size;
         private String desc;
+        private Boolean isClosed;
+        private LocalDateTime createdAt;
         private List<Map<String, Object>> equipment;
-        private List<String> imageUrl;
+        private List<ImagesResponseDto.ReadImagesResponseDto> image;
         private List<List<LocalDateTime>> reservatedTimeList;
+        private List<List<LocalDateTime>> restScheduleList;
     }
 
     @Getter
@@ -45,6 +50,17 @@ public class RoomsResponseDto {
     @AllArgsConstructor
     public static class UpdateRoomsImagesResponseDto {
         private List<String> imageUrl;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "휴식 일정 응답 dto")
+    public static class ReadRoomsRestScheduleResponseDto {
+        private Long id;
+        private LocalDateTime startTime;
+        private LocalDateTime endTime;
     }
 
 }

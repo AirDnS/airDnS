@@ -1,7 +1,10 @@
 package com.example.airdns.domain.room.dto;
 
+import com.example.airdns.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -19,12 +22,14 @@ public class RoomsRequestDto {
         private String name;
 
         @Schema(description = "방 가격", example = "500000")
+        @PositiveOrZero(message = "가격은 0보다 큰 값을 입력해야 합니다.")
         private BigDecimal price;
 
         @Schema(description = "주소", example = "서울특별시 강남구 테헤란로44길 8")
         private String address;
 
         @Schema(description = "방 평수", example = "10")
+        @PositiveOrZero(message = "평수는 0보다 큰 값을 입력해야 합니다.")
         private Integer size;
 
         @Schema(description = "방 설명", example = "크기가 아담한 방입니다")
@@ -78,6 +83,15 @@ public class RoomsRequestDto {
         @Schema(description = "장비 종류", example = "[1,2,4,5,10]")
         private List<Long> equipment;
     }
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadRoomsListByHostRequestDto {
+        @Schema(description = "검색어", example = "엘리스")
+        private String keyword;
+    }
 
     @Getter
     @Builder
@@ -99,9 +113,6 @@ public class RoomsRequestDto {
         @Schema(description = "방 설명", example = "작고 불편한데 싼 방입니다.")
         private String desc;
 
-        @Schema(description = "방 운영 여부", example = "false")
-        private Boolean isClosed;
-
         @Schema(description = "장비 종류 리스트", example = "[1,2,3]")
         private List<Long> equipment;
     }
@@ -113,6 +124,16 @@ public class RoomsRequestDto {
     public static class UpdateRoomsImagesRequestDto {
         @Schema(description = "삭제할 이미지 ID", example = "[1,2,3]")
         private List<Long> removeImages;
+    }
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UpdateRoomsIsClosedRequestDto {
+        @Schema(description = "방 운영 여부", example = "false")
+        @NotNull(message = "방 운영 여부를 선택해주세요")
+        private Boolean isClosed;
     }
 
     @Getter
@@ -138,4 +159,5 @@ public class RoomsRequestDto {
         @NotNull(message = "삭제할 휴식 일정 번호를 입력해주세요.")
         private Long restScheduleId;
     }
+
 }

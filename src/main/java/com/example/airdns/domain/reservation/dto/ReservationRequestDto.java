@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class ReservationRequestDto {
@@ -18,7 +19,7 @@ public class ReservationRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "Create Reservation request")
-    public static class CreateReservationDto {
+    public static class CreateReservationRequestDto {
 
         @Schema(description = "checkInTime", example = "2024-05-10 10:00:00")
         private LocalDateTime checkInTime;
@@ -26,10 +27,12 @@ public class ReservationRequestDto {
         @Schema(description = "checkOutTime", example = "2024-05-10 12:00:00")
         private LocalDateTime checkOutTime;
 
-        public Reservation toEntity(Users users, Rooms rooms) {
+        public Reservation toEntity(Users users, Rooms rooms, BigDecimal price, String name) {
             return Reservation.builder()
                     .users(users)
                     .rooms(rooms)
+                    .price(price)
+                    .name(name)
                     .checkIn(checkInTime)
                     .checkOut(checkOutTime)
                     .build();
@@ -41,13 +44,11 @@ public class ReservationRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Schema(description = "Create Reservation request")
-    public static class UpdateReservationDto {
+    public static class ReadReservationListRequestDto {
 
-        @Schema(description = "checkInTime", example = "2024-05-10T10:00:00")
-        private LocalDateTime checkInTime;
-
-        @Schema(description = "checkOutTime", example = "2024-05-10T12:00:00")
-        private LocalDateTime checkOutTime;
-
+        @Schema(description = "date", example = "2024-05-10 10:00:00")
+        private LocalDateTime standardDate;
     }
+
+    
 }

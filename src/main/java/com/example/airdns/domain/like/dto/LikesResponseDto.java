@@ -28,7 +28,6 @@ public class LikesResponseDto {
         @Schema(description = "좋아요 추가 응답 내용", defaultValue = "add like response")
         private String nickName;
         private String roomName;
-        private LocalDateTime createdAt;
     }
 
     @Getter

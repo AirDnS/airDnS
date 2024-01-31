@@ -18,6 +18,11 @@ public class UsersRequestDto {
     @Schema(description = "유저 정보 수정 dto")
     public static class UpdateUserInfoRequestDto {
 
+        @Schema(description = "유저 이름", example = "홍길동", defaultValue = "아무개")
+        @Pattern(regexp = "^[가-힣]{2,4}$", message = "한글 이름 2 ~ 4자 이내")
+        private String name;
+
+
         @Schema(description = "닉네임", example = "양배추123", defaultValue = "양배추123")
         @Size(min= 2, max=10)
         private String nickname;
@@ -29,16 +34,5 @@ public class UsersRequestDto {
         @Schema(description = "주소", example = "서울특별시 서초구 서초대로77길 54", defaultValue = "서울특별시 서초구 서초대로77길 54")
         @Pattern(regexp = "^[a-zA-Z0-9가-힣\\s-]+$")
         private String address;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "유저 권한 수정 dto")
-    public static class UpdateUserRoleRequestDto {
-
-        @Schema(description = "권한", example = "ROLE_USER", defaultValue = "ROLE_USER")
-        private UserRole role;
     }
 }

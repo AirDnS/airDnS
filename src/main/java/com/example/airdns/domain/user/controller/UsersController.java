@@ -54,14 +54,14 @@ public class UsersController {
     @Operation(summary = "유저 권한 수정", description = "사용중 유저의 권한을 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "유저 권한 변경 성공",
-                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.UpdateRoleUsersResponseDto.class))}),
+                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.UpdateUsersResponseDto.class))}),
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
-    public ResponseEntity<CommonResponse<UsersResponseDto.UpdateRoleUsersResponseDto>> updateRole(
+    public ResponseEntity<CommonResponse<UsersResponseDto.UpdateUsersResponseDto>> updateRole(
             @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
-        UsersResponseDto.UpdateRoleUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "권한 변경 성공", responseDto)
         );
@@ -76,14 +76,28 @@ public class UsersController {
             @ApiResponse(responseCode = "400", description = "입력한 정보가 유효하지 않습니다"),
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
-    public ResponseEntity getUserInfo(
+    public ResponseEntity readUserInfo(
             @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
 
-        UsersResponseDto.ReadUserResponseDto responseDto = usersService.getUserInfo(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.ReadUserResponseDto responseDto = usersService.readUserInfo(UserDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "유저 정보 조회 성공", responseDto)
         );
     }
 
-
+    @GetMapping("/users/silence")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "유저 조회", description = "유저 정보를 조회한다")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "의미없는 요청 성공",
+                    content = {@Content(schema = @Schema(implementation = UsersResponseDto.ReadUserResponseDto.class))}),
+            @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
+    })
+    public ResponseEntity readUserSilence(
+            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
+        usersService.readUserSilence(UserDetailsImpl.getUser().getId());
+        return ResponseEntity.status(HttpStatus.OK).body(
+                new CommonResponse<>(HttpStatus.OK, "Silence Login")
+        );
+    }
 }

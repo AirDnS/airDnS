@@ -1,12 +1,30 @@
 package com.example.airdns.domain.payment.service;
 
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
-import com.example.airdns.domain.payment.entity.Payments;
+import com.example.airdns.domain.payment.entity.Payment;
+import com.example.airdns.domain.payment.entity.QPayment;
+import com.example.airdns.domain.payment.exception.PaymentCustomException;
+import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
+import com.example.airdns.domain.payment.repository.PaymentRepositoryQuery;
+import com.example.airdns.domain.payment.repository.PaymentRepositoryQueryImpl;
+import com.example.airdns.domain.reservation.entity.Reservation;
+import com.example.airdns.domain.reservation.exception.ReservationCustomException;
+import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
+import com.example.airdns.domain.reservation.repository.ReservationRepository;
+import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.Base64;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -25,17 +43,30 @@ import org.springframework.web.client.RestTemplate;
 @RequiredArgsConstructor
 public class PaymentServiceImplV1 implements PaymentService {
 
-    private final PaymentRepository paymentsRepository;
+    private final ReservationService reservationService;
+    private final PaymentRepository paymentRepository;
+    private final ReservationRepository reservationRepository;
     private final RestTemplate restTemplate;
+    private final DeleteInfoService deleteInfoService;
 
     @Value("${payment.toss.url}")
-    private String tossPaymentsApiUrl;
+    private String tossPaymentApiUrl;
 
     @Value("${payment.toss.secret_api_key}")
     private String secretApiKey;
 
     @Override
-    public PaymentResponseDto requestPayment(PaymentRequestDto.RequestPaymentDto requestDto) {
+    public PaymentResponseDto.CreatePaymentResponseDto createPayment(
+            Long userId,
+            Long reservationId,
+            PaymentRequestDto.CreatePaymentRequestDto requestDto) {
+
+        Reservation reservation = reservationService.findById(reservationId);
+
+        if (!Objects.equals(reservation.getUsers().getId(), userId)) {
+            throw new PaymentCustomException(PaymentExceptionCode.FORBIDDEN_RESERVATION_NOT_USER);
+        }
+
         try {
             String authorizations = encodeSecretKey(secretApiKey);
 
@@ -45,10 +76,11 @@ public class PaymentServiceImplV1 implements PaymentService {
 
             HttpEntity<JSONObject> requestEntity = new HttpEntity<>(requestData, headers);
 
-            ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(tossPaymentsApiUrl, requestEntity, JSONObject.class);
+            ResponseEntity<JSONObject> responseEntity = restTemplate.postForEntity(
+                    tossPaymentApiUrl, requestEntity, JSONObject.class);
 
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                return handleSuccessfulResponse(requestDto, responseEntity.getBody());
+                return handleSuccessfulResponse(requestDto, reservation);
             } else {
                 handlePaymentError(String.valueOf(responseEntity));
                 throw new RuntimeException("Error requesting payment");
@@ -74,35 +106,31 @@ public class PaymentServiceImplV1 implements PaymentService {
         return headers;
     }
 
-    private JSONObject createTossApiRequestBody(PaymentRequestDto.RequestPaymentDto requestDto) {
+    private JSONObject createTossApiRequestBody(
+            PaymentRequestDto.CreatePaymentRequestDto requestDto) {
         JSONObject requestData = new JSONObject();
         requestData.put("orderId", requestDto.getOrderId());
         requestData.put("amount", requestDto.getAmount());
         requestData.put("paymentKey", requestDto.getPaymentKey());
+        requestData.put("orderName", requestDto.getOrderName());
+        requestData.put("paymentType", requestDto.getPaymentType());
         return requestData;
     }
 
-    private PaymentResponseDto handleSuccessfulResponse(PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
-        // 성공 시 결제 정보 저장
-        savePaymentInfo((String) responseBody.get("paymentKey"), requestDto, responseBody);
-
-        return PaymentResponseDto.builder()
-                .paymentKey((String) responseBody.get("paymentKey"))
+    private PaymentResponseDto.CreatePaymentResponseDto handleSuccessfulResponse(
+            PaymentRequestDto.CreatePaymentRequestDto requestDto
+            , Reservation reservation) {
+        // 성공 시 결제 정보 및 예약정보 저장
+        Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
+                .orderName(requestDto.getOrderName())
                 .amount(requestDto.getAmount())
-                .payType((String) responseBody.get("payType"))
-                .createdAt((String) responseBody.get("createdAt"))
+                .paymentKey(requestDto.getPaymentKey())
+                .paymentType(requestDto.getPaymentType())
+                .reservation(reservation)
                 .build();
-    }
-
-    private void savePaymentInfo(String paymentKey, PaymentRequestDto.RequestPaymentDto requestDto, JSONObject responseBody) {
-        Payments payments = Payments.builder()
-                .orderId(requestDto.getOrderId())
-                .amount(requestDto.getAmount())
-                .paymentKey(paymentKey)
-                .build();
-
-        paymentsRepository.save(payments);
+        paymentRepository.save(payment);
+        return PaymentResponseDto.CreatePaymentResponseDto.from(payment);
     }
 
     private void handlePaymentError(String errorResponse) {
@@ -114,7 +142,6 @@ public class PaymentServiceImplV1 implements PaymentService {
             String errorMessage = (String) errorObject.get("message");
 
             if ("NOT_FOUND_PAYMENT_SESSION".equals(errorCode)) {
-                log.error("NOT_FOUND_PAYMENT_SESSION Error: {}", errorMessage);
             } else {
                 log.error("Unhandled Toss Payment Error: {} - {}", errorCode, errorMessage);
             }
@@ -122,5 +149,72 @@ public class PaymentServiceImplV1 implements PaymentService {
             log.error("Error parsing error response", e);
         }
     }
-}
 
+    @Override
+    public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId,
+            Long paymentId) {
+        Payment payment = paymentRepository.findByReservationIdAndIdAndIsDeletedFalse(reservationId, paymentId)
+                .orElseThrow(() -> new PaymentCustomException(
+                        PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
+
+        return PaymentResponseDto.ReadPaymentResponseDto.from(payment);
+    }
+
+    @Override
+    public List<Long> findPaymentIdsByUserId(Long userId){
+        return paymentRepository.findPaymentIdsByUserId(userId);
+    }
+
+    @Override
+    public void deleteByUserId(Long userId){
+        paymentRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public void saveDeletedPaymentInfo(Long paymentId) {
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
+                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+        );
+        deleteInfoService.saveDeletedPaymentInfo(payment);
+    }
+
+    @Override
+    public List<Long> findPaymentIdsByReservationIds(List<Long> reservationIds){
+        return paymentRepository.findPaymentIdsByReservationIds(reservationIds);
+    }
+
+    @Override
+    public void deleteByRoomId(Long roomId){
+        paymentRepository.deleteByRoomId(roomId);
+    }
+
+    @Override
+    public void deleteByReservationId(Long reservationId){
+        paymentRepository.deleteByReservationId(reservationId);
+    }
+
+    @Override
+    public List<Long> findPaymentIdsByReservationId(Long reservationId){
+        return paymentRepository.findPaymentIdsByReservationId(reservationId);
+    }
+
+    @Override
+    public void deletePayment(LocalDateTime deleteTime){
+        List<Long> paymentIds = paymentRepository.findPaymentIdsByDeleteTime(deleteTime);
+
+        for (Long paymentId : paymentIds) {
+            // DeleteInfo 저장
+            saveDeletePaymentInfo(paymentId);
+
+            // Payments 삭제
+            paymentRepository.deletePaymentId(paymentId);
+        }
+    }
+
+    private void saveDeletePaymentInfo(Long paymentId){
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(
+                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+        );
+        deleteInfoService.saveDeletedPaymentInfo(payment);
+    }
+}

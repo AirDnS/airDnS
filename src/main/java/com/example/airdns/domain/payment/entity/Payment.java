@@ -4,6 +4,9 @@ import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.global.common.entity.CommonEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "payments")
@@ -11,7 +14,8 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Payments extends CommonEntity {
+@SQLDelete(sql = "UPDATE payment SET is_deleted = true, deleted_at = CURRENT_TIMESTAMP whwere id = ?")
+public class Payment extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,19 +34,14 @@ public class Payments extends CommonEntity {
     private String orderId;
 
     @Column
-    private Boolean isCanceled;
-
-    @Column
-    private Boolean isPaySuccess;
-
-    @Column
     private String paymentKey;
 
     @Column
-    private String failReason;
+    @Builder.Default
+    private Boolean isDeleted = Boolean.FALSE;
 
     @Column
-    private String cancelReason;
+    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")

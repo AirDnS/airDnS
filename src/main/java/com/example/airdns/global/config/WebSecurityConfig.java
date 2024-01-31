@@ -5,6 +5,7 @@ import com.example.airdns.domain.oauth2.handler.OAuth2AuthenticationSuccessHandl
 import com.example.airdns.domain.oauth2.repository.HttpCookieOAuth2AuthorizationRequestRepository;
 import com.example.airdns.domain.oauth2.service.CustomOAuth2UserService;
 import com.example.airdns.global.jwt.JwtAuthorizationFilter;
+import com.example.airdns.global.jwt.JwtCustomExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.intercept.AuthorizationFilter;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -27,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
 
+    private final JwtCustomExceptionFilter jwtCustomExceptionFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
     private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
@@ -42,10 +45,11 @@ public class WebSecurityConfig {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowCredentials(true);
-            config.setAllowedOrigins(List.of("http://airdns.s3-website.ap-northeast-2.amazonaws.com","http://localhost:3000"));
+            config.setAllowedOrigins(List.of("https://air-dns.org", "http://localhost:3000"));
             config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
             config.setAllowedHeaders(List.of("*"));
             config.setExposedHeaders(List.of("*"));
+            config.setAllowCredentials(true);
             return config;
         };
     }
@@ -61,6 +65,7 @@ public class WebSecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/equipments").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/rooms").permitAll()
+                        .requestMatchers("/health-check").permitAll()
                         // swagger v3
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .requestMatchers("/login").permitAll()
@@ -76,6 +81,7 @@ public class WebSecurityConfig {
                 );
 
         http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtCustomExceptionFilter, AuthorizationFilter.class);
         return http.build();
     }
 }

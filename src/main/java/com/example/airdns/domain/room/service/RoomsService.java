@@ -1,77 +1,35 @@
 package com.example.airdns.domain.room.service;
 
-import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
+import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
+import com.example.airdns.domain.room.entity.QRooms;
 import com.example.airdns.domain.room.entity.Rooms;
-import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomsService {
 
     /**
-     * 스터디 룸 등록
-     * @param requestDto 스터디 룸 정보
-     * @param files 이미지 파일
+     * 방 조회
+     * @return 방
      */
-    ReadRoomsResponseDto createRooms(CreateRoomsRequestDto requestDto, List<MultipartFile> files, Users users);
-
+    Rooms findById(Long roomsId);
 
     /**
-     * 스터디 룸 조회
-     * @param roomsId 방 번호
-     * @return 방 데이터
+     * 방 저장
+     * @param rooms 방 객체
+     * @return 방 객체
      */
-    ReadRoomsResponseDto readRooms(Long roomsId);
+    Rooms save(Rooms rooms);
 
     /**
-     * 스터디 룸 전체 조회
-     * @param requestDto 검색 조건
-     * @return 방 리스트 데이터
+     * 방 삭제
+     * @param rooms 방 객체
      */
-    Page<ReadRoomsResponseDto> readRoomsList(Pageable pageable, ReadRoomsListRequestDto requestDto);
-
-    /**
-     * 스터디 룸 변경
-     * @param requestDto 변경할 데이터
-     * @param roomsId 방 번호
-     * @param users 로그인 회원
-     * @return 변경된 방 데이터
-     */
-    ReadRoomsResponseDto updateRooms(UpdateRoomsRequestDto requestDto, Long roomsId, Users users);
-
-    /**
-     * 스터디룸 이미지 수정
-     * @param requestDto 변경된 이미지 정보
-     * @param roomsId 방 번호
-     * @param users 로그인 회원
-     */
-    UpdateRoomsImagesResponseDto updateRoomsImages(
-            UpdateRoomsImagesRequestDto requestDto, Long roomsId, List<MultipartFile> files, Users users);
-
-    /**
-     * 스터디룸 삭제
-     * @param roomsId 방 번호
-     * @param users 로그인 회원
-     */
-    void deleteRooms(Long roomsId, Users users);
-
-    /**
-     * 스터디룸 휴식 일정 등록
-     * @param requestDto 휴식 일정 정보
-     * @param roomsId 방 번호
-     */
-    void CreateRoomsRestSchedule(CreateRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
-
-    /**
-     * 스터디룸 휴식 일정 삭제
-     * @param requestDto 휴식 일정 정보
-     * @param roomsId 방 번호
-     */
-    void DeleteRoomsRestSchedule(DeleteRoomsRestScheduleRequestDto requestDto, Long roomsId, Users users);
+    void delete(Rooms rooms);
 
     /**
      * 방 활성화 여부 확인
@@ -85,10 +43,58 @@ public interface RoomsService {
      */
     boolean isDeleted(Long roomsId);
 
+    /**
+     * 방 검색
+     * @param pageable 페이징 객체
+     * @param roomsSearchCondition 방 조회 조건
+     * @return 방 조회 데이터
+     */
+    Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
 
     /**
-     * 방 조회
-     * @return 방
+     * 등록한 방 검색
+     * @param pageable 페이징 객체
+     * @param roomsSearchCondition 방 조회 조건
+     * @return 방 조회 데이터
      */
-    Rooms findById(Long roomsId);
+    Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
+
+    /**
+     * 유저 아이디를 통한 방 삭제
+     * @param userId 유저 아이디
+     */
+    void deleteByUserId(Long userId);
+
+    /**
+     * 삭제 시간을 통한 방 리스트 조회
+     * @param deleteTime 삭제 시간
+     * @return 방 아이디 리스트
+     */
+    List<Long> findRoomIds(LocalDateTime deleteTime);
+
+    /**
+     * 방 소프트 삭제 필드 변경
+     * @param roomsId
+     */
+    void saveDeletedRoomInfo(Long roomsId);
+
+    /**
+     * 유저 아이디를 통한 룸 아이디 리스트 조회
+     * @param userId 유저 아이디
+     * @return 유저 아이디에 대한 룸 아이디 리스트
+     */
+    List<Long> findRoomIdsByUserId(Long userId);
+
+    /**
+     * 룸 데이터 삭제
+     * @param roomId 룸 아이디
+     */
+    void deleteRoomInfo(Long roomId);
+
+    /**
+     * 필드 is_deleted true와 roomId에 해당 하는 방 조회
+     * @param roomId
+     * @return 필드 is_deleted true와 roomId에 해당 하는 방 객체 데이터
+     */
+    Rooms findByIdAndIsDeletedTrue(Long roomId);
 }
