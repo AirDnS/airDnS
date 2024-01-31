@@ -36,6 +36,7 @@ public class LikesController {
     @PostMapping("/{roomsId}/likes")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 성공"),
+            @ApiResponse(responseCode = "400", description = "해당 사용자는 좋아요를 이미 눌렀습니다.")
     })
     public ResponseEntity<CommonResponse<LikesResponseDto.CreateLikeResponseDto>> createLike(
             @PathVariable Long roomsId,
@@ -43,9 +44,7 @@ public class LikesController {
         LikesResponseDto.CreateLikeResponseDto responseDto = likesService.createLike(roomsId, userDetails.getUser());
         // ok
         return ResponseEntity.status(HttpStatus.OK).body(
-                new CommonResponse<>(
-                        HttpStatus.OK, "룸 좋아요 성공", responseDto
-                )
+                new CommonResponse<>(HttpStatus.OK, "룸 좋아요 성공", responseDto)
         );
     }
 
