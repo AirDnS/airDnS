@@ -70,7 +70,7 @@ public interface RoomsServiceFacade {
             UpdateRoomsImagesRequestDto requestDto, Long roomsId, List<MultipartFile> files, Users users);
 
     /**
-     * 스터디룸 삭제
+     * 스터디룸 소프트 삭제
      * @param roomsId 방 번호
      * @param users 로그인 회원
      */
@@ -102,5 +102,9 @@ public interface RoomsServiceFacade {
      */
     void DeleteRoomsRestSchedule(Long roomsId, Long restscheduleId, Users users);
 
+    /**
+     * 스터디룸 엔티티 삭제
+     * @param deleteTime
+     */
     void deleteRooms(LocalDateTime deleteTime);
 }

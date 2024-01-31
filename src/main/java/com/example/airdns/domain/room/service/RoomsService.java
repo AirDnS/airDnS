@@ -58,10 +58,43 @@ public interface RoomsService {
      * @return 방 조회 데이터
      */
     Page<ReadRoomsResponseDto> findAllByHost(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
+
+    /**
+     * 유저 아이디를 통한 방 삭제
+     * @param userId 유저 아이디
+     */
     void deleteByUserId(Long userId);
+
+    /**
+     * 삭제 시간을 통한 방 리스트 조회
+     * @param deleteTime 삭제 시간
+     * @return 방 아이디 리스트
+     */
     List<Long> findRoomIds(LocalDateTime deleteTime);
+
+    /**
+     * 방 소프트 삭제 필드 변경
+     * @param roomsId
+     */
     void saveDeletedRoomInfo(Long roomsId);
+
+    /**
+     * 유저 아이디를 통한 룸 아이디 리스트 조회
+     * @param userId 유저 아이디
+     * @return 유저 아이디에 대한 룸 아이디 리스트
+     */
     List<Long> findRoomIdsByUserId(Long userId);
+
+    /**
+     * 룸 데이터 삭제
+     * @param roomId 룸 아이디
+     */
     void deleteRoomInfo(Long roomId);
+
+    /**
+     * 필드 is_deleted true와 roomId에 해당 하는 방 조회
+     * @param roomId
+     * @return 필드 is_deleted true와 roomId에 해당 하는 방 객체 데이터
+     */
     Rooms findByIdAndIsDeletedTrue(Long roomId);
 }

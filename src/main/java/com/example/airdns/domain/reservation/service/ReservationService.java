@@ -65,17 +65,52 @@ public interface ReservationService {
      */
     Page<Reservation> findAllByRoomsIdAndIsCancelledFalse(Long roomsId, Pageable pageable);
 
+    /**
+     * 해당 예약에 대한 소프트 삭제 데이터 변경
+     *
+     * @Param 예약 아이디
+     */
     void saveDeletedReservationInfo(Long reservationId);
 
+    /**
+     * 유저 아이디를 통한 예약 정보 삭제
+     *
+     * @Param 유저 아이디
+     */
     void deleteByUserId(Long userId);
 
+    /**
+     * 룸 아이디를 통한 예약 정보 삭제
+     *
+     * @Param 룸 아이디
+     */
     void deleteByRoomId(Long roomId);
 
+    /**
+     * 룸 아이디를 통한 예약 아이디 리스트 조회
+     *
+     * @Param 룸 아이디
+     */
     List<Long> findReservationIdsByRoomId(Long roomId);
 
+    /**
+     * 삭제 시간을 통한 예약 아이디 리스트 조회
+     *
+     * @Param 삭제 시간
+     */
     List<Long> findReservationIds(LocalDateTime deleteTime);
 
+    /**
+     * 유저 아이디를 통한 예약 아이디 리스트 조회
+     *
+     * @Param 유저 아이디
+     */
     List<Long> findReservationIdsByUserId(Long userId);
 
+    /**
+     * 예약 아이디를 통한 예약 정보를 하드 삭제
+     *
+     * @Param 예약 아이디
+     */
     void deleteReservation(Long reservationId);
 }
