@@ -139,6 +139,7 @@ public class RoomsController {
                 roomsServiceFacade.updateRoomsImages(requestDto, roomsId, files, userDetails.getUser())
         ));
     }
+
     @PatchMapping(
             value = "/rooms/{roomsId}/updateIsClosed",
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE}
