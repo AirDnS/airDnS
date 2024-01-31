@@ -97,4 +97,9 @@ public interface ReservationServiceFacade {
             LocalDateTime checkOut
     );
 
+    /**
+     * 해당 예약 방에 삭제한다
+     * @param deleteTime
+     */
+    void deleteReservation(LocalDateTime deleteTime);
 }

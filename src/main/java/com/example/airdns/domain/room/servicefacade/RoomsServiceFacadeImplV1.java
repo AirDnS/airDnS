@@ -1,8 +1,10 @@
 package com.example.airdns.domain.room.servicefacade;
 
+import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
 import com.example.airdns.domain.equipment.service.EquipmentsService;
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.image.service.ImagesService;
+import com.example.airdns.domain.payment.service.PaymentService;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -36,6 +39,8 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     private final RestScheduleService restScheduleService;
     private final EquipmentsService equipmentsService;
     private final ReservationService reservationService;
+    private final PaymentService paymentService;
+    private final DeleteInfoService deleteInfoService;
 
     @Transactional
     @Override
@@ -231,5 +236,36 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
         }
 
         removeImages.forEach(images -> imagesService.deleteImages(images, rooms));
+    }
+
+    @Override
+    public void deleteRooms(LocalDateTime deleteTime){
+        // 삭제할 Rooms의 ID 조회
+        List<Long> roomIds = roomsService.findRoomIds(deleteTime);
+        for (Long roomId : roomIds) {
+            // 연관된 Reservations, Payments의 ID 조회
+            List<Long> reservationIds = reservationService.findReservationIdsByRoomId(roomId);
+            List<Long> paymentIds = paymentService.findPaymentIdsByReservationIds(reservationIds);
+
+            // DeleteInfo 저장
+            saveDeleteRoomInfo(roomId);
+
+            // 예약이 없으면 결제는 없다. 예약이 있으면 결제는 있을 수 있고 없을 수도 있다.
+            if(!reservationIds.isEmpty() && !paymentIds.isEmpty()){
+                // 예약이 존재
+                reservationIds.forEach(reservationId -> reservationService.saveDeletedReservationInfo(reservationId));
+                paymentIds.forEach(paymentId -> paymentService.saveDeletedPaymentInfo(paymentId));
+                // 연관된 엔터티 삭제
+                paymentService.deleteByRoomId(roomId);
+                reservationService.deleteByRoomId(roomId);
+            }
+            // 마지막으로 Rooms 삭제
+            roomsService.deleteRoomInfo(roomId);
+        }
+    }
+
+    private void saveDeleteRoomInfo(Long roomId){
+        Rooms room = roomsService.findByIdAndIsDeletedTrue(roomId);
+        deleteInfoService.saveDeletedRoomsInfo(room);
     }
 }

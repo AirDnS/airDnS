@@ -13,8 +13,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -130,5 +132,38 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                 equpmentList
                         ))
         );
+    }
+
+    @Override
+    public List<Long> findRoomIdsByUserId(Long userId){
+        return queryFactory.select(rooms.id)
+                .from(rooms)
+                .where(rooms.users.id.eq(userId))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteByUserId(Long userId) {
+        queryFactory.delete(rooms)
+                .where(rooms.users.id.eq(userId))
+                .execute();
+    }
+
+    @Override
+    public List<Long> findRoomIds(LocalDateTime deleteTime){
+        return queryFactory.select(rooms.id)
+                .from(rooms)
+                .where(rooms.isDeleted.eq(true)
+                        .and(rooms.deletedAt.before(deleteTime)))
+                .fetch();
+    }
+
+    @Override
+    @Transactional
+    public void deleteRoomInfo(Long roomId){
+        queryFactory.delete(rooms)
+                .where(rooms.id.eq(roomId))
+                .execute();
     }
 }
