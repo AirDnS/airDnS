@@ -42,4 +42,6 @@ public interface UsersService {
      * @param deleteTime 유저 엔티티 삭제 시간
      */
     void deleteUsers(LocalDateTime deleteTime);
+  
+    void readUserSilence(Long userId);
 }

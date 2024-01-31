@@ -48,6 +48,7 @@ public class RoomsConverter {
                 )
                 .reservatedTimeList(
                         rooms.getReservationList().stream()
+                                .filter(reservation -> !reservation.getIsCancelled())
                                 .map(reservation -> Arrays.asList(
                                         reservation.getCheckIn(), reservation.getCheckOut()
                                 ))

@@ -57,6 +57,11 @@ public class UsersServiceImplV1 implements UsersService {
     }
 
     @Override
+    public void readUserSilence(Long userId) {
+        findById(userId);
+    }
+
+    @Override
     public Users findById(Long userId) {
         return usersRepository.findByIdAndIsDeletedFalse(userId).orElseThrow(() ->
                 new UsersCustomException(UsersExceptionCode.NOT_FOUND_USER));
