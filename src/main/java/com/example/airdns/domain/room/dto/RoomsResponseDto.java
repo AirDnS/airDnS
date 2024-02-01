@@ -32,6 +32,22 @@ public class RoomsResponseDto {
     }
 
     @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadRoomsListResponseDto {
+        private Long roomsId;
+        private String name;
+        private BigDecimal price;
+        private String address;
+        private Integer size;
+        private Boolean isClosed;
+        private LocalDateTime createdAt;
+        private String image;
+    }
+
+    @Getter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor

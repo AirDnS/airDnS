@@ -4,6 +4,7 @@ import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
 import com.example.airdns.domain.user.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,7 @@ public interface RoomsServiceFacade {
      * @param requestDto 검색 조건
      * @return 방 리스트 데이터
      */
-    Page<ReadRoomsResponseDto> readRoomsList(Pageable pageable, ReadRoomsListRequestDto requestDto);
+    List<ReadRoomsListResponseDto> readRoomsList(ReadRoomsListRequestDto requestDto);
 
     /**
      * 직접 등록한 스터디 룸 전체 조회

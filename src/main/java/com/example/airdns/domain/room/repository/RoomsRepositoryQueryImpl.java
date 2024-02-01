@@ -5,10 +5,12 @@ import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,12 +20,15 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.example.airdns.domain.image.entity.QImages.images;
 import static com.example.airdns.domain.room.entity.QRooms.rooms;
 import static com.example.airdns.domain.roomequipment.entity.QRoomEquipments.roomEquipments;
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
 
 public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implements RoomsRepositoryQuery {
 
@@ -35,22 +40,55 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public Page<RoomsResponseDto.ReadRoomsResponseDto> findAllSearchFilter(
-            Pageable pageable, RoomsSearchConditionDto condition) {
-        JPQLQuery<Rooms> query = queryFactory
-                .select(rooms)
-                .from(rooms)
-                .where(
-                        eqName(condition.getKeyword())
-                                .or(eqAddress(condition.getKeyword())),
-                        betweenPrice(condition.getStartPrice(), condition.getEndPrice()),
-                        betweenSize(condition.getStartSize(), condition.getEndSize()),
-                        inEquipment(condition.getEqupmentList()),
-                        rooms.isDeleted.isFalse(),
-                        rooms.isClosed.isFalse()
-                );
+    public List<RoomsResponseDto.ReadRoomsListResponseDto> findAllSearchFilter(
+            RoomsSearchConditionDto condition) {
+        List<RoomsResponseDto.ReadRoomsListResponseDto> roomsResult = queryFactory.select(
+                Projections.fields(RoomsResponseDto.ReadRoomsListResponseDto.class,
+                        rooms.id.as("roomsId"),
+                        rooms.name,
+                        rooms.price,
+                        rooms.address,
+                        rooms.size,
+                        rooms.isClosed,
+                        rooms.createdAt
+                        )
+            )
+            .from(rooms)
+            .where(
+                    eqName(condition.getKeyword())
+                            .or(eqAddress(condition.getKeyword())),
+                    betweenPrice(condition.getStartPrice(), condition.getEndPrice()),
+                    betweenSize(condition.getStartSize(), condition.getEndSize()),
+                    inEquipment(condition.getEqupmentList()),
+                    lessThanCursor(condition.getCursor()),
+                    rooms.isDeleted.isFalse(),
+                    rooms.isClosed.isFalse()
+            )
+            .orderBy(rooms.id.desc())
+            .limit(ObjectUtils.defaultIfNull(condition.getPazeSize(), 10L))
+            .fetch();
 
-        return getRoomsResponseDto(pageable, query);
+        Map<Long, List<String>> imagesResult = queryFactory.select(
+                images.imageUrl,
+                images.rooms.id
+            )
+            .from(images)
+            .where(
+                images.rooms.id.in(
+                        roomsResult.stream().map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId).toList()
+                )
+            )
+            .transform(groupBy(images.rooms.id).as(list(images.imageUrl)));
+
+        roomsResult.forEach(
+                result -> result.setImage(
+                        imagesResult.get(result.getRoomsId()) != null
+                                ? imagesResult.get(result.getRoomsId()).get(0)
+                                : null
+                )
+        );
+
+        return roomsResult;
     }
 
     @Override
@@ -116,6 +154,14 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         }
         if (endSize != null) {
             return rooms.size.loe(endSize); // price <= endSize
+        }
+
+        return null;
+    }
+
+    private BooleanExpression lessThanCursor(Long cursor) {
+        if (cursor != null) {
+            return rooms.id.lt(cursor);
         }
 
         return null;

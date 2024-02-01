@@ -2,7 +2,6 @@ package com.example.airdns.domain.room.service;
 
 import com.example.airdns.domain.room.dto.RoomsResponseDto.*;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
-import com.example.airdns.domain.room.entity.QRooms;
 import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,11 +44,10 @@ public interface RoomsService {
 
     /**
      * 방 검색
-     * @param pageable 페이징 객체
      * @param roomsSearchCondition 방 조회 조건
      * @return 방 조회 데이터
      */
-    Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto roomsSearchCondition);
+    List<ReadRoomsListResponseDto> findAllSearchFilter(RoomsSearchConditionDto roomsSearchCondition);
 
     /**
      * 등록한 방 검색

@@ -73,12 +73,11 @@ public class RoomsController {
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
     public ResponseEntity readRoomsList(
-            @PageableDefault(size = 6, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
-                roomsServiceFacade.readRoomsList(pageable, requestDto)
+                roomsServiceFacade.readRoomsList(requestDto)
         ));
     }
 
