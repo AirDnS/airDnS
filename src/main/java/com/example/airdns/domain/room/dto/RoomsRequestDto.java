@@ -69,6 +69,12 @@ public class RoomsRequestDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadRoomsListRequestDto {
+        @Schema(description = "커서", example = "1L")
+        private Long cursor;
+
+        @Schema(description = "페이지 크기", example = "10")
+        private Long pageSize;
+
         @Schema(description = "검색어", example = "엘리스")
         private String keyword;
 

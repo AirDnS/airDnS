@@ -12,6 +12,8 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class RoomsSearchConditionDto {
+    Long cursor;
+    Long pageSize;
     String keyword;
     BigDecimal startPrice;
     BigDecimal endPrice;
