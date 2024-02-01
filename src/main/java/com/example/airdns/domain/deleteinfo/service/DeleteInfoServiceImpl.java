@@ -50,16 +50,20 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     public void saveDeletedRoomsInfo(Rooms room){
 
         // 1차 캐시에 있는 Rooms의 정보를 먼저 가져와서 넣기
-        Rooms saveRoom = em.find(Rooms.class, room.getId());
+        // Rooms saveRoom = em.find(Rooms.class, room.getId());
+        Rooms saveRoom = em.createQuery(
+                        "SELECT r FROM Rooms r JOIN FETCH r.users WHERE r.id = :roomId", Rooms.class)
+                .setParameter("roomId", room.getId())
+                .getSingleResult();
 
         deleteRoomsInfoRepository.save(
                 DeleteRoomsInfo.builder()
                         .deletedAt(LocalDateTime.now())
-                        .name(room.getName())
-                        .price(room.getPrice())
-                        .address(room.getAddress())
-                        .size(room.getSize())
-                        .description(room.getDescription())
+                        .name(saveRoom.getName())
+                        .price(saveRoom.getPrice())
+                        .address(saveRoom.getAddress())
+                        .size(saveRoom.getSize())
+                        .description(saveRoom.getDescription())
                         .owner(saveRoom.getUsers().getNickname())
                         .build()
         );
@@ -69,13 +73,16 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     @Transactional
     public void saveDeletedReservationInfo(Reservation reservation){
 
-        Reservation saveReservation = em.find(Reservation.class, reservation.getId());
+        Reservation saveReservation = em.createQuery(
+                        "SELECT res FROM Reservation res JOIN FETCH res.rooms r JOIN FETCH res.users u WHERE res.id = :reservationId", Reservation.class)
+                .setParameter("reservationId", reservation.getId())
+                .getSingleResult();
 
         deleteReservationInfoRepository.save(
                 DeleteReservationsInfo.builder()
                         .cancelledAt(LocalDateTime.now())
-                        .checkIn(reservation.getCheckIn())
-                        .checkOut(reservation.getCheckOut())
+                        .checkIn(saveReservation.getCheckIn())
+                        .checkOut(saveReservation.getCheckOut())
                         .roomName(saveReservation.getRooms().getName())
                         .reserverName(saveReservation.getUsers().getNickname())
                         .build()
