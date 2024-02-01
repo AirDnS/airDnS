@@ -46,14 +46,9 @@ public class ReviewsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
     @MockBean
     private ReviewsService reviewsService;
-
-    private ObjectMapper objectMapper;
-
     private UserDetailsImpl userDetails;
-
     private Users notLoginUser;
     private Rooms room1;
     private Rooms room2;
@@ -64,8 +59,6 @@ public class ReviewsControllerTest {
 
     @BeforeEach
     void setup() {
-        objectMapper = new ObjectMapper();
-
         userDetails = new UserDetailsImpl(
                 Users.builder().name("testUser").role(UserRole.USER).build()
         );
