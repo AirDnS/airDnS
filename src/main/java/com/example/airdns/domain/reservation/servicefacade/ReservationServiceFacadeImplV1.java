@@ -15,7 +15,10 @@ import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.exception.UsersCustomException;
 import com.example.airdns.domain.user.exception.UsersExceptionCode;
 import com.example.airdns.domain.user.service.UsersService;
+import io.lettuce.core.RedisClient;
 import lombok.RequiredArgsConstructor;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -26,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
@@ -37,26 +41,43 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     private final RestScheduleService restScheduleService;
     private final PaymentService paymentService;
     private final DeleteInfoService deleteInfoService;
+
+    private final RedissonClient redissonClient;
+
+
     @Override
     public ReservationResponseDto.CreateReservationResponseDto createReservation(
             Long userId,
             Long roomId,
             ReservationRequestDto.CreateReservationRequestDto requestDto) {
-        Users users = usersService.findById(userId);
-        Rooms rooms = roomsService.findById(roomId);
 
-        LocalDateTime checkInTime = requestDto.getCheckInTime().truncatedTo(ChronoUnit.HOURS);
-        LocalDateTime checkOutTime = requestDto.getCheckOutTime().truncatedTo(ChronoUnit.HOURS);
+        RLock lock = redissonClient.getLock(roomId.toString());
+        try {
+            boolean available = lock.tryLock(10, 5, TimeUnit.SECONDS);
+            if(!available) {
+                System.out.println("lock 획득 실패");
+            }
 
-        isValidatedRequestSchedule(rooms, checkInTime, checkOutTime);
+            Users users = usersService.findById(userId);
+            Rooms rooms = roomsService.findById(roomId);
 
-        BigDecimal price = calculateReservationPrice(rooms.getPrice(), checkInTime, checkOutTime);
-        String name = createReservationName(rooms.getName(), checkInTime, checkOutTime);
+            LocalDateTime checkInTime = requestDto.getCheckInTime().truncatedTo(ChronoUnit.HOURS);
+            LocalDateTime checkOutTime = requestDto.getCheckOutTime().truncatedTo(ChronoUnit.HOURS);
 
-        Reservation reservation = requestDto.toEntity(users, rooms, price, name);
-        return ReservationResponseDto.CreateReservationResponseDto.from(reservationService.save(reservation));
+            isValidatedRequestSchedule(rooms, checkInTime, checkOutTime);
+
+            BigDecimal price = calculateReservationPrice(rooms.getPrice(), checkInTime, checkOutTime);
+            String name = createReservationName(rooms.getName(), checkInTime, checkOutTime);
+
+            Reservation reservation = requestDto.toEntity(users, rooms, price, name);
+            return ReservationResponseDto.CreateReservationResponseDto.from(reservationService.save(reservation));
+
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
     }
-
 
     @Override
     public ReservationResponseDto.ReadReservationResponseDto readReservation(
