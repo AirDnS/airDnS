@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class RoomsSearchConditionDto {
     Long cursor;
-    Long pazeSize;
+    Long pageSize;
     String keyword;
     BigDecimal startPrice;
     BigDecimal endPrice;
