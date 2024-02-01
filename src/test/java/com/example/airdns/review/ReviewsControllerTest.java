@@ -7,260 +7,268 @@ import com.example.airdns.domain.review.entity.Reviews;
 import com.example.airdns.domain.review.service.ReviewsService;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.user.entity.Users;
-import com.example.airdns.global.jwt.UserDetailsImplV1;
+import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.global.config.WebSecurityConfig;
+import com.example.airdns.global.jwt.JwtAuthorizationFilter;
+import com.example.airdns.global.security.UserDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 
-@WebMvcTest(ReviewsController.class)
+@WebMvcTest(
+        controllers = ReviewsController.class,
+        excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {WebSecurityConfig.class, JwtAuthorizationFilter.class})
+)
+// @EnableJpaAuditing 이거 때문에 해야함
 @MockBean(JpaMetamodelMappingContext.class)
-@AutoConfigureMockMvc(addFilters = false)
+@ExtendWith(SpringExtension.class)
 public class ReviewsControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-
     @MockBean
     private ReviewsService reviewsService;
 
-    private ReviewsResponseDto.ReadReviewResponseDto fakeReviewResponseDto;
-
     private ObjectMapper objectMapper;
+
+    private UserDetailsImpl userDetails;
+
+    private Users notLoginUser;
+    private Rooms room1;
+    private Rooms room2;
+    private Reviews review1;
+    private Reviews review2;
+    private Reviews review3;
+    private Reviews review4;
 
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-    }
 
-    @Test
-    @DisplayName("ReviewsController getReview Success")
-    public void getReviewSuccess() throws Exception {
-        // given
-        Long roomId = 1L;
-        Long reviewId = 123L;
-
-        String username = "testUser";
-        String password = "testPassword";
-
-        // 가상 사용자를 생성하는 부분을 업데이트
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(username, password));
-        SecurityContextHolder.setContext(securityContext);
-
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(
-                Users.builder()
-                        .nickName(username)
-                        .password(password)
-                        .build()
+        userDetails = new UserDetailsImpl(
+                Users.builder().name("testUser").role(UserRole.USER).build()
         );
 
-        ReviewsResponseDto.ReadReviewResponseDto mockReview = ReviewsResponseDto.ReadReviewResponseDto.builder()
-                .content("review1")
-                .nickName(userDetails.getUser().getNickName())
+        notLoginUser = Users.builder().name("User Name").build();
+        room1 = Rooms.builder().users(userDetails.getUser()).name("Room name1").build();
+        room2 = Rooms.builder().users(notLoginUser).name("Room name2").build();
+
+        review1 = Reviews.builder()
+                .users(userDetails.getUser())
+                .content("너무 별로에요!")
+                .rooms(room1)
                 .build();
 
-        when(reviewsService.getReview(roomId, reviewId)).thenReturn(mockReview);
+        review2 = Reviews.builder()
+                .users(notLoginUser)
+                .content("너무 멋있어요!")
+                .rooms(room1)
+                .build();
 
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/rooms/{roomsId}/review/{reviewId}", roomId, reviewId))
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("리뷰 단건 조회 성공"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.content").value("review1"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.nickName").value(userDetails.getUser().getNickName()));
+        review3 = Reviews.builder()
+                .users(userDetails.getUser())
+                .content("너무 심각해요!")
+                .rooms(room2)
+                .build();
+
+        review4 = Reviews.builder()
+                .users(notLoginUser)
+                .content("또 오고 싶어요!")
+                .rooms(room2)
+                .build();
     }
 
-
     @Test
-    @DisplayName("ReviewsController getReviews Success")
-    public void getReviewsSuccess() throws Exception {
+    @DisplayName("ReviewsController readReviewList Success")
+    public void readReviewListSuccess() throws Exception {
         // given
-        Long roomId = 1L;
+        Long roomsId = 1L;
 
-        String username = "testUser";
-        String password = "testPassword";
-
-        // 가상 사용자를 생성하는 부분을 업데이트
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(username, password));
-        SecurityContextHolder.setContext(securityContext);
-
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(
-                Users.builder()
-                        .nickName(username)
-                        .password(password)
-                        .build()
-        );
-
-        Rooms rooms = Rooms.builder().name("Room Number1").users(userDetails.getUser()).build();
-
-        List<ReviewsResponseDto.ReadReviewResponseDto> mockReviews = new ArrayList<>();
-        mockReviews.add(
+        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = new ArrayList<>();
+        responseDtoList.add(
                 ReviewsResponseDto.ReadReviewResponseDto.builder()
-                        .content("review1")
-                        .nickName(userDetails.getUser().getNickName())
-                        .roomName(rooms.getName())
+                        .reviewsId(review1.getId())
+                        .createdAt(review1.getCreatedAt())
+                        .nickName(review1.getUsers().getName())
+                        .roomName(review1.getRooms().getName())
+                        .content(review1.getContent())
                         .build()
         );
+        responseDtoList.add(
+                ReviewsResponseDto.ReadReviewResponseDto.builder()
+                        .reviewsId(review2.getId())
+                        .createdAt(review2.getCreatedAt())
+                        .nickName(review2.getUsers().getName())
+                        .roomName(review2.getRooms().getName())
+                        .content(review2.getContent())
+                        .build()
+        );
+        responseDtoList.add(
+                ReviewsResponseDto.ReadReviewResponseDto.builder()
+                        .reviewsId(review3.getId())
+                        .createdAt(review3.getCreatedAt())
+                        .nickName(review3.getUsers().getName())
+                        .roomName(review3.getRooms().getName())
+                        .content(review3.getContent())
+                        .build()
+        );
+        responseDtoList.add(
+                ReviewsResponseDto.ReadReviewResponseDto.builder()
+                        .reviewsId(review4.getId())
+                        .createdAt(review4.getCreatedAt())
+                        .nickName(review4.getUsers().getName())
+                        .roomName(review4.getRooms().getName())
+                        .content(review4.getContent())
+                        .build()
+        );
+        when(reviewsService.readReviewList(roomsId)).thenReturn(responseDtoList);
 
-        Page<ReviewsResponseDto.ReadReviewResponseDto> mockPage = new PageImpl<>(mockReviews);
-
-        when(reviewsService.getReviews(roomId, Pageable.unpaged())).thenReturn(mockPage);
-
-        // when
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/rooms/{roomsId}/review", roomId))
+        // when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/rooms/{roomsId}/review", roomsId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 전체 조회 성공"));
-                //.andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].content").value("review1"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 전체 조회 성공"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].reviewsId").value(responseDtoList.get(0).getReviewsId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].nickName").value("testUser"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].roomName").value("Room name1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[0].content").value("너무 별로에요!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].reviewsId").value(responseDtoList.get(1).getReviewsId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].nickName").value("User Name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].roomName").value("Room name1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[1].content").value("너무 멋있어요!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].reviewsId").value(responseDtoList.get(2).getReviewsId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].nickName").value("testUser"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].roomName").value("Room name2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[2].content").value("너무 심각해요!"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].reviewsId").value(responseDtoList.get(3).getReviewsId()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].nickName").value("User Name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].roomName").value("Room name2"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data[3].content").value("또 오고 싶어요!"));
     }
 
     @Test
-    @DisplayName("ReviewsController addReview Success")
-    public void addReviewSuccess() throws Exception {
+    @DisplayName("ReviewsController createReview Success")
+    public void createReviewSuccess() throws Exception {
         // given
-        Long roomId = 1L;
+        Long roomsId = 1L;
 
-        String username = "testUser";
-        String password = "testPassword";
+        ReviewsRequestDto.CreateReviewRequestDto requestDto =
+                new ReviewsRequestDto.CreateReviewRequestDto("add room review!");
 
-        Users user = Users.builder()
-                .nickName(username)
-                .password(password)
-                .build();
-
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(user);
-
-        ReviewsRequestDto.AddReviewRequestDto requestDto =
-                new ReviewsRequestDto.AddReviewRequestDto("add room review!");
-
-        ReviewsResponseDto.CreateReviewResponseDto mockResponseDto = ReviewsResponseDto.CreateReviewResponseDto.builder()
+        Reviews createReview = Reviews.builder()
+                .rooms(room1)
+                .users(userDetails.getUser())
                 .content(requestDto.getContent())
-                .nickName(userDetails.getUser().getNickName())
                 .build();
 
-        when(reviewsService.addReview(roomId, userDetails.getUser(), requestDto)).thenReturn(mockResponseDto);
+        ReviewsResponseDto.CreateReviewResponseDto responseDto =
+                ReviewsResponseDto.CreateReviewResponseDto.builder()
+                        .content(createReview.getContent())
+                        .nickName(userDetails.getUsername())
+                        .roomName(room1.getName())
+                        .build();
 
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-        SecurityContextHolder.setContext(securityContext);
+        when(reviewsService.createReview(roomsId, userDetails.getUser(), requestDto)).thenReturn(responseDto);
 
-        when(reviewsService.addReview(eq(roomId), eq(user), eq(requestDto))).thenReturn(mockResponseDto);
-
-        // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/{roomsId}/review", roomId)
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/rooms/{roomsId}/review", roomsId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
+                        .content(asJsonString(requestDto)))
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 작성 성공"));
     }
 
     @Test
-    @DisplayName("ReviewsController modifyReview Success")
-    public void modifyReviewSuccess() throws Exception {
+    @DisplayName("ReviewsController updateReview Success")
+    public void updateReviewSuccess() throws Exception {
         // given
         Long roomId = 1L;
-        Long reviewId = 2L;
-
-        String username = "testUser";
-        String password = "testPassword";
-
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(
-                Users.builder()
-                        .nickName(username)
-                        .password(password)
-                        .build()
-        );
+        Long reviewId = 1L;
 
         ReviewsRequestDto.UpdateReviewRequestDto requestDto =
-                new ReviewsRequestDto.UpdateReviewRequestDto("Updated room review!");
+                new ReviewsRequestDto.UpdateReviewRequestDto("update room review!");
 
-        ReviewsResponseDto.UpdateReviewResponseDto mockResponseDto = ReviewsResponseDto.UpdateReviewResponseDto.builder()
-                .content(requestDto.getContent())
-                .nickName(userDetails.getUser().getNickName())
-                .build();
+        review1.update(requestDto);
 
-        when(reviewsService.modifyReview(roomId, reviewId, userDetails.getUser(), requestDto)).thenReturn(mockResponseDto);
+        ReviewsResponseDto.UpdateReviewResponseDto responseDto =
+                ReviewsResponseDto.UpdateReviewResponseDto.builder()
+                        .content(review1.getContent())
+                        .reviewsId(review1.getId())
+                        .roomName(review1.getRooms().getName())
+                        .nickName(review1.getUsers().getName())
+                        .build();
 
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-        SecurityContextHolder.setContext(securityContext);
-
+        when(reviewsService.updateReview(roomId, reviewId, userDetails.getUser(), requestDto)).thenReturn(responseDto);
         // when & then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/rooms/{roomsId}/review", roomId)
+        mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/rooms/{roomsId}/review/{reviewId}", roomId, reviewId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(requestDto)))
-                .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 작성 성공"))
-                .andDo(print())
-                .andReturn();
+                        .content(asJsonString(requestDto)))
+                        .andDo(print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 수정 성공"));
     }
 
     @Test
-    @DisplayName("ReviewsController removeReview Success")
-    public void removeReviewSuccess() throws Exception {
+    @DisplayName("ReviewsController deleteReview Success")
+    public void deleteReviewSuccess() throws Exception {
         // given
         Long roomId = 1L;
-        Long reviewId = 2L;
+        Long reviewId = 1L;
 
-        String username = "testUser";
-        String password = "testPassword";
+        Reviews deleteReview =
+                Reviews.builder()
+                        .users(userDetails.getUser())
+                        .content("delete Review!")
+                        .rooms(room1)
+                        .build();
 
-        UserDetailsImplV1 userDetails = new UserDetailsImplV1(
-                Users.builder()
-                        .nickName(username)
-                        .password(password)
-                        .build()
-        );
+        ReviewsResponseDto.DeleteReviewResponseDto responseDto =
+                ReviewsResponseDto.DeleteReviewResponseDto.builder().content(deleteReview.getContent()).build();
 
-        Rooms room = Rooms.builder().name("Room Number 1").users(userDetails.getUser()).build();
-        Reviews savedReview = Reviews.builder().users(userDetails.getUser()).rooms(room).build();
-
-        ReviewsResponseDto.DeleteReviewResponseDto mockResponseDto = ReviewsResponseDto.DeleteReviewResponseDto.builder()
-                .content(savedReview.getContent())
-                .nickName(userDetails.getUser().getNickName())
-                .build();
-
-        when(reviewsService.removeReview(roomId,reviewId,userDetails.getUser())).thenReturn(mockResponseDto);
-
-        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-        SecurityContextHolder.setContext(securityContext);
+        when(reviewsService.deleteReview(deleteReview.getId(), deleteReview.getId(), deleteReview.getUsers())).thenReturn(responseDto);
         // when & then
         mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/rooms/{roomsId}/review/{reviewId}", roomId, reviewId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("룸 리뷰 삭제 성공"));
+    }
+
+    private static String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
