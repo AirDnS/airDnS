@@ -85,6 +85,8 @@ public class RoomsConverter {
 
     public static RoomsSearchConditionDto toRoomsSearchCondition(RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return RoomsSearchConditionDto.builder()
+                .cursor(requestDto.getCursor())
+                .pageSize(requestDto.getPageSize())
                 .keyword(requestDto.getKeyword())
                 .startPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(0) : null)
                 .endPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(1) : null)

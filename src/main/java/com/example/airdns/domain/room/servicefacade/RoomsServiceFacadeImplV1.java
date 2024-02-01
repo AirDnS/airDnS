@@ -10,6 +10,7 @@ import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
 import com.example.airdns.domain.room.entity.Rooms;
@@ -67,11 +68,10 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     }
 
     @Override
-    public Page<ReadRoomsResponseDto> readRoomsList(
-            Pageable pageable,
+    public List<ReadRoomsListResponseDto> readRoomsList(
             ReadRoomsListRequestDto requestDto) {
         return roomsService.findAllSearchFilter(
-                pageable, RoomsConverter.toRoomsSearchCondition(requestDto));
+                RoomsConverter.toRoomsSearchCondition(requestDto));
     }
 
     @Override
