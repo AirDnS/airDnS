@@ -1,6 +1,7 @@
 package com.example.airdns.domain.reservation.repository;
 
 import com.example.airdns.domain.reservation.entity.QReservation;
+import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.room.entity.QRooms;
 
 import java.time.LocalDateTime;
@@ -18,4 +19,6 @@ public interface ReservationRepositoryQuery {
     List<Long> findReservationIds(LocalDateTime deleteTime);
 
     void deleteReservationInfo(Long reservationId);
+
+    Reservation findDeleteReservationInfo(Reservation reservation);
 }

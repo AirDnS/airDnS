@@ -71,7 +71,8 @@ public class ReservationServiceImplV1 implements ReservationService {
                 // 삭제된 Room
                 ()-> new ReservationCustomException(ReservationExceptionCode.NOT_FOUND_RESERVATION)
         );
-        deleteInfoService.saveDeletedReservationInfo(reservation);
+        Reservation saveReservation = reservationRepository.findDeleteReservationInfo(reservation);
+        deleteInfoService.saveDeletedReservationInfo(saveReservation);
     }
 
     @Override

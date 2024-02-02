@@ -28,7 +28,6 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     private final DeleteRoomsInfoRepository deleteRoomsInfoRepository;
     private final DeleteReservationInfoRepository deleteReservationInfoRepository;
     private final DeletePaymentsInfoRepository deletePaymentsInfoRepository;
-    private final EntityManager em;
 
     @Override
     @Transactional
@@ -47,19 +46,16 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
 
     @Override
     @Transactional
-    public void saveDeletedRoomsInfo(Rooms room){
-
-        // 1차 캐시에 있는 Rooms의 정보를 먼저 가져와서 넣기
-        Rooms saveRoom = em.find(Rooms.class, room.getId());
+    public void saveDeletedRoomsInfo(Rooms saveRoom){
 
         deleteRoomsInfoRepository.save(
                 DeleteRoomsInfo.builder()
                         .deletedAt(LocalDateTime.now())
-                        .name(room.getName())
-                        .price(room.getPrice())
-                        .address(room.getAddress())
-                        .size(room.getSize())
-                        .description(room.getDescription())
+                        .name(saveRoom.getName())
+                        .price(saveRoom.getPrice())
+                        .address(saveRoom.getAddress())
+                        .size(saveRoom.getSize())
+                        .description(saveRoom.getDescription())
                         .owner(saveRoom.getUsers().getNickname())
                         .build()
         );
@@ -67,15 +63,13 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
 
     @Override
     @Transactional
-    public void saveDeletedReservationInfo(Reservation reservation){
-
-        Reservation saveReservation = em.find(Reservation.class, reservation.getId());
+    public void saveDeletedReservationInfo(Reservation saveReservation){
 
         deleteReservationInfoRepository.save(
                 DeleteReservationsInfo.builder()
                         .cancelledAt(LocalDateTime.now())
-                        .checkIn(reservation.getCheckIn())
-                        .checkOut(reservation.getCheckOut())
+                        .checkIn(saveReservation.getCheckIn())
+                        .checkOut(saveReservation.getCheckOut())
                         .roomName(saveReservation.getRooms().getName())
                         .reserverName(saveReservation.getUsers().getNickname())
                         .build()
