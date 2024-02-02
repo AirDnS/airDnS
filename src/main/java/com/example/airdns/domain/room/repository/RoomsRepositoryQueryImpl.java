@@ -65,7 +65,7 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                     rooms.isClosed.isFalse()
             )
             .orderBy(rooms.id.desc())
-            .limit(ObjectUtils.defaultIfNull(condition.getPageSize(), 10L))
+            .limit(condition.getPageSize())
             .fetch();
 
         Map<Long, List<String>> imagesResult = queryFactory.select(
