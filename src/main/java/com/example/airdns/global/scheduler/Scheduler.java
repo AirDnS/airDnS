@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 @Component
@@ -21,7 +22,7 @@ public class Scheduler {
     private final PaymentServiceImplV1 paymentService;
 
     // 초 분 시 일 월 요일
-    //@Transactional
+    @Transactional
     @Scheduled(cron = "0 0 1 * * *")
     //@Scheduled(cron = "10 * * * * *")
     public void deleteEntities(){

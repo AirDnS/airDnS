@@ -28,7 +28,6 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
     private final DeleteRoomsInfoRepository deleteRoomsInfoRepository;
     private final DeleteReservationInfoRepository deleteReservationInfoRepository;
     private final DeletePaymentsInfoRepository deletePaymentsInfoRepository;
-    private final EntityManager em;
 
     @Override
     @Transactional
@@ -47,14 +46,7 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
 
     @Override
     @Transactional
-    public void saveDeletedRoomsInfo(Rooms room){
-
-        // 1차 캐시에 있는 Rooms의 정보를 먼저 가져와서 넣기
-        // Rooms saveRoom = em.find(Rooms.class, room.getId());
-        Rooms saveRoom = em.createQuery(
-                        "SELECT r FROM Rooms r JOIN FETCH r.users WHERE r.id = :roomId", Rooms.class)
-                .setParameter("roomId", room.getId())
-                .getSingleResult();
+    public void saveDeletedRoomsInfo(Rooms saveRoom){
 
         deleteRoomsInfoRepository.save(
                 DeleteRoomsInfo.builder()
@@ -71,12 +63,7 @@ public class DeleteInfoServiceImpl implements DeleteInfoService{
 
     @Override
     @Transactional
-    public void saveDeletedReservationInfo(Reservation reservation){
-
-        Reservation saveReservation = em.createQuery(
-                        "SELECT res FROM Reservation res JOIN FETCH res.rooms r JOIN FETCH res.users u WHERE res.id = :reservationId", Reservation.class)
-                .setParameter("reservationId", reservation.getId())
-                .getSingleResult();
+    public void saveDeletedReservationInfo(Reservation saveReservation){
 
         deleteReservationInfoRepository.save(
                 DeleteReservationsInfo.builder()

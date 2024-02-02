@@ -2,6 +2,7 @@ package com.example.airdns.domain.room.repository;
 
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
+import com.example.airdns.domain.room.entity.Rooms;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +23,6 @@ public interface RoomsRepositoryQuery {
     List<Long> findRoomIds(LocalDateTime deleteTime);
 
     void deleteRoomInfo(Long roomId);
+
+    Rooms findDeleteRoomInfo(Rooms room);
 }

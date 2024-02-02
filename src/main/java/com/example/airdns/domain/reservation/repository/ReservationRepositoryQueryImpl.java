@@ -72,4 +72,15 @@ public class ReservationRepositoryQueryImpl extends QuerydslRepositorySupport im
                 .where(qReservation.id.eq(reservationId))
                 .execute();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Reservation findDeleteReservationInfo(Reservation reservation){
+        return jpaQueryFactory
+                .selectFrom(qReservation)
+                .join(qReservation.rooms).fetchJoin()
+                .join(qReservation.users).fetchJoin()
+                .where(qReservation.id.eq(reservation.getId()))
+                .fetchOne();
+    }
 }

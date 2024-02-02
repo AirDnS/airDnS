@@ -81,7 +81,8 @@ public class RoomsServiceImplV1 implements RoomsService {
                 // 삭제된 Room
                 ()-> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID)
         );
-        deleteInfoService.saveDeletedRoomsInfo(room);
+        Rooms saveRoom = roomsRepository.findDeleteRoomInfo(room);
+        deleteInfoService.saveDeletedRoomsInfo(saveRoom);
     }
 
     @Override

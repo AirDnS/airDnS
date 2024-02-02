@@ -212,4 +212,14 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                 .where(rooms.id.eq(roomId))
                 .execute();
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Rooms findDeleteRoomInfo(Rooms room){
+        return queryFactory.selectFrom(rooms)
+                .join(rooms.users)
+                .fetchJoin()
+                .where(rooms.id.eq(room.getId()))
+                .fetchOne();
+    }
 }
