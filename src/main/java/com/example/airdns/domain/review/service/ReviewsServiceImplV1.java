@@ -119,7 +119,7 @@ public class ReviewsServiceImplV1 implements ReviewsService{
                 ()-> new ReviewsCustomException(ReviewsExceptionCode.NOT_DELETE_REVIEW)
         );
 
-        reviewsRepository.deleteById(reviewId);
+        reviewsRepository.delete(review);
 
         return ReviewsResponseDto.DeleteReviewResponseDto.builder()
                 .nickName(review.getUsers().getNickname())

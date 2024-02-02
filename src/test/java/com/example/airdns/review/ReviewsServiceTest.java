@@ -1,243 +1,220 @@
 package com.example.airdns.review;
 
-import com.example.airdns.domain.oauth2.common.OAuth2UserPrincipal;
 import com.example.airdns.domain.review.dto.ReviewsRequestDto;
 import com.example.airdns.domain.review.dto.ReviewsResponseDto;
-import com.example.airdns.domain.review.entity.QReviews;
 import com.example.airdns.domain.review.entity.Reviews;
-import com.example.airdns.domain.review.exception.NotModifyReviewException;
-import com.example.airdns.domain.review.exception.NotRemoveReviewException;
-import com.example.airdns.domain.review.exception.ReviewAlreadyExistsException;
+import com.example.airdns.domain.review.exception.ReviewsCustomException;
 import com.example.airdns.domain.review.repository.ReviewsRepository;
 import com.example.airdns.domain.review.service.ReviewsServiceImplV1;
 import com.example.airdns.domain.room.entity.Rooms;
-import com.example.airdns.domain.room.repository.RoomsRepository;
-import com.example.airdns.domain.room.service.RoomsService;
+import com.example.airdns.domain.room.service.RoomsServiceImplV1;
 import com.example.airdns.domain.user.entity.Users;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.global.security.UserDetailsImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@Transactional
+import java.util.List;
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 public class ReviewsServiceTest {
     @Mock
-    private RoomsService roomsService;
-
-    @Mock
-    private ReviewsRepository reviewsRepository;
-
-    @Mock
-    private JPAQueryFactory queryFactory;
-
-    @Mock
-    private QReviews qReviews;
-
-    @Mock
-    private RoomsRepository roomsRepository;
-
+    private RoomsServiceImplV1 roomsService;
     @InjectMocks
     private ReviewsServiceImplV1 reviewsService;
-
-    @Test
-    @DisplayName("ReviewsService getReview Success")
-    void getReviewSuccess() {
-        // given
-        Long roomId = 1L;
-        Long reviewId = 1L;
-
-        Reviews mockReview = Reviews.builder()
-                .users(Users.builder().nickName("User number 1").build())
-                .rooms(Rooms.builder().name("Room Number 1").build())
-                .content("review Content")
-                .build();
-
-        when(reviewsRepository.findByRoomsId(roomId)).thenReturn(Optional.of(mockReview));
-
-        // when
-        ReviewsResponseDto.ReadReviewResponseDto result = reviewsService.getReview(roomId, reviewId);
-
-        // then
-        assertNotNull(result);
-        assertEquals("review Content", result.getContent());
-    }
-
-    @Test
-    @DisplayName("ReviewsService addReview Success")
-    void addReviewSuccess() {
-        // given
-        Long roomId = 1L;
-
-        Users user = saveUsersInfo();
-
-        ReviewsRequestDto.AddReviewRequestDto requestDto
-                = new ReviewsRequestDto.AddReviewRequestDto("Test review content");
-        Rooms room = Rooms.builder().id(roomId).name("Room number1").build();
-        when(roomsService.findById(roomId)).thenReturn(room);
-
-        when(reviewsRepository.existsByRoomsId(roomId)).thenReturn(Optional.of(
-                Reviews.builder()
-                        .rooms(room)
-                        .users(user)
-                        .content(requestDto.getContent())
-                        .build())
+    private UserDetailsImpl userDetails;
+    private Users notLoginUser;
+    @Mock
+    private ReviewsRepository reviewsRepository;
+    @BeforeEach
+    void setup(){
+        userDetails = new UserDetailsImpl(
+                Users.builder().id(1L).nickname("testUser").role(UserRole.USER).build()
         );
+        notLoginUser = Users.builder().id(2L).name("User Name").role(UserRole.USER).build();
 
-        Reviews savedReview = Reviews.builder()
-                .id(1L)
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    @Test
+    @DisplayName("ReviewsService readReviewList Success")
+    void readReviewListSuccess() {
+        // given
+        Long roomId = 1L; // 방 ID를 명시적으로 설정
+        Users user = Users.builder().nickname(userDetails.getUser().getNickname()).build();
+        Rooms room = Rooms.builder().id(roomId).name("RoomName").users(user).build();
+
+        Reviews review1 = Reviews.builder()
                 .rooms(room)
-                .users(user)
-                .content(requestDto.getContent())
-                .build();
-
-        when(reviewsRepository.save(any(Reviews.class))).thenReturn(savedReview);
-
-        // when
-        ReviewsResponseDto.CreateReviewResponseDto result = reviewsService.addReview(roomId, user, requestDto);
-
-        // then
-        assertNotNull(result);
-        assertEquals(user.getNickName(), result.getNickName());
-        assertEquals(room.getName(), result.getRoomName());
-        assertEquals(requestDto.getContent(), result.getContent());
-    }
-
-    @Test
-    @DisplayName("ReviewsService addReview ReviewAlreadyExistsException")
-    void addReviewReviewAlreadyExists() {
-        // given
-        Long roomsId = 1L;
-        OAuth2UserPrincipal userDetails = mock(OAuth2UserPrincipal.class);
-        Rooms room = Rooms.builder().id(roomsId).name("Room Number1").build();
-
-        ReviewsRequestDto.AddReviewRequestDto requestDto = ReviewsRequestDto.AddReviewRequestDto.builder()
-                .content("Great stay!")
-                .build();
-
-        when(roomsService.findById(roomsId)).thenReturn(room);
-
-        // when / then
-        assertThrows(ReviewAlreadyExistsException.class,
-                () -> reviewsService.addReview(roomsId, userDetails.getUser(), requestDto));
-
-        verify(reviewsRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("ReviewsService modifyReview Success")
-    void modifyReviewSuccess() {
-        // given
-        Long roomId = 1L;
-        Long reviewId = 1L;
-
-        Users user = saveUsersInfo();
-
-        Rooms room = Rooms.builder().id(roomId).users(user).name("Room number1").build();
-
-        Reviews originalReview = Reviews.builder()
-                .id(reviewId)
-                .rooms(room)
-                .users(user)
-                .content("original review")
-                .build();
-
-        when(reviewsRepository.findByIdAndUsersId(user.getId(), reviewId)).thenReturn(Optional.of(originalReview));
-
-        ReviewsRequestDto.UpdateReviewRequestDto requestDto
-                = new ReviewsRequestDto.UpdateReviewRequestDto("modify review");
-
-        // when
-        ReviewsResponseDto.UpdateReviewResponseDto result
-                = reviewsService.modifyReview(roomId, reviewId, user, requestDto);
-
-        // then
-        assertNotNull(result);
-        assertEquals(user.getNickName(), result.getNickName());
-        assertEquals(room.getName(), result.getRoomName());
-        assertEquals(requestDto.getContent(), result.getContent());
-    }
-
-    @Test
-    @DisplayName("ReviewsService modifyReview NotModifyReviewException")
-    public void modifyReviewNotModifyReviewException(){
-        Long mockUserId = 1L;
-        Long mockReviewId = 1L;
-        Long mockRoomId = 1L;
-
-        Users user = saveUsersInfo();
-
-        ReviewsRequestDto.UpdateReviewRequestDto mockRequestDto = new ReviewsRequestDto.UpdateReviewRequestDto();
-
-        when(reviewsRepository.findByIdAndUsersId(mockUserId, mockReviewId)).thenReturn(Optional.empty());
-
-        assertThrows(NotModifyReviewException.class, () -> {
-            reviewsService.modifyReview(mockRoomId, mockReviewId, user, mockRequestDto);
-        });
-    }
-
-    @Test
-    @DisplayName("ReviewsService deleteReview Success")
-    public void deleteReviewSuccess(){
-        // given
-        Long userId = 1L;
-        Long reviewId = 1L;
-        Long roomId = 1L;
-
-        Users user = saveUsersInfo();
-
-        Rooms room = Rooms.builder().name("Room Number1").build();
-        Reviews review = Reviews.builder()
+                .content("review content1")
                 .users(user)
                 .rooms(room)
-                .content("content").build();
+                .build();
 
-        when(reviewsRepository.findByIdAndUsersId(reviewId, userId)).thenReturn(Optional.of(review));
+        Reviews review2 = Reviews.builder()
+                .rooms(room)
+                .content("review content2")
+                .users(user)
+                .rooms(room)
+                .build();
+
+        room.addReview(review1);
+        room.addReview(review2);
+
+        when(roomsService.findById(room.getId())).thenReturn(room);
 
         // when
-        reviewsService.removeReview(roomId, reviewId, user);
+        List<ReviewsResponseDto.ReadReviewResponseDto> responseDtoList = reviewsService.readReviewList(room.getId());
 
         // then
-        verify(reviewsRepository).deleteById(reviewId);
+        assertNotNull(responseDtoList);
+        assertEquals(2, responseDtoList.size());
+        // 해당 사항은 user 객체에 username만 넣었기에 가능
+        assertEquals(review1.getUsers().getNickname(), responseDtoList.get(0).getNickName());
+        assertEquals(review2.getUsers().getNickname(), responseDtoList.get(1).getNickName());
+        assertEquals(review1.getRooms().getName(), responseDtoList.get(0).getRoomName());
+        assertEquals(review2.getRooms().getName(), responseDtoList.get(1).getRoomName());
+        assertEquals(review1.getContent(), responseDtoList.get(0).getContent());
+        assertEquals(review2.getContent(), responseDtoList.get(1).getContent());
     }
 
     @Test
-    @DisplayName("ReviewsService deleteReview Success")
-    public void testNotRemoveReviewException() {
+    @DisplayName("ReviewsService createReview ALREADY_EXISTS_REVIEW Exception")
+    void createReviewAlreadyExistsReview(){
         // given
-        Long userId = 1L;
-        Long reviewId = 1L;
-        Long roomId = 1L;
-        Users user = saveUsersInfo();
+        Long roomId = 5000L;
+        Rooms room = Rooms.builder().id(roomId).users(notLoginUser).name("Room Name").build();
+        ReviewsRequestDto.CreateReviewRequestDto requestDto =
+                ReviewsRequestDto.CreateReviewRequestDto.builder().content("create review").build();
 
-        when(reviewsRepository.findByIdAndUsersId(reviewId, userId)).thenReturn(Optional.empty());
+        when(roomsService.findById(roomId)).thenReturn(room);
+        // 존재 여부 확인을 위해 true를 반환하도록 설정
+        when(reviewsRepository.existsByRoomsId(roomId)).thenReturn(Optional.empty());
 
         // when & then
-        assertThrows(NotRemoveReviewException.class, () -> {
-            reviewsService.removeReview(roomId, reviewId, user);
-        });
+        assertThrows(ReviewsCustomException.class, () -> reviewsService.createReview(roomId, userDetails.getUser(), requestDto));
     }
 
-    private Users saveUsersInfo(){
-        OAuth2UserPrincipal userDetails = mock(OAuth2UserPrincipal.class);
-        Users mockUser = Users.builder().id(1L).nickName("test").build();
-        when(userDetails.getUser()).thenReturn(mockUser);
+    @Test
+    @DisplayName("ReviewsService updateReview Success")
+    void updateReviewSuccess(){
+        Rooms room  = Rooms.builder().users(userDetails.getUser()).build();
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        ReviewsRequestDto.UpdateReviewRequestDto requestDto = new ReviewsRequestDto.UpdateReviewRequestDto("Updated Content");
 
-        return userDetails.getUser();
+        Reviews review = Reviews.builder().users(userDetails.getUser()).rooms(room).content(requestDto.getContent()).build();
+        when(reviewsRepository.findById(review.getId())).thenReturn(Optional.of(review));
+
+        ReviewsResponseDto.UpdateReviewResponseDto updatedReview = reviewsService.updateReview(room.getId(), review.getId(), userDetails.getUser(), requestDto);
+
+        assertNotNull(updatedReview);
+        assertEquals("Updated Content", updatedReview.getContent());
+        assertEquals(userDetails.getUser().getId(), updatedReview.getUsersId());
+
+        verify(reviewsRepository, times(1)).save(review);
+    }
+
+    @Test
+    @DisplayName("ReviewsService updateReview NOT_FOUND_REVIEW Exception")
+    void updateReviewNotFoundReview(){
+        // given
+        Long roomId = 1L;
+        Long reviewId = 1L;
+        ReviewsRequestDto.UpdateReviewRequestDto requestDto
+                = new ReviewsRequestDto.UpdateReviewRequestDto("updated content");
+
+        when(reviewsRepository.findById(reviewId)).thenReturn(Optional.empty());
+
+        // when & then
+        assertThrows(ReviewsCustomException.class,
+                () -> reviewsService.updateReview(roomId, reviewId, userDetails.getUser(), requestDto));
+    }
+
+    @Test
+    @DisplayName("ReviewsService updateReview NOT_MODIFY_REVIEW Exception")
+    void updateReviewNotModifyReview(){
+        // given
+        Long roomId = 1L;
+        Rooms room = Rooms.builder()
+                .id(roomId)
+                .name("Room Name")
+                .users(notLoginUser)
+                .build();
+
+        Long reviewId = 1L;
+
+        Reviews review = Reviews.builder()
+                .users(notLoginUser)
+                .id(reviewId)
+                .rooms(room)
+                .content("original Review!")
+                .build();
+
+        ReviewsRequestDto.UpdateReviewRequestDto requestDto = new ReviewsRequestDto.UpdateReviewRequestDto("Update review");
+
+        when(reviewsRepository.findById(anyLong())).thenReturn(Optional.of(review));
+
+        // when & then
+        assertThrows(ReviewsCustomException.class,
+                () -> reviewsService.updateReview(roomId, reviewId, userDetails.getUser(), requestDto));
+    }
+    @Test
+    @DisplayName("ReviewsService deleteReview Success")
+    void deleteReviewSuccess(){
+        Rooms room = Rooms.builder()
+                .users(userDetails.getUser())
+                .name("Room Name")
+                .build();
+
+        Reviews review = Reviews.builder()
+                .users(userDetails.getUser())
+                .rooms(room)
+                .content("delete Review!")
+                .build();
+
+        when(reviewsRepository.findByIdAndUsersId(review.getId(), userDetails.getUser().getId())).thenReturn(Optional.of(review));
+
+        ReviewsResponseDto.DeleteReviewResponseDto responseDto = reviewsService.deleteReview(room.getId(), review.getId(), userDetails.getUser());
+
+        assertNotNull(responseDto);
+        assertEquals("delete Review!", responseDto.getContent());
+
+        verify(reviewsRepository, times(1)).delete(review);
+    }
+
+    @Test
+    @DisplayName("ReviewsService deleteReview NOT_DELETE_REVIEW Exception")
+    void deleteReviewNotDeleteReview(){
+        Users loginUser = userDetails.getUser();
+        Rooms room = Rooms.builder().id(1L).users(notLoginUser).build();
+
+        Reviews review = Reviews.builder()
+                .id(1L)
+                .users(notLoginUser)
+                .rooms(room)
+                .content("delete Reivew! Exception")
+                .build();
+
+        // Stubbing : Repository나 Service 클래스의 메서드를 Stubbing하여
+        // DB 연결 없이 원하는 결과를 반환하도록 설정할 수 있습니다.
+        // Mockito가 사용하지 않는 stubbing을 사용하기에 lenient()... 사용
+        lenient().when(reviewsRepository.findById(review.getId())).thenReturn(Optional.of(review));
+
+        assertThrows(ReviewsCustomException.class, () -> reviewsService.deleteReview(room.getId(), review.getId(), loginUser));
+
+        verify(reviewsRepository, never()).delete(any(Reviews.class));
     }
 }
