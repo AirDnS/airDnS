@@ -6,6 +6,7 @@ import com.example.airdns.domain.payment.service.PaymentServiceImplV1;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import com.example.airdns.domain.reservation.service.ReservationServiceImplV1;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
@@ -60,8 +61,8 @@ public class RoomsServiceImplV1 implements RoomsService {
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
     }
     @Override
-    public Page<ReadRoomsResponseDto> findAllSearchFilter(Pageable pageable, RoomsSearchConditionDto condition) {
-        return roomsRepository.findAllSearchFilter(pageable, condition);
+    public List<ReadRoomsListResponseDto> findAllSearchFilter(RoomsSearchConditionDto condition) {
+        return roomsRepository.findAllSearchFilter(condition);
     }
 
     @Override
