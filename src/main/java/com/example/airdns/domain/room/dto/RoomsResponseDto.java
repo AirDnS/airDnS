@@ -45,6 +45,9 @@ public class RoomsResponseDto {
         private Boolean isClosed;
         private LocalDateTime createdAt;
         private String image;
+        private Double latitude; // 위도
+        private Double longitude; // 경도
+        private Double distance;
     }
 
     @Getter

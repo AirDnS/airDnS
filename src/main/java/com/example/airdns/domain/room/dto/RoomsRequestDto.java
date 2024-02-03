@@ -1,9 +1,7 @@
 package com.example.airdns.domain.room.dto;
 
-import com.example.airdns.domain.user.entity.Users;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -28,6 +26,9 @@ public class RoomsRequestDto {
         @Schema(description = "주소", example = "서울특별시 강남구 테헤란로44길 8")
         private String address;
 
+        @Schema(description = "상세주소", example = "[1,2,3]")
+        private String addressDetail;
+
         @Schema(description = "방 평수", example = "10")
         @PositiveOrZero(message = "평수는 0보다 큰 값을 입력해야 합니다.")
         private Integer size;
@@ -37,6 +38,12 @@ public class RoomsRequestDto {
 
         @Schema(description = "방에 입력할 장비 종류 리스트", example = "[1,2,3]")
         private List<Long> equipment;
+
+        @Schema(description = "위도", example = "33.450701")
+        private Double latitude;
+
+        @Schema(description = "경도", example = "126.570667")
+        private Double longitude;
     }
 
     @Getter
@@ -88,7 +95,14 @@ public class RoomsRequestDto {
 
         @Schema(description = "장비 종류", example = "[1,2,4,5,10]")
         private List<Long> equipment;
+
+        @Schema(description = "검색 위도", example = "33.450701")
+        private Double latitude; // 위도
+
+        @Schema(description = "검색 경도", example = "126.570667")
+        private Double longitude; // 경도
     }
+
     @Getter
     @Setter
     @Builder

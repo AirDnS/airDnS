@@ -45,6 +45,12 @@ public class Rooms extends CommonEntity {
     @Column
     private String description;
 
+    @Column
+    private Double latitude; // 위도, y좌표
+
+    @Column
+    private Double longitude; // 경도, x좌표
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean isClosed = Boolean.FALSE;
