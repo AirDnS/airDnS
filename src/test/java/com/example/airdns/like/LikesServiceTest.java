@@ -49,6 +49,10 @@ public class LikesServiceTest {
         // given
         Long roomId = 1L;
         Rooms room = mock(Rooms.class);
+        Users user = mock(Users.class);
+
+        when(user.getName()).thenReturn("User Name");
+        when(room.getUsers()).thenReturn(user);
         when(roomsService.findById(roomId)).thenReturn(room);
 
         List<Likes> likesList = IntStream.range(0, 5)
@@ -62,6 +66,8 @@ public class LikesServiceTest {
 
         // then
         assertEquals(5, response.getLikeCount());
+        assertEquals(user.getName(), response.getOwnerName());
+        assertEquals(room.getName(), response.getRoomName());
     }
 
     @Test
