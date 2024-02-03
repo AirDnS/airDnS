@@ -22,4 +22,7 @@ public class RoomsSearchConditionDto {
     List<Long> equpmentList;
     Users users;
     Boolean isClosed;
+    Double latitude;
+    Double longitude;
+    Double searchDistance;
 }

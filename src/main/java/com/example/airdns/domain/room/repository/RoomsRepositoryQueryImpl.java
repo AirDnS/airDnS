@@ -4,13 +4,13 @@ import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
+import com.example.airdns.global.address.AddressUtil;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +39,8 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         this.queryFactory = queryFactory;
     }
 
+    //TODO 좌표값 없으면 정렬, 있으면 조회 후 정렬되도록
+    //TODO 좌표 검색에 대해 없으면 searchDistance를 늘려서 검색하도록 유도하는 방안 검토
     @Override
     public List<RoomsResponseDto.ReadRoomsListResponseDto> findAllSearchFilter(
             RoomsSearchConditionDto condition) {
@@ -50,7 +52,9 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                         rooms.address,
                         rooms.size,
                         rooms.isClosed,
-                        rooms.createdAt
+                        rooms.createdAt,
+                        rooms.latitude,
+                        rooms.longitude
                         )
             )
             .from(rooms)
@@ -61,6 +65,11 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                     betweenSize(condition.getStartSize(), condition.getEndSize()),
                     inEquipment(condition.getEqupmentList()),
                     lessThanCursor(condition.getCursor()),
+                    nearbyPoiont(
+                            condition.getLatitude(),
+                            condition.getLongitude(),
+                            condition.getSearchDistance()),
+
                     rooms.isDeleted.isFalse(),
                     rooms.isClosed.isFalse()
             )
@@ -80,13 +89,29 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
             )
             .transform(groupBy(images.rooms.id).as(list(images.imageUrl)));
 
-        roomsResult.forEach(
-                result -> result.setImage(
-                        imagesResult.get(result.getRoomsId()) != null
-                                ? imagesResult.get(result.getRoomsId()).get(0)
-                                : null
-                )
-        );
+        for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsResult) {
+            result.setImage(
+                    imagesResult.get(result.getRoomsId()) != null
+                            ? imagesResult.get(result.getRoomsId()).get(0)
+                            : null
+            );
+        }
+
+        if (condition.getSearchDistance() != null
+                && condition.getLatitude() != null
+                && condition.getLongitude() != null) {
+            for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsResult) {
+                if (result.getLatitude() != null) {
+                    result.setDistance(
+                            AddressUtil.distance(
+                                    result.getLatitude(), condition.getLatitude(),
+                                    result.getLongitude(), condition.getLongitude()
+                            )
+                    );
+
+                }
+            }
+        }
 
         return roomsResult;
     }
@@ -178,6 +203,21 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                 equpmentList
                         ))
         );
+    }
+
+    private BooleanExpression nearbyPoiont(Double latitude, Double longitude, Double searchDistance) {
+        if (searchDistance != null && latitude != null && longitude != null ) {
+            //TODO 경도에 따른 거리계산이 잘 되고있지 않음 (좌우)
+            return rooms.latitude.between(
+                    latitude - AddressUtil.kmToLatitude(searchDistance),
+                    latitude + AddressUtil.kmToLatitude(searchDistance)
+            ).and(rooms.longitude.between(
+                    longitude - AddressUtil.kmToLongtitude(searchDistance),
+                    longitude + AddressUtil.kmToLongtitude(searchDistance)
+            ));
+        }
+
+        return null;
     }
 
     @Override

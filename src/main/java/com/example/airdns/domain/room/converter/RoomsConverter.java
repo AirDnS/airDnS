@@ -21,10 +21,12 @@ public class RoomsConverter {
         return Rooms.builder()
                 .users(users)
                 .price(requestDto.getPrice())
-                .address(requestDto.getAddress())
+                .address(requestDto.getAddress() + ", " + requestDto.getAddressDetail())
                 .size(requestDto.getSize())
                 .description(requestDto.getDesc())
                 .name(requestDto.getName())
+                .latitude(requestDto.getLatitude())
+                .longitude(requestDto.getLongitude())
                 .build();
     }
 
@@ -96,6 +98,9 @@ public class RoomsConverter {
                 .endPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(1) : null)
                 .startSize(requestDto.getSize() != null ? requestDto.getSize().get(0) : null)
                 .endSize(requestDto.getSize() != null ? requestDto.getSize().get(1) : null)
+                .latitude(requestDto.getLatitude())
+                .longitude(requestDto.getLongitude())
+                .searchDistance(100.0) //TODO front 요청에 따라 값 다르게 받도록, 데이터 량에 따라 조절가능하도록 수정
                 .equpmentList(requestDto.getEquipment())
                 .build();
     }
