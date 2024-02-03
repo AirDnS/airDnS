@@ -84,7 +84,10 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
             .from(images)
             .where(
                 images.rooms.id.in(
-                        roomsResult.stream().map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId).toList()
+                        roomsResult
+                                .stream()
+                                .map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId)
+                                .toList()
                 )
             )
             .transform(groupBy(images.rooms.id).as(list(images.imageUrl)));
@@ -131,7 +134,8 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         return getRoomsResponseDto(pageable, query);
     }
 
-    private Page<RoomsResponseDto.ReadRoomsResponseDto> getRoomsResponseDto(Pageable pageable, JPQLQuery<Rooms> query) {
+    private Page<RoomsResponseDto.ReadRoomsResponseDto> getRoomsResponseDto(
+            Pageable pageable, JPQLQuery<Rooms> query) {
         List<RoomsResponseDto.ReadRoomsResponseDto> content;
         try (Stream<Rooms> stream = Objects.requireNonNull(this.getQuerydsl())
                 .applyPagination(pageable, query)
@@ -205,7 +209,9 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         );
     }
 
-    private BooleanExpression nearbyPoiont(Double latitude, Double longitude, Double searchDistance) {
+    private BooleanExpression nearbyPoiont(Double latitude,
+                                           Double longitude,
+                                           Double searchDistance) {
         if (searchDistance != null && latitude != null && longitude != null ) {
             //TODO 경도에 따른 거리계산이 잘 되고있지 않음 (좌우)
             return rooms.latitude.between(
