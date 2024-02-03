@@ -8,6 +8,8 @@ import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/rooms")
+@Tag(name = "review", description = "Review API")
 @RequiredArgsConstructor
 public class ReviewsController {
 
@@ -41,6 +44,7 @@ public class ReviewsController {
     }
 
     @PostMapping("/{roomsId}/review")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "룸 리뷰 작성 성공"),
             @ApiResponse(responseCode = "400", description = "해당 방에 대한 리뷰가 이미 존재합니다."),
@@ -56,6 +60,7 @@ public class ReviewsController {
     }
 
     @PatchMapping("/{roomsId}/review/{reviewId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 수정 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 수정할 권한이 없습니다."),
@@ -72,6 +77,7 @@ public class ReviewsController {
     }
 
     @DeleteMapping("/{roomsId}/review/{reviewId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 삭제할 권한이 없습니다."),
