@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 @AllArgsConstructor
 public class ImagesServiceImplV1 implements ImagesService {
@@ -41,6 +44,11 @@ public class ImagesServiceImplV1 implements ImagesService {
         s3FileUtil.removeFile(images.getImageUrl(), getFilePrefix(images.getRooms()));
         imagesRepository.delete(images);
         rooms.deleteImages(images);
+    }
+
+    @Override
+    public Map<Long, List<String>> findAllByRoomsId(List<Long> roomsIdList) {
+        return imagesRepository.findImageUrlGroupByRoomsId(roomsIdList);
     }
 
 
