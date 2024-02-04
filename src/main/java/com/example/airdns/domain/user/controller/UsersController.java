@@ -28,7 +28,6 @@ public class UsersController {
 
     private final UsersService usersService;
 
-
     @PatchMapping("/users/profile")
     @SecurityRequirement(name = "Bearer Authentication")
     @Operation(summary = "유저 정보 수정", description = "사용중 유저의 닉네임과 주소 핸드폰 번호 변경이 가능하다.")
@@ -39,10 +38,10 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
     public ResponseEntity<CommonResponse<UsersResponseDto.UpdateUsersResponseDto>> updateProfile(
-            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl,
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl,
             @Valid @RequestBody UsersRequestDto.UpdateUserInfoRequestDto userRequestDto) {
 
-        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUser(UserDetailsImpl.getUser().getId()
+        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUser(userDetailsImpl.getUser().getId()
                 , userRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "프로필 수정 성공", responseDto)
@@ -59,9 +58,9 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
     public ResponseEntity<CommonResponse<UsersResponseDto.UpdateUsersResponseDto>> updateRole(
-            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 
-        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUserRole(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.UpdateUsersResponseDto responseDto = usersService.updateUserRole(userDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "권한 변경 성공", responseDto)
         );
@@ -77,9 +76,9 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
     public ResponseEntity readUserInfo(
-            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
 
-        UsersResponseDto.ReadUserResponseDto responseDto = usersService.readUserInfo(UserDetailsImpl.getUser().getId());
+        UsersResponseDto.ReadUserResponseDto responseDto = usersService.readUserInfo(userDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "유저 정보 조회 성공", responseDto)
         );
@@ -94,8 +93,8 @@ public class UsersController {
             @ApiResponse(responseCode = "404", description = "해당 유저는 존재하지 않습니다")
     })
     public ResponseEntity readUserSilence(
-            @AuthenticationPrincipal UserDetailsImpl UserDetailsImpl) {
-        usersService.readUserSilence(UserDetailsImpl.getUser().getId());
+            @AuthenticationPrincipal UserDetailsImpl userDetailsImpl) {
+        usersService.readUserSilence(userDetailsImpl.getUser().getId());
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "Silence Login")
         );
