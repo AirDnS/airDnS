@@ -102,7 +102,7 @@ public class RoomsRequestDto {
         @Schema(description = "검색 경도", example = "126.570667")
         private Double longitude; // 경도
 
-        @Schema(description = "검색 지도 범위", example = "126.570667")
+        @Schema(description = "검색 지도 범위", example = "100.0")
         private Double searchDistance;
     }
 
