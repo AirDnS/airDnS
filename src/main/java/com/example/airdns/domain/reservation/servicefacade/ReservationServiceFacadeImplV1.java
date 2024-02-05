@@ -175,7 +175,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
 
             // DeleteInfo 저장
             saveDeleteReservationInfo(reservationId);
-            paymentIds.forEach(paymentId -> paymentService.saveDeletedPaymentInfo(paymentId));
+            paymentIds.forEach(paymentService::saveDeletedPaymentInfo);
 
             // 연관된 Payments 삭제
             paymentService.deleteByReservationId(reservationId);
