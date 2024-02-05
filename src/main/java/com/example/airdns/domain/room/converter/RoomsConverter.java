@@ -86,6 +86,11 @@ public class RoomsConverter {
     }
 
     public static RoomsSearchConditionDto toRoomsSearchCondition(RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
+        Double searchDistance = requestDto.getSearchDistance() != null
+                ? requestDto.getSearchDistance() < 100
+                    ? requestDto.getSearchDistance() : 100.0
+                : null;
+
         return RoomsSearchConditionDto.builder()
                 .cursor(requestDto.getCursor())
                 .pageSize(
@@ -100,7 +105,7 @@ public class RoomsConverter {
                 .endSize(requestDto.getSize() != null ? requestDto.getSize().get(1) : null)
                 .latitude(requestDto.getLatitude())
                 .longitude(requestDto.getLongitude())
-                .searchDistance(100.0) //TODO front 요청에 따라 값 다르게 받도록, 데이터 량에 따라 조절가능하도록 수정
+                .searchDistance(searchDistance)
                 .equpmentList(requestDto.getEquipment())
                 .build();
     }

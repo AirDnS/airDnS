@@ -2,9 +2,10 @@ package com.example.airdns.domain.image.service;
 
 import com.example.airdns.domain.image.entity.Images;
 import com.example.airdns.domain.room.entity.Rooms;
-import com.example.airdns.domain.user.entity.Users;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.Map;
 
 public interface ImagesService {
 
@@ -12,4 +13,5 @@ public interface ImagesService {
 
     void deleteImages(Long imagesId, Rooms rooms);
 
+    Map<Long, List<String>> findAllByRoomsId(List<Long> roomsIdList);
 }

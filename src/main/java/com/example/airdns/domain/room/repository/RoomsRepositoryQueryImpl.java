@@ -10,6 +10,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,31 +21,29 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static com.example.airdns.domain.image.entity.QImages.images;
 import static com.example.airdns.domain.room.entity.QRooms.rooms;
 import static com.example.airdns.domain.roomequipment.entity.QRoomEquipments.roomEquipments;
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
 
 public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implements RoomsRepositoryQuery {
 
     private final JPAQueryFactory queryFactory;
+
+    //TODO @Value("${}")
+    //지도 검색 시 최대 건수 제한, 프런트랑 같이 수정할 것
+    private Integer mapSearchLimit = 100;
 
     public RoomsRepositoryQueryImpl(JPAQueryFactory queryFactory) {
         super(Rooms.class);
         this.queryFactory = queryFactory;
     }
 
-    //TODO 좌표값 없으면 정렬, 있으면 조회 후 정렬되도록
-    //TODO 좌표 검색에 대해 없으면 searchDistance를 늘려서 검색하도록 유도하는 방안 검토
     @Override
     public List<RoomsResponseDto.ReadRoomsListResponseDto> findAllSearchFilter(
             RoomsSearchConditionDto condition) {
-        List<RoomsResponseDto.ReadRoomsListResponseDto> roomsResult = queryFactory.select(
+        JPAQuery<RoomsResponseDto.ReadRoomsListResponseDto> query = queryFactory.select(
                 Projections.fields(RoomsResponseDto.ReadRoomsListResponseDto.class,
                         rooms.id.as("roomsId"),
                         rooms.name,
@@ -72,48 +71,18 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
 
                     rooms.isDeleted.isFalse(),
                     rooms.isClosed.isFalse()
-            )
-            .orderBy(rooms.id.desc())
-            .limit(condition.getPageSize())
-            .fetch();
-
-        Map<Long, List<String>> imagesResult = queryFactory.select(
-                images.imageUrl,
-                images.rooms.id
-            )
-            .from(images)
-            .where(
-                images.rooms.id.in(
-                        roomsResult
-                                .stream()
-                                .map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId)
-                                .toList()
-                )
-            )
-            .transform(groupBy(images.rooms.id).as(list(images.imageUrl)));
-
-        for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsResult) {
-            result.setImage(
-                    imagesResult.get(result.getRoomsId()) != null
-                            ? imagesResult.get(result.getRoomsId()).get(0)
-                            : null
             );
-        }
 
-        if (condition.getSearchDistance() != null
-                && condition.getLatitude() != null
-                && condition.getLongitude() != null) {
-            for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsResult) {
-                if (result.getLatitude() != null) {
-                    result.setDistance(
-                            AddressUtil.distance(
-                                    result.getLatitude(), condition.getLatitude(),
-                                    result.getLongitude(), condition.getLongitude()
-                            )
-                    );
-
-                }
-            }
+        List<RoomsResponseDto.ReadRoomsListResponseDto> roomsResult;
+        if (condition.getSearchDistance() == null) {
+            roomsResult = query
+                    .orderBy(rooms.id.desc())
+                    .limit(condition.getPageSize())
+                    .fetch();
+        } else {
+            roomsResult = query
+                    .limit(mapSearchLimit)
+                    .fetch();
         }
 
         return roomsResult;
@@ -215,11 +184,11 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         if (searchDistance != null && latitude != null && longitude != null ) {
             //TODO 경도에 따른 거리계산이 잘 되고있지 않음 (좌우)
             return rooms.latitude.between(
-                    latitude - AddressUtil.kmToLatitude(searchDistance),
-                    latitude + AddressUtil.kmToLatitude(searchDistance)
+                    latitude - AddressUtil.calLatDiff(searchDistance),
+                    latitude + AddressUtil.calLatDiff(searchDistance)
             ).and(rooms.longitude.between(
-                    longitude - AddressUtil.kmToLongtitude(searchDistance),
-                    longitude + AddressUtil.kmToLongtitude(searchDistance)
+                    longitude - AddressUtil.calLongDiff(searchDistance, latitude),
+                    longitude + AddressUtil.calLongDiff(searchDistance, latitude)
             ));
         }
 

@@ -13,6 +13,7 @@ import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
+import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
@@ -20,6 +21,7 @@ import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.roomequipment.service.RoomEquipmentsService;
 import com.example.airdns.domain.user.entity.Users;
 import com.example.airdns.domain.user.enums.UserRole;
+import com.example.airdns.global.address.AddressUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -70,8 +74,46 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     @Override
     public List<ReadRoomsListResponseDto> readRoomsList(
             ReadRoomsListRequestDto requestDto) {
-        return roomsService.findAllSearchFilter(
-                RoomsConverter.toRoomsSearchCondition(requestDto));
+
+        RoomsSearchConditionDto roomsSearchConditionDto = RoomsConverter.toRoomsSearchCondition(requestDto);
+
+        List<ReadRoomsListResponseDto> roomsList = roomsService.findAllSearchFilter(roomsSearchConditionDto);
+
+        List<Long> roomsIdList = roomsList.stream()
+                .map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId)
+                .toList();
+
+        Map<Long, List<String>> imagesMap = imagesService.findAllByRoomsId(roomsIdList);
+
+        for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsList) {
+            result.setImage(
+                    imagesMap.get(result.getRoomsId()) != null
+                            ? imagesMap.get(result.getRoomsId()).get(0)
+                            : null
+            );
+        }
+
+        if (requestDto.getSearchDistance() != null
+                && requestDto.getLatitude() != null
+                && requestDto.getLongitude() != null) {
+            for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsList) {
+                if (result.getLatitude() != null) {
+                    result.setDistance(
+                            AddressUtil.distance(
+                                    result.getLatitude(), requestDto.getLatitude(),
+                                    result.getLongitude(), requestDto.getLongitude()
+                            )
+                    );
+
+                }
+            }
+
+            roomsList.sort(Comparator.comparing(ReadRoomsListResponseDto::getDistance));
+        }
+
+        //TODO 좌표 검색에 대해 없으면 searchDistance를 늘려서 검색하도록 유도하는 방안 검토
+
+        return roomsList;
     }
 
     @Override
