@@ -184,11 +184,11 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
         if (searchDistance != null && latitude != null && longitude != null ) {
             //TODO 경도에 따른 거리계산이 잘 되고있지 않음 (좌우)
             return rooms.latitude.between(
-                    latitude - AddressUtil.kmToLatitude(searchDistance),
-                    latitude + AddressUtil.kmToLatitude(searchDistance)
+                    latitude - AddressUtil.calLatDiff(searchDistance),
+                    latitude + AddressUtil.calLatDiff(searchDistance)
             ).and(rooms.longitude.between(
-                    longitude - AddressUtil.kmToLongtitude(searchDistance),
-                    longitude + AddressUtil.kmToLongtitude(searchDistance)
+                    longitude - AddressUtil.calLongDiff(searchDistance, latitude),
+                    longitude + AddressUtil.calLongDiff(searchDistance, latitude)
             ));
         }
 

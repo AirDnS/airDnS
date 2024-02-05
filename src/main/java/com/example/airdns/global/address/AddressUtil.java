@@ -30,19 +30,11 @@ public class AddressUtil {
         return(c * r);
     }
 
-    public static double latitudeToKm(double lat) {
-        return 111.111 * lat;
-    }
-
-    public static double longitudeToKm(double lon) {
-        return 111.111 * Math.cos(lon);
-    }
-
-    public static double kmToLatitude(double dis) {
+    public static double calLatDiff(double dis) {
         return 0.009 * dis;
     }
 
-    public static double kmToLongtitude(double dis) {
-        return Math.acos(0.009 * dis);
+    public static double calLongDiff(double dis, double latitude) {
+        return 0.009 * dis / Math.cos(Math.toRadians(latitude));
     }
 }
