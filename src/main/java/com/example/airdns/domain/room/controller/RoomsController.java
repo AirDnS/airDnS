@@ -1,6 +1,7 @@
 package com.example.airdns.domain.room.controller;
 
 import com.example.airdns.domain.room.dto.RoomsRequestDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto;
 import com.example.airdns.domain.room.servicefacade.RoomsServiceFacade;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -39,7 +41,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "등록 권한 없음"),
             @ApiResponse(responseCode = "400", description = "입력된 장비 없음")
     })
-    public ResponseEntity createRooms(
+    public ResponseEntity<CommonResponse<RoomsResponseDto.ReadRoomsResponseDto>> createRooms(
             @RequestPart(value = "data") @Valid RoomsRequestDto.CreateRoomsRequestDto requestDto,
             @RequestPart(value = "files") List<MultipartFile> files,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -57,7 +59,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity readRooms(@Parameter(name = "roomsId", description = "방 ID") @PathVariable Long roomsId) {
+    public ResponseEntity<CommonResponse<RoomsResponseDto.ReadRoomsResponseDto>> readRooms(@Parameter(name = "roomsId", description = "방 ID") @PathVariable Long roomsId) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
                 "스터디 룸 정보 조회에 성공했습니다",
@@ -72,7 +74,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity readRoomsList(
+    public ResponseEntity<CommonResponse<List<RoomsResponseDto.ReadRoomsListResponseDto>>> readRoomsList(
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,
@@ -88,7 +90,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity readRoomsListByHost(
+    public ResponseEntity<CommonResponse<Page<RoomsResponseDto.ReadRoomsResponseDto>>> readRoomsListByHost(
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             @Valid RoomsRequestDto.ReadRoomsListByHostRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -106,7 +108,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity updateRooms(
+    public ResponseEntity<CommonResponse<RoomsResponseDto.ReadRoomsResponseDto>> updateRooms(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -127,7 +129,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity updateRoomsImage(
+    public ResponseEntity<CommonResponse<RoomsResponseDto.UpdateRoomsImagesResponseDto>> updateRoomsImage(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestPart(value = "data", required = false) RoomsRequestDto.UpdateRoomsImagesRequestDto requestDto,
             @RequestPart(value = "files", required = false) List<MultipartFile> files,
@@ -149,7 +151,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity updateRoomsIsClosed(
+    public ResponseEntity<CommonResponse> updateRoomsIsClosed(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody RoomsRequestDto.UpdateRoomsIsClosedRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -186,7 +188,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity ReadRoomsRestSchedule(
+    public ResponseEntity<CommonResponse<Page<RoomsResponseDto.ReadRoomsRestScheduleResponseDto>>> ReadRoomsRestSchedule(
             @PageableDefault(sort = "startTime") Pageable pageable,
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
