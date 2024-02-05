@@ -27,6 +27,8 @@ public class LikesServiceImplV1 implements LikesService {
         Integer roomLikeCount = room.getLikesList().size();
 
         return LikesResponseDto.ReadLikeResponseDto.builder()
+                .roomName(room.getName())
+                .ownerName(room.getUsers().getName())
                 .likeCount(roomLikeCount)
                 .build();
     }

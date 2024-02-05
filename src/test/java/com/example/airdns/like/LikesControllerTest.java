@@ -50,16 +50,33 @@ public class LikesControllerTest {
     void readRoomLikeSuccess() throws Exception{
         // given
         Long roomId = 1L;
-        LikesResponseDto.ReadLikeResponseDto responseDto = new LikesResponseDto.ReadLikeResponseDto(5); // 예상되는 응답 DTO
+        Users notLoginUser = Users.builder().id(1L).name("User Name").build();
 
-        when(likesService.readRoomLike(roomId)).thenReturn(responseDto);
+        UserDetailsImpl userDetails = new UserDetailsImpl(
+                Users.builder().name("User Name").role(UserRole.USER).build()
+        );
+
+        Rooms room = Rooms.builder().id(roomId).users(notLoginUser).build();
+
+        LikesResponseDto.ReadLikeResponseDto responseDto =
+                LikesResponseDto.ReadLikeResponseDto.builder()
+                        .ownerName(room.getUsers().getName())
+                        .roomName(room.getName())
+                        .likeCount(5)
+                        .build();
+
+        when(likesService.readRoomLike(room.getId())).thenReturn(responseDto);
 
         // when & then
         mockMvc.perform(get("/api/v1/rooms/{roomId}/likes", roomId)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
+                        .with(SecurityMockMvcRequestPostProcessors.user(userDetails))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("룸 좋아요 조회 성공"))
-                .andExpect(jsonPath("$.data.likeCount").value(5));
+                .andExpect(jsonPath("$.data.likeCount").value(5))
+                .andExpect(jsonPath("$.data.roomName").value(room.getName()))
+                .andExpect(jsonPath("$.data.ownerName").value(room.getUsers().getName()));
     }
 
     @Test

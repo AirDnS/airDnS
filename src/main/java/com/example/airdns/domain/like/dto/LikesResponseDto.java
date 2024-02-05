@@ -16,8 +16,10 @@ public class LikesResponseDto {
     @AllArgsConstructor
     @Schema(description = "좋아요 조회 응답 dto")
     public static class ReadLikeResponseDto {
-        @Schema(description = "좋아요 조회 응답 내용", defaultValue = "get like response")
+        @Schema(description = "좋아요 조회 응답 내용", defaultValue = "Read like response")
         private Integer likeCount;
+        private String roomName;
+        private String ownerName;
     }
     @Getter
     @Builder
@@ -25,7 +27,7 @@ public class LikesResponseDto {
     @AllArgsConstructor
     @Schema(description = "좋아요 추가 응답 dto")
     public static class CreateLikeResponseDto {
-        @Schema(description = "좋아요 추가 응답 내용", defaultValue = "add like response")
+        @Schema(description = "좋아요 추가 응답 내용", defaultValue = "Create like response")
         private String nickName;
         private String roomName;
     }
@@ -36,7 +38,7 @@ public class LikesResponseDto {
     @AllArgsConstructor
     @Schema(description = "좋아요 삭제 응답 dto")
     public static class DeleteLikeResponseDto {
-        @Schema(description = "좋아요 삭제 응답 내용", defaultValue = "delete like response")
+        @Schema(description = "좋아요 삭제 응답 내용", defaultValue = "Delete like response")
         private String nickName;
         private String roomName;
     }

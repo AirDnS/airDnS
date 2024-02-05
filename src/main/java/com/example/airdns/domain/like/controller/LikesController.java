@@ -6,6 +6,8 @@ import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "like", description = "Like API")
 @RequestMapping("/api/v1/rooms")
 public class LikesController {
 
@@ -34,6 +37,7 @@ public class LikesController {
     }
 
     @PostMapping("/{roomsId}/likes")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 성공"),
             @ApiResponse(responseCode = "400", description = "해당 사용자는 좋아요를 이미 눌렀습니다.")
@@ -48,11 +52,12 @@ public class LikesController {
         );
     }
 
+    @DeleteMapping("/{roomsId}/likes/{likeId}")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 취소 성공"),
             @ApiResponse(responseCode = "400", description = "해당 사용자가 좋아요를 누르지 않았습니다."),
     })
-    @DeleteMapping("/{roomsId}/likes/{likeId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> deleteLike(
             @PathVariable Long roomsId,
             @PathVariable Long likeId,
