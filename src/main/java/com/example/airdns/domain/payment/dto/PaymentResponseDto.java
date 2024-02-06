@@ -15,7 +15,7 @@ public class PaymentResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Create Payment response")
+    @Schema(description = "Create Payment Response")
     public static class CreatePaymentResponseDto implements Serializable {
 
         @Schema(description = "결제 id", example = "1")
@@ -49,7 +49,7 @@ public class PaymentResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Read Payment")
+    @Schema(description = "Read Payment Response")
     public static class ReadPaymentResponseDto implements Serializable {
 
 
