@@ -15,7 +15,7 @@ public class PaymentResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(description = "Create Payment request")
+    @Schema(description = "Create Payment response")
     public static class CreatePaymentResponseDto implements Serializable {
 
         @Schema(description = "결제 id", example = "1")
