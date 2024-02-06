@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ import java.util.List;
 
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-//@Tag(name = "Rooms", description = "Rooms API")
+@Tag(name = "공부방", description = "방 API")
 @RestController
 public class RoomsController {
 
@@ -169,7 +170,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity deleteRooms(
+    public ResponseEntity<CommonResponse> deleteRooms(
             @Parameter(name = "roomsId", description = "방 ID")
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -206,7 +207,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity CreateRoomsRestSchedule(
+    public ResponseEntity<CommonResponse> CreateRoomsRestSchedule(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @RequestBody @Valid RoomsRequestDto.CreateRoomsRestScheduleRequestDto requestDto,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -224,7 +225,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity DeleteRoomsRestSchedule(
+    public ResponseEntity<CommonResponse> DeleteRoomsRestSchedule(
             @Parameter(name = "roomsId", description = "방 ID") @PathVariable("roomsId") Long roomsId,
             @Parameter(name = "restscheduleId", description = "휴무 ID") @PathVariable("restscheduleId") Long restscheduleId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
