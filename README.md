@@ -35,7 +35,7 @@
 ![스크린샷 2024-01-31 오후 3 28 47](https://github.com/AirDnS/airDnS-back/assets/62927374/f6c85efb-96db-4021-b29b-cea7fb8a3e76)
 
 ### 4️⃣ 조회
-![스크린샷 2024-01-31 오후 3 26 42](https://github.com/AirDnS/airDnS-back/assets/62927374/bd7eb88e-81c2-46de-8ea7-80a3e8ff9570)
+![AirDnS 회원조회](https://github.com/AirDnS/airDnS-back/assets/147155601/a228aed7-54f1-4f79-bd4f-86defd36f54d)
 
 
 ## 📋 ERD
