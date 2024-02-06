@@ -31,7 +31,7 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          SPRING_PROFILES_ACTIVE=prod ./gradlew clean build -x test
+          ./gradlew clean build -x test
 
       - name: Docker build & push to docker repo
         run: |
