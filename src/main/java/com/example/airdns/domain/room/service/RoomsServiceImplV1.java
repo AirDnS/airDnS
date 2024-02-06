@@ -1,19 +1,13 @@
 package com.example.airdns.domain.room.service;
 
 import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
-import com.example.airdns.domain.payment.service.PaymentService;
-import com.example.airdns.domain.payment.service.PaymentServiceImplV1;
-import com.example.airdns.domain.reservation.service.ReservationService;
-import com.example.airdns.domain.reservation.service.ReservationServiceImplV1;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
-import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListContentDto;
 import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
 import com.example.airdns.domain.room.repository.RoomsRepository;
-import com.example.airdns.domain.room.repository.RoomsRepositoryQuery;
-import com.example.airdns.domain.room.repository.RoomsRepositoryQueryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -61,7 +55,7 @@ public class RoomsServiceImplV1 implements RoomsService {
                 .orElseThrow(() -> new RoomsCustomException(RoomsExceptionCode.INVALID_ROOMS_ID));
     }
     @Override
-    public List<ReadRoomsListResponseDto> findAllSearchFilter(RoomsSearchConditionDto condition) {
+    public List<ReadRoomsListContentDto> findAllSearchFilter(RoomsSearchConditionDto condition) {
         return roomsRepository.findAllSearchFilter(condition);
     }
 

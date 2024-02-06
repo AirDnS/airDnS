@@ -10,10 +10,10 @@ import com.example.airdns.domain.restschedule.service.RestScheduleService;
 import com.example.airdns.domain.room.converter.RoomsConverter;
 import com.example.airdns.domain.room.dto.RoomsRequestDto.*;
 import com.example.airdns.domain.room.dto.RoomsResponseDto;
-import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListContentDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsResponseDto;
 import com.example.airdns.domain.room.dto.RoomsResponseDto.UpdateRoomsImagesResponseDto;
-import com.example.airdns.domain.room.dto.RoomsSearchConditionDto;
+import com.example.airdns.domain.room.dto.RoomsResponseDto.ReadRoomsListResponseDto;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.exception.RoomsCustomException;
 import com.example.airdns.domain.room.exception.RoomsExceptionCode;
@@ -72,20 +72,40 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
     }
 
     @Override
-    public List<ReadRoomsListResponseDto> readRoomsList(
+    public ReadRoomsListResponseDto readRoomsList(
             ReadRoomsListRequestDto requestDto) {
 
-        RoomsSearchConditionDto roomsSearchConditionDto = RoomsConverter.toRoomsSearchCondition(requestDto);
+        Integer searchLevel = requestDto.getSearchLevel();
 
-        List<ReadRoomsListResponseDto> roomsList = roomsService.findAllSearchFilter(roomsSearchConditionDto);
+        List<ReadRoomsListContentDto> roomsList;
+        if (searchLevel != null) {
+            Double searchDistance = Math.pow(2, searchLevel - 7) * 10;
+            searchDistance = searchDistance < 100 ? searchDistance : 100.0;
+
+            roomsList = roomsService.findAllSearchFilter(
+                    RoomsConverter.toRoomsSearchCondition(requestDto, searchDistance));
+
+            // 데이터가 나올때까지 검색
+            while (roomsList.isEmpty() && searchDistance < 100) {
+                searchDistance *= 2;
+                searchLevel++;
+
+                roomsList = roomsService.findAllSearchFilter(
+                        RoomsConverter.toRoomsSearchCondition(requestDto, searchDistance));
+            }
+
+        } else {
+            roomsList = roomsService.findAllSearchFilter(
+                    RoomsConverter.toRoomsSearchCondition(requestDto));
+        }
 
         List<Long> roomsIdList = roomsList.stream()
-                .map(RoomsResponseDto.ReadRoomsListResponseDto::getRoomsId)
+                .map(ReadRoomsListContentDto::getRoomsId)
                 .toList();
 
         Map<Long, List<String>> imagesMap = imagesService.findAllByRoomsId(roomsIdList);
 
-        for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsList) {
+        for (ReadRoomsListContentDto result : roomsList) {
             result.setImage(
                     imagesMap.get(result.getRoomsId()) != null
                             ? imagesMap.get(result.getRoomsId()).get(0)
@@ -93,10 +113,10 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
             );
         }
 
-        if (requestDto.getSearchDistance() != null
+        if (requestDto.getSearchLevel() != null
                 && requestDto.getLatitude() != null
                 && requestDto.getLongitude() != null) {
-            for (RoomsResponseDto.ReadRoomsListResponseDto result : roomsList) {
+            for (ReadRoomsListContentDto result : roomsList) {
                 if (result.getLatitude() != null) {
                     result.setDistance(
                             AddressUtil.distance(
@@ -108,12 +128,13 @@ public class RoomsServiceFacadeImplV1 implements RoomsServiceFacade {
                 }
             }
 
-            roomsList.sort(Comparator.comparing(ReadRoomsListResponseDto::getDistance));
+            roomsList.sort(Comparator.comparing(ReadRoomsListContentDto::getDistance));
         }
 
-        //TODO 좌표 검색에 대해 없으면 searchDistance를 늘려서 검색하도록 유도하는 방안 검토
-
-        return roomsList;
+        return RoomsResponseDto.ReadRoomsListResponseDto.builder()
+                .content(roomsList)
+                .searchLevel(searchLevel)
+                .build();
     }
 
     @Override

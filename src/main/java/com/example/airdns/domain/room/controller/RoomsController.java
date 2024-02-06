@@ -75,7 +75,7 @@ public class RoomsController {
             @ApiResponse(responseCode = "403", description = "권한 없음"),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 요청")
     })
-    public ResponseEntity<CommonResponse<List<RoomsResponseDto.ReadRoomsListResponseDto>>> readRoomsList(
+    public ResponseEntity<CommonResponse<RoomsResponseDto.ReadRoomsListResponseDto>> readRoomsList(
             @Valid RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(new CommonResponse<>(
                 HttpStatus.OK,

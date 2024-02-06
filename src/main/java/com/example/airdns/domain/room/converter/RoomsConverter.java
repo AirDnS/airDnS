@@ -86,10 +86,25 @@ public class RoomsConverter {
     }
 
     public static RoomsSearchConditionDto toRoomsSearchCondition(RoomsRequestDto.ReadRoomsListRequestDto requestDto) {
-        Double searchDistance = requestDto.getSearchDistance() != null
-                ? requestDto.getSearchDistance() < 100
-                    ? requestDto.getSearchDistance() : 100.0
-                : null;
+        return RoomsSearchConditionDto.builder()
+                .cursor(requestDto.getCursor())
+                .pageSize(
+                        // 페이지 사이즈 검색 수 제한
+                        requestDto.getPageSize() == null || requestDto.getPageSize() > 100
+                                ? 100 : requestDto.getPageSize()
+                )
+                .keyword(requestDto.getKeyword())
+                .startPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(0) : null)
+                .endPrice(requestDto.getPrice() != null ? requestDto.getPrice().get(1) : null)
+                .startSize(requestDto.getSize() != null ? requestDto.getSize().get(0) : null)
+                .endSize(requestDto.getSize() != null ? requestDto.getSize().get(1) : null)
+                .equpmentList(requestDto.getEquipment())
+                .build();
+    }
+
+    public static RoomsSearchConditionDto toRoomsSearchCondition(
+            RoomsRequestDto.ReadRoomsListRequestDto requestDto,
+            Double searchDistance) {
 
         return RoomsSearchConditionDto.builder()
                 .cursor(requestDto.getCursor())

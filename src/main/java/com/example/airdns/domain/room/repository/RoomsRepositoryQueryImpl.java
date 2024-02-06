@@ -41,10 +41,10 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<RoomsResponseDto.ReadRoomsListResponseDto> findAllSearchFilter(
+    public List<RoomsResponseDto.ReadRoomsListContentDto> findAllSearchFilter(
             RoomsSearchConditionDto condition) {
-        JPAQuery<RoomsResponseDto.ReadRoomsListResponseDto> query = queryFactory.select(
-                Projections.fields(RoomsResponseDto.ReadRoomsListResponseDto.class,
+        JPAQuery<RoomsResponseDto.ReadRoomsListContentDto> query = queryFactory.select(
+                Projections.fields(RoomsResponseDto.ReadRoomsListContentDto.class,
                         rooms.id.as("roomsId"),
                         rooms.name,
                         rooms.price,
@@ -73,7 +73,7 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                     rooms.isClosed.isFalse()
             );
 
-        List<RoomsResponseDto.ReadRoomsListResponseDto> roomsResult;
+        List<RoomsResponseDto.ReadRoomsListContentDto> roomsResult;
         if (condition.getSearchDistance() == null) {
             roomsResult = query
                     .orderBy(rooms.id.desc())
@@ -182,7 +182,6 @@ public class RoomsRepositoryQueryImpl extends QuerydslRepositorySupport implemen
                                            Double longitude,
                                            Double searchDistance) {
         if (searchDistance != null && latitude != null && longitude != null ) {
-            //TODO 경도에 따른 거리계산이 잘 되고있지 않음 (좌우)
             return rooms.latitude.between(
                     latitude - AddressUtil.calLatDiff(searchDistance),
                     latitude + AddressUtil.calLatDiff(searchDistance)
