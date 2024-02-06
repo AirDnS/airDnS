@@ -14,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "like", description = "Like API")
@@ -46,18 +44,17 @@ public class LikesController {
             @PathVariable Long roomsId,
             @AuthenticationPrincipal UserDetailsImpl userDetails){
         LikesResponseDto.CreateLikeResponseDto responseDto = likesService.createLike(roomsId, userDetails.getUser());
-        // ok
         return ResponseEntity.status(HttpStatus.OK).body(
                 new CommonResponse<>(HttpStatus.OK, "룸 좋아요 성공", responseDto)
         );
     }
 
     @DeleteMapping("/{roomsId}/likes/{likeId}")
+    @SecurityRequirement(name = "Bearer Authentication")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 좋아요 취소 성공"),
             @ApiResponse(responseCode = "400", description = "해당 사용자가 좋아요를 누르지 않았습니다."),
     })
-    @SecurityRequirement(name = "Bearer Authentication")
     public ResponseEntity<CommonResponse<LikesResponseDto.DeleteLikeResponseDto>> deleteLike(
             @PathVariable Long roomsId,
             @PathVariable Long likeId,

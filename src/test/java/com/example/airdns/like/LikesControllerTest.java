@@ -92,8 +92,12 @@ public class LikesControllerTest {
 
         Rooms.builder().id(roomId).users(userDetails.getUser()).name("Room Name").build();
 
-        LikesResponseDto.CreateLikeResponseDto responseDto
-                = new LikesResponseDto.CreateLikeResponseDto("testUser","Room Name"); // Assuming '10' is the new like count
+        LikesResponseDto.CreateLikeResponseDto responseDto =
+                LikesResponseDto.CreateLikeResponseDto.builder()
+                        .roomName("testUser")
+                        .roomName("Room Name")
+                        .userLiked(false)
+                        .build();
 
         when(likesService.createLike(eq(roomId), any())).thenReturn(responseDto);
 

@@ -8,6 +8,7 @@ import com.example.airdns.domain.like.repository.LikesRepository;
 import com.example.airdns.domain.room.entity.Rooms;
 import com.example.airdns.domain.room.service.RoomsService;
 import com.example.airdns.domain.user.entity.Users;
+import com.example.airdns.domain.user.service.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,18 +19,24 @@ public class LikesServiceImplV1 implements LikesService {
 
     private final LikesRepository likesRepository;
     private final RoomsService roomsService;
+    private final UsersService usersService;
 
     @Override
     @Transactional(readOnly = true)
     public LikesResponseDto.ReadLikeResponseDto readRoomLike(Long roomsId){
+
         Rooms room = roomsService.findById(roomsId);
+        Users user = usersService.findById(room.getUsers().getId());
+        Boolean userLiked = likesRepository.existsByRoomsAndUsers(room, user);
 
         Integer roomLikeCount = room.getLikesList().size();
+        room.addLikeCount(roomLikeCount);
 
         return LikesResponseDto.ReadLikeResponseDto.builder()
                 .roomName(room.getName())
-                .ownerName(room.getUsers().getName())
+                .ownerName(room.getUsers().getNickname())
                 .likeCount(roomLikeCount)
+                .userLiked(userLiked)
                 .build();
     }
 
@@ -53,6 +60,7 @@ public class LikesServiceImplV1 implements LikesService {
         return LikesResponseDto.CreateLikeResponseDto.builder()
                 .roomName(room.getName())
                 .nickName(user.getNickname())
+                .userLiked(true)
                 .build();
     }
 
