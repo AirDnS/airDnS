@@ -33,7 +33,14 @@ public enum ReservationExceptionCode {
     BAD_REQUEST_RESERVATION_NOT_RESERVE(
             HttpStatus.BAD_REQUEST,
             "Reservation-005",
-            "해당 시간에 이미 예약이 있습니다.");
+            "해당 시간에 이미 예약이 있습니다."),
+
+    /* 423 - Lock */
+
+    LOCKED_REDISSON(
+            HttpStatus.LOCKED,
+            "Reservation-006",
+            "Lock 획득 실패");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

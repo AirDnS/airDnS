@@ -41,7 +41,6 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
     private final RestScheduleService restScheduleService;
     private final PaymentService paymentService;
     private final DeleteInfoService deleteInfoService;
-
     private final RedissonClient redissonClient;
 
 
@@ -55,7 +54,7 @@ public class ReservationServiceFacadeImplV1 implements ReservationServiceFacade 
         try {
             boolean available = lock.tryLock(10, 5, TimeUnit.SECONDS);
             if(!available) {
-                System.out.println("lock 획득 실패");
+                throw new ReservationCustomException(ReservationExceptionCode.LOCKED_REDISSON);
             }
 
             Users users = usersService.findById(userId);

@@ -25,13 +25,13 @@ jobs:
         run: |
           cd ./src/main/resources
           touch ./application.yml
-          echo "${{ secrets.PROPERTIES }}" > ./application.yml
+          echo "${{ secrets.PROPERTIES }}" > ./application-prod.yml
         shell: bash
 
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
+          SPRING_PROFILES_ACTIVE=prod ./gradlew clean build -x test
 
       - name: Docker build & push to docker repo
         run: |
