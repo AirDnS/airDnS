@@ -55,11 +55,23 @@ public class RoomsResponseDto {
     }
 
     @Getter
-    @Setter
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
     public static class ReadRoomsListResponseDto {
+        @Schema(description = "방 조회 목록")
+        private List<ReadRoomsListContentDto> content;
+
+        @Schema(description = "지도 검색 범위", example = "4")
+        private Integer searchLevel;
+    }
+
+    @Getter
+    @Setter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ReadRoomsListContentDto {
         @Schema(description = "방 ID", example = "5")
         private Long roomsId;
 

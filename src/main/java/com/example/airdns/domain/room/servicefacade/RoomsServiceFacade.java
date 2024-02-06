@@ -35,7 +35,7 @@ public interface RoomsServiceFacade {
      * @param requestDto 검색 조건
      * @return 방 리스트 데이터
      */
-    List<ReadRoomsListResponseDto> readRoomsList(ReadRoomsListRequestDto requestDto);
+    ReadRoomsListResponseDto readRoomsList(ReadRoomsListRequestDto requestDto);
 
     /**
      * 직접 등록한 스터디 룸 전체 조회

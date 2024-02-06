@@ -47,7 +47,7 @@ public interface RoomsService {
      * @param roomsSearchCondition 방 조회 조건
      * @return 방 조회 데이터
      */
-    List<ReadRoomsListResponseDto> findAllSearchFilter(RoomsSearchConditionDto roomsSearchCondition);
+    List<ReadRoomsListContentDto> findAllSearchFilter(RoomsSearchConditionDto roomsSearchCondition);
 
     /**
      * 등록한 방 검색

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface RoomsRepositoryQuery {
-    List<RoomsResponseDto.ReadRoomsListResponseDto> findAllSearchFilter(
+    List<RoomsResponseDto.ReadRoomsListContentDto> findAllSearchFilter(
             RoomsSearchConditionDto condition);
 
     Page<RoomsResponseDto.ReadRoomsResponseDto> findAllByHost(
