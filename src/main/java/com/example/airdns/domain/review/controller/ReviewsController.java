@@ -5,6 +5,7 @@ import com.example.airdns.domain.review.dto.ReviewsResponseDto;
 import com.example.airdns.domain.review.service.ReviewsService;
 import com.example.airdns.global.common.dto.CommonResponse;
 import com.example.airdns.global.security.UserDetailsImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -25,6 +26,7 @@ public class ReviewsController {
     private final ReviewsService reviewsService;
 
     @GetMapping("/{roomsId}/review")
+    @Operation(summary = "리뷰 조회", description = "해당 방에 대해 리뷰를 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 전체 조회 성공"),
     })
@@ -38,6 +40,7 @@ public class ReviewsController {
 
     @PostMapping("/{roomsId}/review")
     @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "리뷰 생성", description = "해당 방에 대해 리뷰를 작성한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "룸 리뷰 작성 성공"),
             @ApiResponse(responseCode = "400", description = "해당 방에 대한 리뷰가 이미 존재합니다."),
@@ -54,6 +57,7 @@ public class ReviewsController {
 
     @PatchMapping("/{roomsId}/review/{reviewId}")
     @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "리뷰 수정", description = "해당 방에 대해 리뷰를 수정한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 수정 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 수정할 권한이 없습니다."),
@@ -71,6 +75,7 @@ public class ReviewsController {
 
     @DeleteMapping("/{roomsId}/review/{reviewId}")
     @SecurityRequirement(name = "Bearer Authentication")
+    @Operation(summary = "리뷰 삭제", description = "해당 방에 대해 리뷰를 삭제한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "룸 리뷰 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "해당 방에 대한 리뷰를 삭제할 권한이 없습니다."),
