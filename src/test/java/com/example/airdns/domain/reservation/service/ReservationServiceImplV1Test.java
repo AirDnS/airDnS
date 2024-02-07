@@ -6,6 +6,7 @@ import com.example.airdns.domain.reservation.entity.Reservation;
 import com.example.airdns.domain.reservation.exception.ReservationCustomException;
 import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
+import com.example.airdns.domain.room.entity.Rooms;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -104,6 +106,34 @@ class ReservationServiceImplV1Test implements ReservationTest {
 
                 // then
                 Assertions.assertSame(TEST_RESERVATION, saveReservation);
+            }
+        }
+    }
+    @Nested
+    @DisplayName("예약 가능 여부 확인")
+    class 예약_가능_여부 {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class 성공_케이스 {
+
+            @Test
+            @DisplayName("예약이 있다")
+            void 예약이_있다() {
+
+                // given
+                given(reservationRepository
+                        .findFirstByRoomsAndIsCancelledFalseAndCheckInBeforeAndCheckOutAfter(
+                                TEST_ROOMS
+                                , TEST_CHECK_IN
+                                , TEST_CHECK_OUT).isPresent())
+                        .willReturn(true);
+
+                // when
+                Boolean isReserved = reservationService.isReserved(TEST_ROOMS, TEST_CHECK_IN, TEST_CHECK_OUT);
+
+                // then
+                Assertions.assertEquals(true, isReserved);
             }
         }
     }
