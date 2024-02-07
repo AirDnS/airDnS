@@ -66,6 +66,9 @@ public class Rooms extends CommonEntity {
     @JoinColumn(name = "users_id")
     private Users users;
 
+    @Column
+    private Integer likeCount;
+
     @Builder.Default
     @OneToMany(mappedBy = "rooms", cascade = CascadeType.PERSIST)
     private List<Reservation> reservationList = new ArrayList<>();
@@ -125,6 +128,9 @@ public class Rooms extends CommonEntity {
         reviewsList.add(review);
     }
 
+    public void addLikeCount(Integer likeCount){
+        this.likeCount = likeCount;
+    }
     public void addRestSchedule(RestSchedule restSchedule) {
         this.restScheduleList.add(restSchedule);
     }

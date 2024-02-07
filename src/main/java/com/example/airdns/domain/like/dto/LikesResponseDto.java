@@ -20,6 +20,7 @@ public class LikesResponseDto {
         private Integer likeCount;
         private String roomName;
         private String ownerName;
+        private boolean userLiked;
     }
     @Getter
     @Builder
@@ -30,6 +31,7 @@ public class LikesResponseDto {
         @Schema(description = "좋아요 추가 응답 내용", defaultValue = "Create like response")
         private String nickName;
         private String roomName;
+        private boolean userLiked;
     }
 
     @Getter
