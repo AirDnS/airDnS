@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
@@ -83,4 +84,27 @@ class ReservationServiceImplV1Test implements ReservationTest {
         }
     }
 
+    @Nested
+    @DisplayName("예약 생성")
+    class 예약_생성 {
+
+        @Nested
+        @DisplayName("성공 케이스")
+        class 성공_케이스 {
+
+            @Test
+            @DisplayName("예약 생성 성공")
+            void 성공() {
+                // given
+                given(reservationRepository.save(any(Reservation.class)))
+                        .willReturn(TEST_RESERVATION);
+
+                // when
+                Reservation saveReservation = reservationService.save(TEST_RESERVATION);
+
+                // then
+                Assertions.assertSame(TEST_RESERVATION, saveReservation);
+            }
+        }
+    }
 }
