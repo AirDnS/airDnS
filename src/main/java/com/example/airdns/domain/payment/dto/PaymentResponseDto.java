@@ -67,7 +67,6 @@ public class PaymentResponseDto {
 
         @Schema(description = "예약 번호", example = "1")
         private Long reservationId;
-
         public static ReadPaymentResponseDto from(Payment payment) {
             return ReadPaymentResponseDto.builder()
                     .id(payment.getId())
