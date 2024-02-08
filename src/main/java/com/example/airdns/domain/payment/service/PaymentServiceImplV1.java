@@ -111,7 +111,6 @@ public class PaymentServiceImplV1 implements PaymentService {
     private PaymentResponseDto.CreatePaymentResponseDto handleSuccessfulResponse(
             PaymentRequestDto.CreatePaymentRequestDto requestDto
             , Reservation reservation) {
-        // 성공 시 결제 정보 및 예약정보 저장
         Payment payment = Payment.builder()
                 .orderId(requestDto.getOrderId())
                 .orderName(requestDto.getOrderName())
@@ -144,7 +143,8 @@ public class PaymentServiceImplV1 implements PaymentService {
     @Override
     public PaymentResponseDto.ReadPaymentResponseDto readPayment(Long reservationId,
             Long paymentId) {
-        Payment payment = paymentRepository.findByReservationIdAndIdAndIsDeletedFalse(reservationId, paymentId)
+        Payment payment = paymentRepository.findByReservationIdAndIdAndIsDeletedFalse(reservationId,
+                        paymentId)
                 .orElseThrow(() -> new PaymentCustomException(
                         PaymentExceptionCode.NOT_FOUND_MATCHED_RESERVATION));
 
@@ -152,45 +152,45 @@ public class PaymentServiceImplV1 implements PaymentService {
     }
 
     @Override
-    public List<Long> findPaymentIdsByUserId(Long userId){
+    public List<Long> findPaymentIdsByUserId(Long userId) {
         return paymentRepository.findPaymentIdsByUserId(userId);
     }
 
     @Override
-    public void deleteByUserId(Long userId){
+    public void deleteByUserId(Long userId) {
         paymentRepository.deleteByUserId(userId);
     }
 
     @Override
     public void saveDeletedPaymentInfo(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(
-                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+                () -> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
         );
         deleteInfoService.saveDeletedPaymentInfo(payment);
     }
 
     @Override
-    public List<Long> findPaymentIdsByReservationIds(List<Long> reservationIds){
+    public List<Long> findPaymentIdsByReservationIds(List<Long> reservationIds) {
         return paymentRepository.findPaymentIdsByReservationIds(reservationIds);
     }
 
     @Override
-    public void deleteByRoomId(Long roomId){
+    public void deleteByRoomId(Long roomId) {
         paymentRepository.deleteByRoomId(roomId);
     }
 
     @Override
-    public void deleteByReservationId(Long reservationId){
+    public void deleteByReservationId(Long reservationId) {
         paymentRepository.deleteByReservationId(reservationId);
     }
 
     @Override
-    public List<Long> findPaymentIdsByReservationId(Long reservationId){
+    public List<Long> findPaymentIdsByReservationId(Long reservationId) {
         return paymentRepository.findPaymentIdsByReservationId(reservationId);
     }
 
     @Override
-    public void deletePayment(LocalDateTime deleteTime){
+    public void deletePayment(LocalDateTime deleteTime) {
         List<Long> paymentIds = paymentRepository.findPaymentIdsByDeleteTime(deleteTime);
 
         for (Long paymentId : paymentIds) {
@@ -202,9 +202,9 @@ public class PaymentServiceImplV1 implements PaymentService {
         }
     }
 
-    private void saveDeletePaymentInfo(Long paymentId){
+    private void saveDeletePaymentInfo(Long paymentId) {
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(
-                ()-> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
+                () -> new PaymentCustomException(PaymentExceptionCode.NOT_FOUND_PAYMENT)
         );
         deleteInfoService.saveDeletedPaymentInfo(payment);
     }
