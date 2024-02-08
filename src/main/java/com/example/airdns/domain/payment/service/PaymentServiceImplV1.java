@@ -1,19 +1,13 @@
 package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.deleteinfo.service.DeleteInfoService;
-import com.example.airdns.domain.deleteinfo.service.DeleteInfoServiceImpl;
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
 import com.example.airdns.domain.payment.entity.Payment;
-import com.example.airdns.domain.payment.entity.QPayment;
 import com.example.airdns.domain.payment.exception.PaymentCustomException;
 import com.example.airdns.domain.payment.exception.PaymentExceptionCode;
 import com.example.airdns.domain.payment.repository.PaymentRepository;
-import com.example.airdns.domain.payment.repository.PaymentRepositoryQuery;
-import com.example.airdns.domain.payment.repository.PaymentRepositoryQueryImpl;
 import com.example.airdns.domain.reservation.entity.Reservation;
-import com.example.airdns.domain.reservation.exception.ReservationCustomException;
-import com.example.airdns.domain.reservation.exception.ReservationExceptionCode;
 import com.example.airdns.domain.reservation.repository.ReservationRepository;
 import com.example.airdns.domain.reservation.service.ReservationService;
 import java.io.UnsupportedEncodingException;
@@ -22,9 +16,6 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
-import com.example.airdns.domain.room.entity.Rooms;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;

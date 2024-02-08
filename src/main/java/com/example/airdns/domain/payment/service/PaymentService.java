@@ -2,8 +2,6 @@ package com.example.airdns.domain.payment.service;
 
 import com.example.airdns.domain.payment.dto.PaymentRequestDto;
 import com.example.airdns.domain.payment.dto.PaymentResponseDto;
-import com.example.airdns.domain.payment.entity.QPayment;
-
 import java.time.LocalDateTime;
 import java.util.List;
 

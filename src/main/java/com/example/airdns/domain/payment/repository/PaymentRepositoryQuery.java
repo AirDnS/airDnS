@@ -1,7 +1,5 @@
 package com.example.airdns.domain.payment.repository;
 
-import com.example.airdns.domain.payment.entity.QPayment;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
