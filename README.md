@@ -78,6 +78,10 @@ Related to: #48, #45
 ```
 
 ## 📋 Directory 구조
+
+<details>
+    <summary>Directory 구조</summary>
+
 ``` markdown
 └─src
     ├─main
@@ -190,6 +194,8 @@ Related to: #48, #45
     │    
     └─test
 ```
+
+</details>
 
 
 ## 📋 Technical Decision
