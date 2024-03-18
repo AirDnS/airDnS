@@ -308,18 +308,6 @@ Related to: #48, #45
 
 
 </details>
-
-<details>
-<summary>kafka, elasticSearch 도입 고찰</summary>
-
-- 프로젝트의 기술적 다양성을 목표로 해당 사안에 대해 논의함
-- kafka는 분산스트리밍 플랫폼으로 "대량으로 들어오는 지속적이고 실시간 데이터를 분산처리"할 때 필요함
-- 현재 시스템에서 kafka는 너무 과도한 기술, 러닝 커브 완만함으로 구성원들이 적용하기 어려움
-- 메세지 큐를 사용하고 싶다면, 특정 부분에 AWS SQS 정도로 하기로 함
-- elasticSearch는 동일한 이유로 폐기 (과도함, 굳이 설명 같은 부분도 검색을 제공해야하는가?)
-
-</details>
-
 <details>
   <summary>반복되는 작업 공통화</summary>
 
